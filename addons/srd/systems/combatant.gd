@@ -1,6 +1,16 @@
 ## Bundles all per-character combat state into one object for the BattleSimulator.
 class_name Combatant
 extends RefCounted
+const _BOOT_SRD    = preload("res://vendor/godot-srd-addon/addons/srd/srd_enums.gd")
+const _BOOT_CSTATS = preload("res://vendor/godot-srd-addon/addons/srd/resources/character_stats.gd")
+const _BOOT_WPN    = preload("res://vendor/godot-srd-addon/addons/srd/resources/weapon_data.gd")
+const _BOOT_EQUIP  = preload("res://vendor/godot-srd-addon/addons/srd/systems/equipment.gd")
+const _BOOT_DEATH  = preload("res://vendor/godot-srd-addon/addons/srd/systems/death_saves.gd")
+const _BOOT_ACT    = preload("res://vendor/godot-srd-addon/addons/srd/systems/action_economy.gd")
+const _BOOT_COND   = preload("res://vendor/godot-srd-addon/addons/srd/systems/condition_tracker.gd")
+const _BOOT_ENERGY = preload("res://vendor/godot-srd-addon/addons/srd/resources/energy_slots.gd")
+const _BOOT_DMGRES = preload("res://vendor/godot-srd-addon/addons/srd/systems/damage_resolver.gd")
+const _BOOT_DICE   = preload("res://vendor/godot-srd-addon/addons/srd/dice.gd")
 
 var stats: CharacterStats
 var weapon: WeaponData

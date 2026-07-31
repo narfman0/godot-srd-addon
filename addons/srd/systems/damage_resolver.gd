@@ -1,6 +1,10 @@
 class_name DamageResolver
 extends RefCounted
 
+const _BOOT_SRD    = preload("res://vendor/godot-srd-addon/addons/srd/srd_enums.gd")
+const _BOOT_CSTATS = preload("res://vendor/godot-srd-addon/addons/srd/resources/character_stats.gd")
+
+
 ## Apply typed damage to a character, respecting resistance/immunity/vulnerability.
 ## Returns actual HP lost.
 static func apply(char: CharacterStats, amount: int,

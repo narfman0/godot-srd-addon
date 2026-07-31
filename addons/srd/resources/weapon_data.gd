@@ -1,5 +1,6 @@
 class_name WeaponData
 extends Resource
+const _BOOT_SRD = preload("res://vendor/godot-srd-addon/addons/srd/srd_enums.gd")
 
 @export var weapon_name: String = ""
 @export var weapon_type: SRD.WeaponType = SRD.WeaponType.SIMPLE

@@ -1,5 +1,7 @@
 class_name CharacterStats
 extends Resource
+const _BOOT_SRD   = preload("res://vendor/godot-srd-addon/addons/srd/srd_enums.gd")
+const _BOOT_RULES = preload("res://vendor/godot-srd-addon/addons/srd/rules_engine.gd")
 
 @export var character_name: String = ""
 @export var level: int = 1

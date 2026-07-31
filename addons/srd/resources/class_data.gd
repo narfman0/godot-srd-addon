@@ -1,5 +1,7 @@
 class_name ClassData
 extends Resource
+const _BOOT_SRD = preload("res://vendor/godot-srd-addon/addons/srd/srd_enums.gd")
+const _BOOT_ES  = preload("res://vendor/godot-srd-addon/addons/srd/resources/energy_slots.gd")
 
 @export var class_name_str: String = ""
 @export var hit_die: int = 8

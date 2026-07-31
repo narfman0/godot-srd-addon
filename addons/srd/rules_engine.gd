@@ -1,5 +1,6 @@
 class_name SRDRules
 extends RefCounted
+const _BOOT_SRD = preload("res://vendor/godot-srd-addon/addons/srd/srd_enums.gd")
 
 static func ability_modifier(score: int) -> int:
 	return floori((score - 10) / 2.0)

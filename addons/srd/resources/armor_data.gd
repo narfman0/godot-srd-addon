@@ -1,5 +1,6 @@
 class_name ArmorData
 extends Resource
+const _BOOT_SRD = preload("res://vendor/godot-srd-addon/addons/srd/srd_enums.gd")
 
 @export var armor_name: String = ""
 @export var armor_type: SRD.ArmorType = SRD.ArmorType.LIGHT
