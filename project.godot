@@ -1,0 +1,11 @@
+; Engine configuration file.
+; Generated for running GUT tests headlessly.
+
+[application]
+
+config/name="godot-srd-addon"
+config/features=PackedStringArray("4.3", "Forward Plus")
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gut/plugin.cfg", "res://addons/srd/plugin.cfg")

@@ -1,0 +1,3 @@
+.godot/
+*.import
+# addons/gut/  # managed as git submodule
