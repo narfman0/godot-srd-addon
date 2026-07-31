@@ -1,8 +1,6 @@
 class_name DamageResolver
 extends RefCounted
 
-const _BOOT_SRD    = preload("res://vendor/godot-srd-addon/addons/srd/srd_enums.gd")
-const _BOOT_CSTATS = preload("res://vendor/godot-srd-addon/addons/srd/resources/character_stats.gd")
 
 
 ## Apply typed damage to a character, respecting resistance/immunity/vulnerability.
@@ -57,7 +55,7 @@ static func _modify(char: CharacterStats, amount: int, damage_type: SRD.DamageTy
 	return amount
 
 static func _roll_weapon_damage(weapon, attacker: CharacterStats, crit: bool) -> int:
-	var total := weapon.roll_damage(attacker)
+	var total: int = weapon.roll_damage(attacker)
 	if crit:
 		# Crit: roll the damage dice an additional time (don't double modifiers)
 		total += weapon.roll_damage_dice_only()

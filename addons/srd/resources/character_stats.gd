@@ -1,7 +1,5 @@
 class_name CharacterStats
 extends Resource
-const _BOOT_SRD   = preload("res://vendor/godot-srd-addon/addons/srd/srd_enums.gd")
-const _BOOT_RULES = preload("res://vendor/godot-srd-addon/addons/srd/rules_engine.gd")
 
 @export var character_name: String = ""
 @export var level: int = 1
@@ -42,12 +40,10 @@ var xp: int = 0
 func _init() -> void:
 	reset()
 
-# Call after changing max_hp or level from code (not needed when loading a saved Resource).
+# Call after changing max_hp or level from code to restore full HP and hit dice.
 func reset() -> void:
-	if current_hp < 0:
-		current_hp = max_hp
-	if hit_dice_remaining < 0:
-		hit_dice_remaining = level
+	current_hp = max_hp
+	hit_dice_remaining = level
 
 # --- Ability scores ---
 

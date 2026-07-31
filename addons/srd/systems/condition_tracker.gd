@@ -1,6 +1,5 @@
 class_name ConditionTracker
 extends RefCounted
-const _BOOT_SRD = preload("res://vendor/godot-srd-addon/addons/srd/srd_enums.gd")
 
 # Bit mask — 1 bit per SRD.Condition value (15 values fit in an int)
 var _mask: int = 0

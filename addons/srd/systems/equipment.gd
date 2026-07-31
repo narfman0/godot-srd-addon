@@ -1,9 +1,5 @@
 class_name EquipmentSlots
 extends RefCounted
-const _BOOT_SRD    = preload("res://vendor/godot-srd-addon/addons/srd/srd_enums.gd")
-const _BOOT_CSTATS = preload("res://vendor/godot-srd-addon/addons/srd/resources/character_stats.gd")
-const _BOOT_ARMOR  = preload("res://vendor/godot-srd-addon/addons/srd/resources/armor_data.gd")
-const _BOOT_WEAPON = preload("res://vendor/godot-srd-addon/addons/srd/resources/weapon_data.gd")
 
 var armor: ArmorData = null
 var shield: ArmorData = null

@@ -108,7 +108,7 @@ func count_events(result: BattleResult, round_num: int, type: String) -> int:
 func _build_order(combatants: Array) -> Array:
 	var entries: Array = []
 	for c in combatants:
-		var dex := c.stats.get_ability(SRD.Ability.DEXTERITY)
+		var dex: int = c.stats.get_ability(SRD.Ability.DEXTERITY)
 		var mod := SRDRules.ability_modifier(dex)
 		var roll := _d20()
 		entries.append({ "combatant": c, "total": roll + mod, "dex": dex })
