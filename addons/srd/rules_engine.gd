@@ -31,3 +31,27 @@ static func saving_throw(d20_roll: int, ability_score: int, proficient: bool, pr
 static func passive_score(ability_score: int, proficient: bool, prof_bonus: int) -> int:
 	var mod := ability_modifier(ability_score)
 	return 10 + mod + (prof_bonus if proficient else 0)
+
+## Spell/ability save DC: 8 + proficiency bonus + casting ability modifier.
+static func spell_save_dc(casting_ability_score: int, prof_bonus: int) -> int:
+	return 8 + prof_bonus + ability_modifier(casting_ability_score)
+
+## DC for a concentration check when taking damage.
+static func concentration_check_dc(damage_taken: int) -> int:
+	return maxi(10, damage_taken / 2)
+
+## Cover bonus to AC and DEX saving throws.
+static func cover_ac_bonus(cover: SRD.Cover) -> int:
+	match cover:
+		SRD.Cover.HALF:          return 2
+		SRD.Cover.THREE_QUARTERS: return 5
+		SRD.Cover.FULL:          return 99  # can't be directly targeted
+	return 0
+
+## Advantage roll: roll twice, take higher.
+static func roll_with_advantage() -> int:
+	return Dice.roll_with_advantage(20)
+
+## Disadvantage roll: roll twice, take lower.
+static func roll_with_disadvantage() -> int:
+	return Dice.roll_with_disadvantage(20)
