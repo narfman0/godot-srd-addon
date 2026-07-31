@@ -12,7 +12,7 @@ func build(combatants: Array) -> void:
 	_current_index = 0
 	round_number = 1
 	for char in combatants:
-		var dex := char.get_ability(SRD.Ability.DEXTERITY)
+		var dex: int = char.get_ability(SRD.Ability.DEXTERITY)
 		var mod := SRDRules.ability_modifier(dex)
 		var roll := Dice.roll_d20()
 		_order.append({ "char": char, "roll": roll, "total": roll + mod })
@@ -21,8 +21,8 @@ func build(combatants: Array) -> void:
 	_order.sort_custom(func(a, b):
 		if a["total"] != b["total"]:
 			return a["total"] > b["total"]
-		var dex_a := a["char"].get_ability(SRD.Ability.DEXTERITY)
-		var dex_b := b["char"].get_ability(SRD.Ability.DEXTERITY)
+		var dex_a: int = a["char"].get_ability(SRD.Ability.DEXTERITY)
+		var dex_b: int = b["char"].get_ability(SRD.Ability.DEXTERITY)
 		if dex_a != dex_b:
 			return dex_a > dex_b
 		return randi() % 2 == 0
