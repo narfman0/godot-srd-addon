@@ -48,6 +48,50 @@ func average_damage(char: CharacterStats, two_handed: bool = false) -> float:
 	var count := versatile_die_count if two_handed and _is_versatile() else die_count
 	return count * (sides + 1) / 2.0 + _damage_mod(char)
 
+# --- Predefined SRD weapon presets ---
+
+static func _make(wname: String, wtype: SRD.WeaponType, dtype: SRD.DamageType,
+		count: int, sides: int, props: int = 0) -> WeaponData:
+	var w := WeaponData.new()
+	w.weapon_name = wname
+	w.weapon_type = wtype
+	w.damage_type = dtype
+	w.die_count = count
+	w.die_sides = sides
+	w.properties = props
+	return w
+
+static func make_dagger() -> WeaponData:
+	return _make("Dagger", SRD.WeaponType.SIMPLE, SRD.DamageType.PIERCING, 1, 4,
+		int(SRD.WeaponProperty.FINESSE) | int(SRD.WeaponProperty.LIGHT) | int(SRD.WeaponProperty.THROWN))
+
+static func make_mace() -> WeaponData:
+	return _make("Mace", SRD.WeaponType.SIMPLE, SRD.DamageType.BLUDGEONING, 1, 6)
+
+static func make_quarterstaff() -> WeaponData:
+	var w := _make("Quarterstaff", SRD.WeaponType.SIMPLE, SRD.DamageType.BLUDGEONING, 1, 6,
+		int(SRD.WeaponProperty.VERSATILE))
+	w.versatile_die_count = 1; w.versatile_die_sides = 8
+	return w
+
+static func make_longsword() -> WeaponData:
+	var w := _make("Longsword", SRD.WeaponType.MARTIAL, SRD.DamageType.SLASHING, 1, 8,
+		int(SRD.WeaponProperty.VERSATILE))
+	w.versatile_die_count = 1; w.versatile_die_sides = 10
+	return w
+
+static func make_greatsword() -> WeaponData:
+	return _make("Greatsword", SRD.WeaponType.MARTIAL, SRD.DamageType.SLASHING, 2, 6,
+		int(SRD.WeaponProperty.TWO_HANDED))
+
+static func make_rapier() -> WeaponData:
+	return _make("Rapier", SRD.WeaponType.MARTIAL, SRD.DamageType.PIERCING, 1, 8,
+		int(SRD.WeaponProperty.FINESSE))
+
+static func make_shortsword() -> WeaponData:
+	return _make("Shortsword", SRD.WeaponType.MARTIAL, SRD.DamageType.PIERCING, 1, 6,
+		int(SRD.WeaponProperty.FINESSE) | int(SRD.WeaponProperty.LIGHT))
+
 # --- Private ---
 
 func _attack_ability(char: CharacterStats) -> SRD.Ability:

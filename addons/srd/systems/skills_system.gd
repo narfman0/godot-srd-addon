@@ -23,9 +23,20 @@ const SKILL_ABILITY: Array[int] = [
 	SRD.Ability.WISDOM,       # SURVIVAL
 ]
 
+const SKILL_NAMES: Array[String] = [
+	"Acrobatics", "Animal Handling", "Arcana", "Athletics", "Deception",
+	"History", "Insight", "Intimidation", "Investigation", "Medicine",
+	"Nature", "Perception", "Performance", "Persuasion", "Religion",
+	"Sleight of Hand", "Stealth", "Survival",
+]
+
 ## Returns the ability that governs a given skill.
 static func governing_ability(skill: SRD.Skill) -> SRD.Ability:
 	return SKILL_ABILITY[int(skill)] as SRD.Ability
+
+## Display name for a skill.
+static func skill_name(skill: SRD.Skill) -> String:
+	return SKILL_NAMES[int(skill)]
 
 ## Returns the total bonus for a skill check (ability mod + proficiency if any).
 static func skill_bonus(char: CharacterStats, skill: SRD.Skill) -> int:

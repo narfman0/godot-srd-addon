@@ -10,6 +10,17 @@ enum Ability {
 	CHARISMA    = 5,
 }
 
+const ABILITY_NAMES: Array[String] = [
+	"Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma",
+]
+const ABILITY_ABBREV: Array[String] = ["STR", "DEX", "CON", "INT", "WIS", "CHA"]
+
+static func ability_name(ability: Ability) -> String:
+	return ABILITY_NAMES[int(ability)]
+
+static func ability_abbrev(ability: Ability) -> String:
+	return ABILITY_ABBREV[int(ability)]
+
 enum Condition {
 	BLINDED        = 0,
 	CHARMED        = 1,
