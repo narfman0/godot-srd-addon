@@ -48,6 +48,11 @@ static func cover_ac_bonus(cover: SRD.Cover) -> int:
 		SRD.Cover.FULL:          return 99  # can't be directly targeted
 	return 0
 
+## Passive check: 10 + full skill bonus (ability mod + proficiency if any).
+## Use for Perception doors, trap detection, hidden enemy awareness, etc.
+static func passive_check(char: CharacterStats, skill: SRD.Skill) -> int:
+	return 10 + SRDSkills.skill_bonus(char, skill)
+
 ## Advantage roll: roll twice, take higher.
 static func roll_with_advantage() -> int:
 	return Dice.roll_with_advantage(20)

@@ -4,6 +4,8 @@ extends RefCounted
 # Bit mask — 1 bit per SRD.Condition value (15 values fit in an int)
 var _mask: int = 0
 var exhaustion_level: int = 0
+# Timed conditions: condition_int → rounds_remaining (absent = permanent)
+var _timed: Dictionary = {}
 
 func add(condition: SRD.Condition) -> void:
 	_mask |= (1 << int(condition))
@@ -21,9 +23,33 @@ func remove(condition: SRD.Condition) -> void:
 func has(condition: SRD.Condition) -> bool:
 	return (_mask >> int(condition)) & 1 == 1
 
+## Add a condition that expires after a set number of rounds.
+## tick_round() must be called at the end of each round to advance timers.
+func add_timed(condition: SRD.Condition, rounds: int) -> void:
+	add(condition)
+	_timed[int(condition)] = rounds
+
+## How many rounds remain for a timed condition. Returns -1 if permanent or absent.
+func rounds_remaining(condition: SRD.Condition) -> int:
+	return _timed.get(int(condition), -1)
+
+## Call at the end of each round. Decrements all timed conditions and removes
+## any that have expired. Returns an Array of conditions that expired this tick.
+func tick_round() -> Array:
+	var expired: Array = []
+	for key: int in _timed.keys():
+		_timed[key] -= 1
+		if _timed[key] <= 0:
+			expired.append(key as SRD.Condition)
+	for cond: SRD.Condition in expired:
+		_timed.erase(int(cond))
+		remove(cond)
+	return expired
+
 func clear_all() -> void:
 	_mask = 0
 	exhaustion_level = 0
+	_timed.clear()
 
 func add_exhaustion() -> void:
 	exhaustion_level = mini(exhaustion_level + 1, 6)
