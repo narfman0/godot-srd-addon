@@ -11,6 +11,14 @@ var conditions: ConditionTracker
 var energy_slots: EnergySlots
 var is_proficient_with_weapon: bool = true
 
+# Flat modifiers layered on top of the SRD math by the host game (feats,
+# fighting styles, subclass passives). Defaults are no-ops; callers that
+# support expanded crit ranges compare their d20 against crit_threshold.
+var bonus_attack: int = 0
+var bonus_damage: int = 0
+var bonus_ac: int = 0
+var crit_threshold: int = 20
+
 # Monster special trait flags
 var has_undead_fortitude: bool = false
 var undead_fortitude_immune_to_radiant: bool = true
@@ -43,7 +51,7 @@ var current_hp: int:
 	get: return stats.current_hp
 
 var armor_class: int:
-	get: return equipment.current_ac(stats)
+	get: return equipment.current_ac(stats) + bonus_ac
 
 ## Apply damage and handle Undead Fortitude if applicable.
 ## Returns actual damage dealt.
@@ -66,15 +74,15 @@ func can_act() -> bool:
 ## Attack bonus with the equipped weapon. Unarmed: STR mod + proficiency.
 func attack_modifier() -> int:
 	if weapon == null:
-		return stats.ability_modifier(SRD.Ability.STRENGTH) + stats.proficiency_bonus()
-	return weapon.attack_bonus(stats, is_proficient_with_weapon)
+		return stats.ability_modifier(SRD.Ability.STRENGTH) + stats.proficiency_bonus() + bonus_attack
+	return weapon.attack_bonus(stats, is_proficient_with_weapon) + bonus_attack
 
 ## Roll damage with the equipped weapon; crits roll the dice an extra time.
 ## Unarmed strike: 1 + STR mod (minimum 1).
 func roll_damage(crit: bool = false) -> int:
 	if weapon == null:
-		return maxi(1, 1 + stats.ability_modifier(SRD.Ability.STRENGTH))
-	var dmg := weapon.roll_damage(stats)
+		return maxi(1, 1 + stats.ability_modifier(SRD.Ability.STRENGTH) + bonus_damage)
+	var dmg := weapon.roll_damage(stats) + bonus_damage
 	if crit:
 		dmg += weapon.roll_damage_dice_only()
-	return dmg
+	return maxi(1, dmg)
