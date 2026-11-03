@@ -56,6 +56,13 @@ func use_reaction() -> bool:
 	_has_reaction = false
 	return true
 
+## Dash action: spend the action to gain extra movement equal to speed.
+func dash() -> bool:
+	if not use_action():
+		return false
+	_movement_remaining += _speed
+	return true
+
 ## Returns false if there isn't enough movement left.
 func spend_movement(feet: int) -> bool:
 	if feet > _movement_remaining:

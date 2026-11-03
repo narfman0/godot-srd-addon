@@ -67,3 +67,10 @@ func test_apply_incapacitated_blocks_action():
 	ae.apply_incapacitated()
 	assert_false(ae.has_action)
 	assert_false(ae.has_bonus_action)
+
+func test_dash_adds_speed_and_uses_action():
+	var ae := ActionEconomy.new(30)
+	assert_true(ae.dash())
+	assert_eq(ae.movement_remaining, 60)
+	assert_false(ae.has_action)
+	assert_false(ae.dash())
