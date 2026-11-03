@@ -360,6 +360,7 @@ func test_pact_slots_match_the_class_table_every_level():
 
 func test_surprise_is_disadvantage_on_initiative():
 	var f := _fighter()  # DEX 12 (+1)
+	f.initiative_advantage = false  # the Champion's Remarkable Athlete would cancel it
 	var r := CombatOrder.roll(f, true, [17, 4])
 	assert_eq([r.d20, r.total, r.disadvantage], [4, 5, true])
 	var n := CombatOrder.roll(f, false, [17, 4])

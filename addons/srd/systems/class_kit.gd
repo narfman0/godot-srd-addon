@@ -19,12 +19,13 @@ const IMPLEMENTED := {
 	"weapon-mastery": true, "extra-attack": true, "two-extra-attacks": true,
 	"three-extra-attacks": true, "spellcasting": true, "ability-score-improvement": false,
 	# Fighter
-	"fighting-style": true, "second-wind": true, "action-surge": true, "tactical-mind": true,
-	"tactical-shift": true, "indomitable": true, "studied-attacks": true, "tactical-master": true,
+	"fighting-style": true, "second-wind": true, "action-surge": true, "tactical-shift": true, "indomitable": true, "studied-attacks": true,
 	"improved-critical": true, "superior-critical": true, "remarkable-athlete": true,
+	"additional-fighting-style": true,
 	# Rogue
 	"sneak-attack": true, "cunning-action": true, "steady-aim": true, "uncanny-dodge": true,
-	"evasion": true, "reliable-talent": true, "expertise": true,
+	"evasion": true, "reliable-talent": true, "expertise": true, "cunning-strike": true,
+	"improved-cunning-strike": true, "slippery-mind": true,
 	# Cleric
 	"divine-order": true, "channel-divinity": true, "disciple-of-life": true,
 	"preserve-life": true, "life-domain-spells": true, "blessed-healer": true,
@@ -32,8 +33,85 @@ const IMPLEMENTED := {
 	"sear-undead": true,
 	# Wizard
 	"arcane-recovery": true, "potent-cantrip": true, "empowered-evocation": true,
-	"sculpt-spells": true, "overchannel": true,
+	"sculpt-spells": true,
+	# Paladin
+	"lay-on-hands": true, "paladins-smite": true, "aura-of-protection": true,
+	"aura-of-courage": true, "radiant-strikes": true, "sacred-weapon": true,
+	"oath-of-devotion-spells": true, "aura-of-devotion": true,
+	# Monk
+	"martial-arts": true, "unarmored-defense": true, "monks-focus": true,
+	"unarmored-movement": true, "uncanny-metabolism": true, "deflect-attacks": true,
+	"stunning-strike": true, "empowered-strikes": true, "heightened-focus": true,
+	"disciplined-survivor": true, "perfect-focus": true,
+	"deflect-energy": true, "open-hand-technique": true, "wholeness-of-body": true,
+	# Ranger
+	"favored-enemy": true, "roving": true, "relentless-hunter": true,
+	"precise-hunter": true, "hunters-prey": true, "defensive-tactics": true,
+	# Bard
+	"bardic-inspiration": true, "font-of-inspiration": true, "magical-secrets": true,
+	"cutting-words": true, "magical-discoveries": true, "jack-of-all-trades": true,
+	# Druid
+	"primal-order": true, "elemental-fury": true, "improved-elemental-fury": true,
+	"wild-resurgence": true, "lands-aid": true, "natural-recovery": true, "natures-ward": true,
+	"circle-of-the-land-spells": true,
+	# Sorcerer
+	"innate-sorcery": true, "metamagic": true,
+	"sorcerous-restoration": true, "draconic-resilience": true,
+	"draconic-spells": true, "elemental-affinity": true,
+	# Warlock
+	"eldritch-invocations": true, "pact-magic": true, "magical-cunning": true,
+	"mystic-arcanum": true, "dark-ones-blessing": true, "fiend-spells": true,
+	"fiendish-resilience": true,
 }
+
+## Hotbar features a game can offer: ClassKit.feature_actions() lists the ones held now,
+## can_use() says if one is usable, use_feature() runs it. cost: "action" | "bonus" | "free";
+## target: "none" | "ally" | "enemy" | "area"; a resource and amount are spent on use.
+const FEATURE_ACTIONS := {
+	"steady_aim": {"needs": "steady-aim", "label": "Steady Aim", "glyph": "SA", "cost": "bonus",
+		"target": "none", "tip": "If you haven't moved: Advantage on your next attack; Speed 0 this turn."},
+	"preserve_life": {"needs": "preserve-life", "label": "Preserve Life", "glyph": "PL", "cost": "action",
+		"target": "none", "range": 30, "resource": "channel_divinity",
+		"tip": "Channel Divinity: split 5 x Cleric level HP among Bloodied allies within 30 ft, up to half their maximum."},
+	"lay_on_hands": {"needs": "lay-on-hands", "label": "Lay On Hands", "glyph": "LOH", "cost": "bonus",
+		"target": "ally", "range": 5, "resource": "lay_on_hands",
+		"tip": "Touch: restore HP from your pool (5 x Paladin level per Long Rest)."},
+	"sacred_weapon": {"needs": "sacred-weapon", "label": "Sacred Weapon", "glyph": "SW", "cost": "free",
+		"target": "none", "resource": "channel_divinity",
+		"tip": "Channel Divinity: add your CHA modifier to attack rolls with this weapon, and its hits may deal Radiant."},
+	"flurry_of_blows": {"needs": "monks-focus", "label": "Flurry of Blows", "glyph": "FoB", "cost": "bonus",
+		"target": "enemy", "range": 5, "resource": "focus_points",
+		"tip": "1 Focus Point: two Unarmed Strikes (three at Monk 10)."},
+	"bonus_unarmed": {"needs": "martial-arts", "label": "Unarmed Strike", "glyph": "US", "cost": "bonus",
+		"target": "enemy", "range": 5, "tip": "Martial Arts: one Unarmed Strike as a Bonus Action."},
+	"patient_defense": {"needs": "monks-focus", "label": "Patient Defense", "glyph": "PD", "cost": "bonus",
+		"target": "none", "tip": "Disengage free; 1 Focus Point also Dodges."},
+	"step_of_the_wind": {"needs": "monks-focus", "label": "Step of the Wind", "glyph": "SoW", "cost": "bonus",
+		"target": "none", "tip": "Dash free; 1 Focus Point also Disengages and doubles your jump."},
+	"wholeness_of_body": {"needs": "wholeness-of-body", "label": "Wholeness of Body", "glyph": "WoB", "cost": "bonus",
+		"target": "none", "resource": "wholeness_of_body", "tip": "Regain Martial Arts die + WIS modifier HP."},
+	"bardic_inspiration": {"needs": "bardic-inspiration", "label": "Bardic Inspiration", "glyph": "BI", "cost": "bonus",
+		"target": "ally", "range": 60, "resource": "bardic_inspiration",
+		"tip": "An ally gains your Bardic die: it adds to their next attack roll or save."},
+	"innate_sorcery": {"needs": "innate-sorcery", "label": "Innate Sorcery", "glyph": "IS", "cost": "bonus",
+		"target": "none", "resource": "innate_sorcery",
+		"tip": "1 minute: +1 to your spell save DC, Advantage on your spell attacks."},
+	"cs_poison": {"needs": "cunning-strike", "label": "Cunning: Poison", "glyph": "CSP", "cost": "free", "target": "none",
+		"tip": "Your next Sneak Attack forgoes 1d6: CON save or Poisoned."},
+	"cs_trip": {"needs": "cunning-strike", "label": "Cunning: Trip", "glyph": "CST", "cost": "free", "target": "none",
+		"tip": "Your next Sneak Attack forgoes 1d6: DEX save or Prone (Large or smaller)."},
+	"cs_withdraw": {"needs": "cunning-strike", "label": "Cunning: Withdraw", "glyph": "CSW", "cost": "free", "target": "none",
+		"tip": "Your next Sneak Attack forgoes 1d6: move half your Speed without provoking."},
+	"mm_quickened": {"needs": "metamagic", "label": "Quickened Spell", "glyph": "QS", "cost": "free", "target": "none",
+		"metamagic": "quickened", "points": 2, "tip": "2 Sorcery Points: your next Action spell costs a Bonus Action."},
+	"mm_empowered": {"needs": "metamagic", "label": "Empowered Spell", "glyph": "ES", "cost": "free", "target": "none",
+		"metamagic": "empowered", "points": 1, "tip": "1 Sorcery Point: reroll your lowest damage dice (up to your CHA modifier) on your next spell."},
+	"mm_careful": {"needs": "metamagic", "label": "Careful Spell", "glyph": "CaS", "cost": "free", "target": "none",
+		"metamagic": "careful", "points": 1, "tip": "1 Sorcery Point: allies in your next save spell auto-succeed and take no damage."},
+	"mm_distant": {"needs": "metamagic", "label": "Distant Spell", "glyph": "DS", "cost": "free", "target": "none",
+		"metamagic": "distant", "points": 1, "tip": "1 Sorcery Point: double the range of your next spell."},
+}
+
 
 var class_slug := ""
 var subclass_slug := ""
@@ -48,6 +126,10 @@ var options: Dictionary = {}
 var weapon_masteries: Array[String] = []
 ## Limited uses: name -> {max, current, short: "all" | "one" | "none"}
 var resources: Dictionary = {}
+## The Unarmed Strike a Monk swings for Flurry of Blows and the Martial Arts Bonus Action.
+var unarmed: WeaponData = null
+## Feats held (slugs): Alert, Savage Attacker, Skilled, Grappler, Ability Score Improvement.
+var feats: Array = []
 
 # ── Building ─────────────────────────────────────────────────────────────────
 
@@ -94,6 +176,351 @@ func short_rest() -> void:
 func long_rest() -> void:
 	for r in resources.values():
 		r.current = r.max
+	restored_this_day = false
+
+## Sorcerous Restoration: spent until the next Long Rest.
+var restored_this_day := false
+
+## Rest-time features: a Short Rest recovers these. Returns log lines.
+## SRD: Arcane Recovery, Natural Recovery (highest slots first, total levels up to half the
+## class level, none of level 6+), Sorcerous Restoration, Magical Cunning are the character's
+## choice at the table; here a helper picks the largest slots missing.
+func rest_recoveries(c: Combatant) -> Array:
+	var out := []
+	var budget := ceili(level / 2.0)
+	for feat: String in ["arcane-recovery", "natural-recovery"]:
+		var res := feat.replace("-", "_")
+		if has_feature(feat) and uses_left(res) > 0 and c.energy_slots != null:
+			var picks := _missing_slots(c, budget, 5)
+			if not picks.is_empty():
+				spend(res)
+				for sl in picks:
+					c.energy_slots.recover_slot(int(sl), 1)
+				out.append("%s recovers level %s slots." % [feat.capitalize().replace("-", " "),
+					", ".join(picks.map(func(p): return str(p)))])
+	if has_feature("sorcerous-restoration") and not restored_this_day and resources.has("sorcery_points"):
+		var r: Dictionary = resources.sorcery_points
+		var got := mini(level / 2, int(r.max) - int(r.current))
+		if got > 0:
+			r.current += got
+			restored_this_day = true
+			out.append("Sorcerous Restoration: %d Sorcery Points." % got)
+	if has_feature("magical-cunning") and uses_left("magical_cunning") > 0 and c.energy_slots != null:
+		var slots := c.energy_slots
+		for i in 9:
+			var missing := slots.slots_max[i] - slots.slots_remaining[i]
+			if missing > 0:
+				slots.recover_slot(i + 1, ceili(slots.slots_max[i] / 2.0))
+				spend("magical_cunning")
+				out.append("Magical Cunning recovers Pact slots.")
+				break
+	return out
+
+## Greedy: the highest missing slot levels whose total stays within the budget.
+func _missing_slots(c: Combatant, budget: int, max_level: int) -> Array:
+	var picks := []
+	var left := {}
+	for sl in range(max_level, 0, -1):
+		left[sl] = c.energy_slots.slots_max[sl - 1] - c.energy_slots.slots_remaining[sl - 1]
+	for sl in range(max_level, 0, -1):
+		while int(left[sl]) > 0 and budget >= sl:
+			picks.append(sl)
+			left[sl] -= 1
+			budget -= sl
+	return picks
+
+# ── Passive features ─────────────────────────────────────────────────────────
+
+## Fold always-on class features into a freshly built character: AC, Speed, HP, saves,
+## resources sized by an ability score, defenses. Called once by SRDContent.make_character.
+func finish(c: Combatant) -> void:
+	var s := c.stats
+	var eq := c.equipment
+	match class_slug:
+		"monk":
+			if has_feature("unarmored-defense"):
+				eq.unarmored_ability = SRD.Ability.WISDOM
+				eq.unarmored_no_shield = true
+			s.speed += int(str(table_row.get("unarmored_movement", "0")).trim_prefix("+").to_int())
+			add_resource("wholeness_of_body", maxi(1, s.ability_modifier(SRD.Ability.WISDOM)) if has_feature("wholeness-of-body") else 0)
+			add_resource("uncanny_metabolism", 1 if has_feature("uncanny-metabolism") else 0)
+			if has_feature("disciplined-survivor"):
+				for a in SRD.Ability.values():
+					s.set_save_proficiency(a as SRD.Ability, true)
+		"bard":
+			add_resource("bardic_inspiration", maxi(1, s.ability_modifier(SRD.Ability.CHARISMA)),
+				"all" if has_feature("font-of-inspiration") else "none")
+		"ranger":
+			add_resource("favored_enemy", int(table_row.get("favored_enemy", 0)))
+			if has_feature("roving"):
+				s.speed += 10
+		"sorcerer":
+			add_resource("innate_sorcery", 2)
+			if has_feature("draconic-resilience"):
+				s.max_hp += level
+				s.current_hp = s.max_hp
+				eq.unarmored_ability = SRD.Ability.CHARISMA
+			if has_feature("elemental-affinity"):
+				s.set_resistance(SRDContent.damage_type_from(str(options.get("elemental_affinity", "fire"))), true)
+		"warlock":
+			add_resource("magical_cunning", 1 if has_feature("magical-cunning") else 0)
+			if has_feature("fiendish-resilience"):
+				s.set_resistance(SRDContent.damage_type_from(str(options.get("fiendish_resilience", "fire"))), true)
+			if invocation("eldritch-mind"):
+				c.concentration_advantage = true
+		"rogue":
+			if has_feature("slippery-mind"):
+				s.set_save_proficiency(SRD.Ability.WISDOM, true)
+				s.set_save_proficiency(SRD.Ability.CHARISMA, true)
+		"paladin":
+			if has_feature("aura-of-courage") and not "frightened" in c.condition_immunities:
+				c.condition_immunities.append("frightened")
+			if has_feature("aura-of-devotion") and not "charmed" in c.condition_immunities:
+				c.condition_immunities.append("charmed")
+		"druid":
+			if has_feature("natures-ward"):
+				s.set_immunity(SRD.DamageType.POISON, true)
+				s.set_resistance(SRDContent.damage_type_from(str(options.get("natures_ward", "fire"))), true)
+				if not "poisoned" in c.condition_immunities:
+					c.condition_immunities.append("poisoned")
+			if has_feature("natural-recovery"):
+				add_resource("natural_recovery", 1)
+		"fighter":
+			if has_feature("remarkable-athlete"):
+				c.initiative_advantage = true
+	if has_feature("jack-of-all-trades"):
+		s.half_proficiency_unskilled = true
+	if "alert" in feats:
+		c.initiative_extra += s.proficiency_bonus()
+	adapt_weapon(c)
+
+## Monk weapons: Dexterous Attacks and the Martial Arts die. Called again on every weapon change.
+func adapt_weapon(c: Combatant) -> void:
+	if not has_feature("martial-arts"):
+		return
+	var die := SRDContent.parse_dice(str(table_row.get("martial_arts", "1d6")))
+	unarmed = WeaponData.new()
+	unarmed.weapon_name = "Unarmed Strike"
+	unarmed.slug = "unarmed-strike"
+	unarmed.weapon_type = SRD.WeaponType.SIMPLE
+	unarmed.die_count = 1
+	unarmed.die_sides = int(die.sides)
+	unarmed.damage_type = SRD.DamageType.FORCE if has_feature("empowered-strikes") else SRD.DamageType.BLUDGEONING
+	unarmed.properties = int(SRD.WeaponProperty.FINESSE)
+	if c.weapon == null:
+		c.weapon = unarmed
+		c.is_proficient_with_weapon = true
+		return
+	if c.equipment.armor != null or c.equipment.shield != null or c.weapon.is_ranged():
+		return
+	var monk_weapon := c.weapon.weapon_type == SRD.WeaponType.SIMPLE \
+		or c.weapon.has_property(SRD.WeaponProperty.LIGHT)
+	if monk_weapon:
+		c.weapon.properties |= int(SRD.WeaponProperty.FINESSE)
+		c.weapon.die_sides = maxi(c.weapon.die_sides, int(die.sides))
+
+func invocation(key: String) -> bool:
+	return "warlock-" + key in options.get("invocations", []) or key in options.get("invocations", [])
+
+# ── Hotbar features ──────────────────────────────────────────────────────────
+
+## FEATURE_ACTIONS entries this kit holds now: [{id, label, glyph, cost, target, range, tip}].
+func feature_actions() -> Array:
+	var out := []
+	for id: String in FEATURE_ACTIONS:
+		var f: Dictionary = FEATURE_ACTIONS[id]
+		if not has_feature(str(f.needs)):
+			continue
+		if f.has("metamagic") and not "sorcerer-%s-spell" % f.metamagic in options.get("metamagic", []):
+			continue
+		var row := f.duplicate()
+		row["id"] = id
+		out.append(row)
+	return out
+
+## [ok, reason]: is this feature usable now? (Action economy is the caller's job.)
+func can_use(id: String, c: Combatant) -> Array:
+	var f: Dictionary = FEATURE_ACTIONS.get(id, {})
+	if f.is_empty():
+		return [false, "Unknown feature"]
+	if f.has("resource") and uses_left(str(f.resource)) <= 0:
+		return [false, "No uses left"]
+	match id:
+		"steady_aim":
+			if c.action_economy.has_moved:
+				return [false, "You've already moved"]
+		"sacred_weapon":
+			if c.weapon == null or c.weapon.is_ranged():
+				return [false, "Needs a melee weapon"]
+			if c.effects.has_id("sacred-weapon"):
+				return [false, "Already active"]
+		"cs_poison", "cs_trip", "cs_withdraw":
+			if c.turn_flags.get("cunning_strike", []).size() >= (2 if has_feature("improved-cunning-strike") else 1):
+				return [false, "Already chosen this turn"]
+		"innate_sorcery":
+			if c.effects.has_id("innate-sorcery"):
+				return [false, "Already active"]
+	if f.has("metamagic"):
+		if uses_left("sorcery_points") < int(f.get("points", 1)):
+			return [false, "Not enough Sorcery Points"]
+		if c.turn_flags.get("metamagic", "") != "":
+			return [false, "Metamagic already set for this spell"]
+	return [true, ""]
+
+## Run a feature. Returns {used, text, healed?, attacks?, ...}; the caller checks the action
+## economy, applies space (attacks, movement) and logs `text`. target: Combatant or null.
+func use_feature(id: String, c: Combatant, target: Combatant = null) -> Dictionary:
+	var ok: Array = can_use(id, c)
+	if not ok[0]:
+		return {"used": false, "text": ok[1]}
+	var f: Dictionary = FEATURE_ACTIONS[id]
+	if f.has("resource"):
+		spend(str(f.resource))
+	match id:
+		"steady_aim":
+			c.effects.add({"id": "steady-aim", "type": "next_attack_advantage", "uses": 1,
+				"source": c.name, "expires": "end_of_turn", "of": c.name})
+			c.action_economy._movement_remaining = 0
+			return {"used": true, "text": "takes [b]Steady Aim[/b]: Advantage on the next attack."}
+		"lay_on_hands":
+			# The resource's one point was spent above: this settles the rest of the amount
+			var want := mini(target.stats.max_hp - target.current_hp, uses_left("lay_on_hands") + 1)
+			resources.lay_on_hands.current = int(resources.lay_on_hands.current) + 1 - want
+			return {"used": true, "heal": want, "text": "lays on hands: %d HP." % want}
+		"sacred_weapon":
+			var bonus := maxi(1, c.stats.ability_modifier(SRD.Ability.CHARISMA))
+			c.effects.add({"id": "sacred-weapon", "type": "attack_bonus", "amount": bonus, "source": c.name,
+				"expires": "start_of_turn", "of": c.name, "turns": 100})
+			return {"used": true, "text": "imbues the weapon: [b]Sacred Weapon[/b] (+%d to hit)." % bonus}
+		"flurry_of_blows":
+			return {"used": true, "attacks": 3 if has_feature("heightened-focus") else 2,
+				"flurry": true, "text": "unleashes a [b]Flurry of Blows[/b]."}
+		"bonus_unarmed":
+			return {"used": true, "attacks": 1, "text": "follows up with an Unarmed Strike."}
+		"patient_defense":
+			var focus := spend("focus_points")
+			var thp := 0
+			if focus and has_feature("heightened-focus"):
+				thp = Dice.roll_nd(2, int(unarmed.die_sides if unarmed else 6))
+				c.stats.add_temp_hp(thp)
+			return {"used": true, "disengage": true, "dodge": focus, "temp_hp": thp,
+				"text": "takes [b]Patient Defense[/b]%s." % (": Disengage and Dodge" if focus else ": Disengage")}
+		"step_of_the_wind":
+			var focus := spend("focus_points")
+			c.action_economy._movement_remaining += c.speed
+			return {"used": true, "disengage": focus, "text": "takes [b]Step of the Wind[/b]: Dash%s." % (" and Disengage" if focus else "")}
+		"wholeness_of_body":
+			var roll := Dice.roll(int(unarmed.die_sides if unarmed else 6))
+			var amount := maxi(1, roll + c.stats.ability_modifier(SRD.Ability.WISDOM))
+			return {"used": true, "self_heal": amount, "text": "draws on [b]Wholeness of Body[/b]."}
+		"bardic_inspiration":
+			var die := bardic_die()
+			target.effects.add({"id": "bardic-inspiration", "type": "bonus_die", "die": "1d%d" % die,
+				"applies": ["attack", "save"], "one_shot": true, "source": c.name,
+				"expires": "start_of_turn", "of": c.name, "turns": 100})
+			return {"used": true, "text": "inspires %s (d%d)." % [target.name, die]}
+		"innate_sorcery":
+			for type in ["spell_dc_bonus", "spell_attack_advantage"]:
+				c.effects.add({"id": "innate-sorcery", "type": type, "amount": 1, "source": c.name,
+					"expires": "start_of_turn", "of": c.name, "turns": 10})
+			return {"used": true, "text": "unleashes [b]Innate Sorcery[/b]."}
+		"cs_poison", "cs_trip", "cs_withdraw":
+			var picks: Array = c.turn_flags.get("cunning_strike", [])
+			picks.append(id.trim_prefix("cs_"))
+			c.turn_flags["cunning_strike"] = picks
+			return {"used": true, "text": "readies a Cunning Strike (%s)." % id.trim_prefix("cs_").capitalize()}
+	if f.has("metamagic"):
+		spend("sorcery_points", int(f.get("points", 1)))
+		c.turn_flags["metamagic"] = str(f.metamagic)
+		return {"used": true, "text": "shapes the next spell: [b]%s[/b]." % f.label}
+	return {"used": true, "text": "uses %s." % f.label}
+
+## The Bardic Inspiration die's size at this level.
+func bardic_die() -> int:
+	return int(str(table_row.get("bardic_die", "D6")).trim_prefix("D").trim_prefix("d"))
+
+## Extra damage this hit deals from class features: [{name, dice, type}]. melee: the weapon
+## is a melee weapon. wounded: the target was already missing HP before this hit.
+func on_hit_extras(c: Combatant, melee: bool, wounded: bool, weapon_type: String) -> Array:
+	var out := []
+	if melee and has_feature("radiant-strikes"):
+		out.append({"name": "Radiant Strikes", "dice": "1d8", "type": "radiant"})
+	if has_feature("hunters-prey") and options.get("hunters_prey", "colossus-slayer") == "colossus-slayer" \
+			and wounded and not c.turn_flags.get("colossus_slayer", false):
+		c.turn_flags["colossus_slayer"] = true
+		out.append({"name": "Colossus Slayer", "dice": "1d8", "type": weapon_type})
+	if has_feature("elemental-fury") and options.get("elemental_fury", "potent-spellcasting") == "primal-strike" \
+			and not c.turn_flags.get("primal_strike", false):
+		c.turn_flags["primal_strike"] = true
+		out.append({"name": "Primal Strike", "dice": "2d8" if has_feature("improved-elemental-fury") else "1d8",
+			"type": str(options.get("primal_strike_type", "fire"))})
+	return out
+
+## Divine Smite (SRD 5.2.1 spell, on Paladin's Smite): radiant dice for a slot level.
+static func divine_smite_dice(slot_level: int, undead_or_fiend: bool) -> int:
+	return 1 + slot_level + (1 if undead_or_fiend else 0)
+
+## Deflect Attacks / Deflect Energy: how much damage the Reaction takes off (monk).
+func deflect_amount(c: Combatant) -> int:
+	return Dice.roll(10) + c.stats.ability_modifier(SRD.Ability.DEXTERITY) + level
+
+## Stunning Strike's DC / any Focus save: 8 + WIS + PB.
+func focus_dc(c: Combatant) -> int:
+	return 8 + c.stats.proficiency_bonus() + c.stats.ability_modifier(SRD.Ability.WISDOM)
+
+## Stunning Strike, on a hit. Costs 1 Focus Point, once per turn.
+func stunning_strike(c: Combatant, target: Combatant, fixed_d20: int = -1) -> Dictionary:
+	if not has_feature("stunning-strike") or c.turn_flags.get("stunning_strike", false) \
+			or not spend("focus_points"):
+		return {"used": false}
+	c.turn_flags["stunning_strike"] = true
+	var dc := focus_dc(c)
+	var d20 := fixed_d20 if fixed_d20 >= 1 else Dice.roll_d20()
+	var saved := d20 + target.stats.saving_throw_bonus(SRD.Ability.CONSTITUTION) + target.effects.roll_bonus("save") >= dc
+	if saved:
+		target.effects.add({"id": "stunning-strike-slow", "type": "speed_penalty", "amount": target.speed / 2,
+			"source": c.name, "expires": "start_of_turn", "of": c.name})
+		target.effects.add({"id": "stunning-strike-open", "type": "advantage_to_attackers", "uses": 1,
+			"source": c.name, "expires": "start_of_turn", "of": c.name})
+	elif not "stunned" in target.condition_immunities:
+		target.effects.add({"id": "stunning-strike", "type": "condition", "condition": "stunned",
+			"source": c.name, "expires": "start_of_turn", "of": c.name})
+	return {"used": true, "dc": dc, "d20": d20, "saved": saved}
+
+## Open Hand Technique, on a hit from Flurry of Blows: Topple (DEX save or Prone).
+func open_hand_topple(c: Combatant, target: Combatant, fixed_d20: int = -1) -> Dictionary:
+	var dc := focus_dc(c)
+	var d20 := fixed_d20 if fixed_d20 >= 1 else Dice.roll_d20()
+	var saved := d20 + target.stats.saving_throw_bonus(SRD.Ability.DEXTERITY) >= dc
+	if not saved and not "prone" in target.condition_immunities:
+		target.conditions.add(SRD.Condition.PRONE)
+	return {"dc": dc, "saved": saved}
+
+## Dark One's Blessing: Temporary HP on reducing an enemy to 0 HP.
+func on_kill(c: Combatant) -> int:
+	if not has_feature("dark-ones-blessing"):
+		return 0
+	var thp := maxi(1, c.stats.ability_modifier(SRD.Ability.CHARISMA) + level)
+	c.stats.add_temp_hp(thp)
+	return thp
+
+## Uncanny Metabolism (Monk 2): on Initiative, regain all Focus Points once per Long Rest.
+func initiative_rolled(c: Combatant) -> int:
+	if has_feature("perfect-focus") and uses_left("focus_points") < 4:
+		var r: Dictionary = resources.focus_points
+		r.current = mini(int(r.max), 4)
+	if uses_left("uncanny_metabolism") > 0 and uses_left("focus_points") == 0:
+		spend("uncanny_metabolism")
+		resources.focus_points.current = resources.focus_points.max
+		c.stats.heal(Dice.roll(int(unarmed.die_sides if unarmed else 6)) + level)
+		return 1
+	if has_feature("wild-resurgence") and uses_left("wild_shape") == 0 and c.energy_slots != null:
+		for i in 9:
+			if c.energy_slots.slots_remaining[i] > 0:
+				c.energy_slots.use_slot(i + 1)
+				resources.wild_shape.current = 1
+				return 1
+	return 0
 
 # ── Attacks ──────────────────────────────────────────────────────────────────
 
@@ -116,6 +543,11 @@ func can_use_mastery(weapon: WeaponData) -> bool:
 
 func fighting_style() -> String:
 	return str(options.get("fighting_style", "")) if has_feature("fighting-style") else ""
+
+## Champion's Additional Fighting Style adds a second one.
+func has_style(style: String) -> bool:
+	return fighting_style() == style or (has_feature("additional-fighting-style") \
+		and str(options.get("fighting_style_2", "")) == style)
 
 ## Sneak Attack dice from the Rogue table ("2d6" at level 3).
 func sneak_attack_dice() -> int:
@@ -303,6 +735,11 @@ func cantrip_damage_bonus(c: Combatant, ability: AbilityData) -> int:
 	if class_slug == "cleric" and has_feature("blessed-strikes") \
 			and options.get("blessed_strikes", "potent-spellcasting") == "potent-spellcasting":
 		bonus += c.stats.ability_modifier(SRD.Ability.WISDOM)
+	if class_slug == "druid" and has_feature("elemental-fury") \
+			and options.get("elemental_fury", "potent-spellcasting") == "potent-spellcasting":
+		bonus += c.stats.ability_modifier(SRD.Ability.WISDOM)
+	if class_slug == "warlock" and invocation("agonizing-blast"):
+		bonus += c.stats.ability_modifier(SRD.Ability.CHARISMA)
 	return bonus
 
 # ── Wizard ───────────────────────────────────────────────────────────────────

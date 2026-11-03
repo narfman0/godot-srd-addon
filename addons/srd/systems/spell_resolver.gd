@@ -150,7 +150,7 @@ func after_cast(_caster: Combatant, _ability: AbilityData,
 func _resolve_save_spell(caster: Combatant, ability: AbilityData,
 		target: Combatant, cast_at_level: int,
 		fixed_d20: int = -1, opts: Dictionary = {}) -> Dictionary:
-	var dc := ability.spell_save_dc(caster.stats)
+	var dc := ability.spell_save_dc(caster.stats) + caster.effects.total("spell_dc_bonus")
 	var saved := false
 	var auto := ""
 	if ability.immune_if.any(func(c): return c in target.condition_immunities):
@@ -205,6 +205,8 @@ func _resolve_attack_spell(caster: Combatant, ability: AbilityData,
 		fixed_d20: int = -1, opts: Dictionary = {}) -> Dictionary:
 	var ev := {}
 	var o := opts.duplicate()
+	if caster.effects.has_type("spell_attack_advantage"):
+		o["advantage"] = true  # Innate Sorcery
 	if fixed_d20 >= 1:
 		o["d20"] = fixed_d20
 	var ranged := ability.is_ranged_attack()
@@ -299,7 +301,7 @@ func _resolve_heal(caster: Combatant, ability: AbilityData, target: Combatant,
 		amount = count * ability.heal_die_sides
 	else:
 		amount = _roll_dice(count, ability.heal_die_sides, opts)
-	amount += ability.heal_bonus
+	amount += ability.heal_bonus + ability.upcast_heal_flat * maxi(0, level - ability.slot_level)
 	if ability.heal_add_modifier:
 		amount += caster.stats.ability_modifier(ability.casting_ability)
 	if caster.kit != null and ability.slot_level > 0:
@@ -363,6 +365,11 @@ func _apply_effects(caster: Combatant, ability: AbilityData, target: Combatant,
 			"condition":
 				if str(tmpl.condition) in target.condition_immunities:
 					continue
+			"temp_hp":  # False Life
+				var td := SRDContent.parse_dice(str(tmpl.dice))
+				target.stats.add_temp_hp(_roll_dice(int(td.count), int(td.sides), {}) + int(td.bonus))
+				applied.append("temp_hp")
+				continue
 		var e := SRDEffects.instantiate(tmpl, _effect_id(ability, tmpl), caster, target)
 		if ability.concentration:
 			e["concentration"] = caster.name
@@ -385,8 +392,13 @@ func _flat_damage(caster: Combatant, ability: AbilityData) -> int:
 	if ability.damage_add_modifier:
 		flat += caster.stats.ability_modifier(ability.casting_ability)
 	if caster.kit != null:
-		if ability.slot_level == 0 and "cleric" in ability.tags:
+		if ability.slot_level == 0 and caster.kit.class_slug in ability.tags:
 			flat += caster.kit.cantrip_damage_bonus(caster, ability)
+		# Elemental Affinity: Charisma modifier to one damage roll of a spell of the type
+		if caster.kit.has_feature("elemental-affinity") and not _empowered \
+				and SRDContent.damage_type_from(str(caster.kit.options.get("elemental_affinity", "fire"))) == ability.damage_type:
+			flat += caster.stats.ability_modifier(SRD.Ability.CHARISMA)
+			_empowered = _in_cast
 		# Empowered Evocation: Int modifier to one damage roll of the spell
 		if caster.kit.has_feature("empowered-evocation") and "evocation" in ability.tags \
 				and "wizard" in ability.tags and not _empowered:
@@ -411,7 +423,21 @@ func _spell_dice(caster: Combatant, ability: AbilityData, level: int, opts: Dict
 		var n := ability.upcasted_damage_dice(level) if level > ability.slot_level and ability.slot_level > 0 \
 			else ability.base_damage_dice(caster.stats.level)
 		return n * ((ability.damage_die_sides + 1) / 2)
+	if int(opts.get("empowered", 0)) > 0:
+		return _empowered_dice(ability, caster, level, int(opts.empowered))
 	return roll_damage(ability, caster.stats.level, level)
+
+## Empowered Spell: reroll up to `rerolls` of the lowest dice and take the new numbers.
+func _empowered_dice(ability: AbilityData, caster: Combatant, level: int, rerolls: int) -> int:
+	var n := ability.upcasted_damage_dice(level) if level > ability.slot_level and ability.slot_level > 0 \
+		else ability.base_damage_dice(caster.stats.level)
+	var dice := []
+	for i in n:
+		dice.append(Dice.roll(ability.damage_die_sides))
+	dice.sort()
+	for i in mini(rerolls, dice.size()):
+		dice[i] = Dice.roll(ability.damage_die_sides)
+	return dice.reduce(func(a, b): return a + b, 0)
 
 func _roll_dice(count: int, sides: int, opts: Dictionary) -> int:
 	if opts.get("average", false):

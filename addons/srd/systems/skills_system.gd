@@ -47,7 +47,7 @@ static func skill_bonus(char: CharacterStats, skill: SRD.Skill) -> int:
 		return mod + prof * 2
 	if char.is_skill_proficient(skill):
 		return mod + prof
-	return mod
+	return mod + (prof / 2 if char.half_proficiency_unskilled else 0)
 
 ## Passive score for a skill (10 + skill_bonus, advantage +5, disadvantage -5).
 static func passive_score(char: CharacterStats, skill: SRD.Skill,

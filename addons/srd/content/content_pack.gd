@@ -5,6 +5,8 @@ class_name SRDContentPack
 extends RefCounted
 
 const DEFAULT_DIR := "res://addons/srd/data/srd-5.2.1"
+## Hand-authored rules on top of the extraction (spell mechanics the extractor can't read).
+const AUTHORED_DIR := "res://addons/srd/data/authored"
 
 var meta: Dictionary = {}
 var _rows: Dictionary = {}  # kind -> { slug -> row }
@@ -14,6 +16,7 @@ var _rows: Dictionary = {}  # kind -> { slug -> row }
 static func load_default() -> SRDContentPack:
 	var pack := SRDContentPack.new()
 	pack.load_dir(DEFAULT_DIR)
+	pack.load_dir(AUTHORED_DIR)
 	return pack
 
 func load_dir(dir: String) -> void:

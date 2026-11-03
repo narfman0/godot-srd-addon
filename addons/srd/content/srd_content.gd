@@ -137,6 +137,10 @@ func make_character(char_name: String, class_slug: String, level: int, scores: A
 			if skill_from(k) >= 0 and s.is_skill_proficient(skill_from(k) as SRD.Skill):
 				s.set_skill_proficiency(skill_from(k) as SRD.Skill, true, true)
 
+	# Skilled and the like, and hit points beyond the class table (Tough-style boosts)
+	for k in options.get("extra_skills", []):
+		if skill_from(k) >= 0:
+			s.set_skill_proficiency(skill_from(k) as SRD.Skill, true)
 	var eq := EquipmentSlots.new()
 	if armor_slug != "":
 		eq.equip_armor(make_armor(armor_slug))
@@ -149,9 +153,12 @@ func make_character(char_name: String, class_slug: String, level: int, scores: A
 	var masteries: Array = options.get("weapon_masteries", [])
 	if masteries.is_empty() and weapon_slug != "":
 		masteries = [weapon_slug]
+	elif weapon_slug != "" and not weapon_slug in masteries:
+		masteries = [weapon_slug] + masteries  # the wielded weapon first
 	for m in masteries.slice(0, weapon_mastery_count(class_slug, level)):
 		kit.weapon_masteries.append(str(m))
 	c.kit = kit
+	kit.finish(c)
 	return c
 
 ## The ClassKit for a class at a level: features (class + subclass), the class table row,
@@ -172,6 +179,8 @@ func make_kit(class_slug: String, level: int, subclass: String = "", options: Di
 		kit.options.merge({"fighting_style": "defense"})  # "Defense is recommended"
 	if class_slug == "cleric":
 		kit.options.merge({"divine_order": "protector", "blessed_strikes": "potent-spellcasting"})
+	if class_slug in ["paladin", "ranger"]:
+		kit.options.merge({"fighting_style": "defense"})
 	var t := kit.table_row
 	match class_slug:
 		"fighter":
@@ -192,6 +201,11 @@ func make_kit(class_slug: String, level: int, subclass: String = "", options: Di
 			kit.add_resource("wild_shape", int(t.get("wild_shape", 0)), "one")
 	if class_slug == "paladin":
 		kit.add_resource("lay_on_hands", 5 * kit.level)
+		kit.add_resource("free_smite", 1 if kit.has_feature("paladins-smite") else 0)
+	for lvl in {11: 6, 13: 7, 15: 8, 17: 9}:
+		if class_slug == "warlock" and kit.level >= lvl:
+			kit.add_resource("arcanum_%d" % {11: 6, 13: 7, 15: 8, 17: 9}[lvl], 1)
+	kit.feats = options.get("feats", []).duplicate()
 	return kit
 
 # ── Class features ────────────────────────────────────────────────────────────
@@ -327,15 +341,30 @@ func make_armor(slug: String) -> ArmorData:
 
 ## True when extraction detected damage or healing for this spell.
 func spell_has_mechanics(slug: String) -> bool:
-	var mech: Dictionary = _require("spell", slug).get("data", {}).get("mechanics", {})
-	return mech.has("damage") or mech.has("healing")
+	_require("spell", slug)
+	var mech := _spell_mechanics(slug)
+	return mech.has("damage") or mech.has("healing") or mech.has("effects")
+
+## The extracted mechanics with the authored override on top (data/authored): its keys win;
+## "replace": true drops the extracted ones; "disabled": true marks a spell the engine can't
+## cast yet, so it stays visible but inert.
+func _spell_mechanics(slug: String) -> Dictionary:
+	var mech: Dictionary = pack.get_row("spell", slug).get("data", {}).get("mechanics", {})
+	var ov: Dictionary = pack.get_row("spell_override", slug).get("data", {})
+	if ov.is_empty():
+		return mech
+	if ov.get("disabled", false):
+		return {"disabled": true}
+	var out: Dictionary = {} if ov.get("replace", false) else mech.duplicate(true)
+	out.merge(ov.get("mechanics", {}), true)
+	return out
 
 func make_spell(slug: String, casting_ability: SRD.Ability = SRD.Ability.INTELLIGENCE) -> AbilityData:
 	var row := _require("spell", slug)
 	if row.is_empty():
 		return null
 	var d: Dictionary = row.data
-	var mech: Dictionary = d.get("mechanics", {})
+	var mech := _spell_mechanics(slug)
 	var ab := AbilityData.new()
 	ab.ability_name = row.name
 	ab.description = str(d.get("text", ""))
@@ -360,6 +389,7 @@ func make_spell(slug: String, casting_ability: SRD.Ability = SRD.Ability.INTELLI
 		ab.tags.append(str(cls))
 	var ct := str(d.get("casting_time", "Action"))
 	ab.casting_time = ct.split(",")[0].strip_edges().to_lower().replace(" ", "_")
+	ab.hostile = bool(mech.get("hostile", false))
 	ab.reaction_trigger = str(mech.get("reaction_trigger", ""))
 	ab.effects = mech.get("effects", []).duplicate(true)
 	ab.immune_if = mech.get("immune_if", []).duplicate()
@@ -380,6 +410,7 @@ func make_spell(slug: String, casting_ability: SRD.Ability = SRD.Ability.INTELLI
 		ab.heal_die_count = h.count
 		ab.heal_die_sides = h.sides
 		ab.heal_bonus = h.bonus
+		ab.upcast_heal_flat = int(mech.get("upcast_heal_flat", 0))
 		ab.heal_add_modifier = bool(mech.get("healing_add_modifier", false))
 		if mech.has("upcast_dice") and not mech.has("damage"):
 			ab.upcast_heal_die_count = parse_dice(mech.upcast_dice).count
@@ -445,6 +476,7 @@ func make_monster(slug: String, id: int = 0) -> Combatant:
 		if int(abilities[key].save) > int(abilities[key].mod):
 			s.set_save_proficiency(ab as SRD.Ability, true)
 	s.max_hp = int(d.get("hp", 1))
+	s.pb_override = int(d.get("proficiency_bonus", 0))
 	var hp_dice := parse_dice(str(d.get("hp_dice", "1d8")))
 	s.hit_die = maxi(hp_dice.sides, 4)
 	var spd: Dictionary = d.get("speed", {})
@@ -474,6 +506,13 @@ func make_monster(slug: String, id: int = 0) -> Combatant:
 		var rider := MonsterActions.parse_hit_rider(a)
 		if not rider.is_empty() and c.weapon != null and rider.name == c.weapon.weapon_name:
 			c.hit_riders.append(rider)
+		# A second damage type on the attack it swings ("plus 5 (2d4) Radiant damage")
+		var atk: Variant = a.get("attack")
+		if atk is Dictionary and c.weapon != null and a.get("name") == c.weapon.weapon_name:
+			for part in atk.get("damage", []).slice(1):
+				c.hit_riders.append({"name": str(a.name), "dice": str(part.dice), "type": str(part.type)})
+	c.monster_spells = MonsterSpells.parse(d.get("actions", []))
+	c.save_actions = MonsterSpells.parse_save_actions(d.get("actions", []))
 	var no_sleep := RegEx.create_from_string("can.t put (?:it|you) to sleep")
 	for t in d.get("traits", []):
 		if t.get("name", "") == "Undead Fortitude":

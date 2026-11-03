@@ -48,7 +48,9 @@ static func repeat_save(c: Combatant, e: Dictionary, fixed_d20: int = -1) -> Dic
 	var d20 := fixed_d20 if fixed_d20 >= 1 else Dice.roll_d20()
 	var total := d20 + c.stats.saving_throw_bonus(ability as SRD.Ability) + c.effects.roll_bonus("save")
 	var saved := total >= dc
-	if not saved:
+	if not saved and e.repeat_save.get("repeat", false):
+		c.effects.add(e.duplicate(true))  # still held: it holds until a save or Concentration ends
+	elif not saved:
 		var follow: Dictionary = e.repeat_save.get("on_fail", {}).duplicate(true)
 		follow["id"] = str(e.get("id", "")) + "-fail"
 		follow["source"] = e.get("source", "")

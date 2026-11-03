@@ -51,6 +51,8 @@ var casting_ability: SRD.Ability = SRD.Ability.INTELLIGENCE
 @export var heal_bonus: int = 0
 @export var heal_add_modifier: bool = false
 @export var upcast_heal_die_count: int = 0
+## Flat healing per slot level above the spell's (Heal: +10).
+@export var upcast_heal_flat: int = 0
 ## Darts and rays: each projectile rolls damage (and an attack roll unless auto_hit).
 @export var projectiles: int = 0
 @export var upcast_projectiles: int = 0
@@ -65,6 +67,11 @@ var effects: Array = []
 var immune_if: Array = []
 ## "melee" | "ranged" spell attack ("" = infer from range: beyond 5 ft. is ranged).
 @export var attack_kind: String = ""
+## Stat-block casters state their numbers: save DC (0 = compute) and attack bonus (-99 = compute).
+@export var fixed_save_dc: int = 0
+@export var fixed_attack_bonus: int = -99
+## A harmful spell with no save and no damage (Hunter's Mark, Hex): it targets foes.
+@export var hostile: bool = false
 ## Summoned force the caster keeps using (Spiritual Weapon): {repeat_as, move_feet, rounds}.
 var summon: Dictionary = {}
 
@@ -116,11 +123,15 @@ func roll_damage(caster_level: int = 1, cast_at_level: int = -1) -> int:
 
 ## Spell save DC for the caster (8 + prof + casting ability mod).
 func spell_save_dc(caster: CharacterStats) -> int:
-	return 8 + caster.proficiency_bonus() + caster.ability_modifier(casting_ability)
+	if fixed_save_dc > 0:
+		return fixed_save_dc
+	return 8 + caster.proficiency_bonus() + caster.ability_modifier(casting_ability) + caster.spell_dc_bonus
 
 ## Spell attack bonus (prof + casting ability mod).
 func spell_attack_bonus(caster: CharacterStats) -> int:
-	return caster.proficiency_bonus() + caster.ability_modifier(casting_ability)
+	if fixed_attack_bonus > -99:
+		return fixed_attack_bonus
+	return caster.proficiency_bonus() + caster.ability_modifier(casting_ability) + caster.spell_attack_mod
 
 # --- Private ---
 

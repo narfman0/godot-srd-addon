@@ -1,0 +1,524 @@
+[
+ {
+  "kind": "spell_override",
+  "slug": "hold-person",
+  "data": {
+   "mechanics": {
+    "save": "wis",
+    "effects": [
+     {
+      "on": "fail",
+      "type": "condition",
+      "condition": "paralyzed",
+      "expires": "end_of_turn",
+      "of": "target",
+      "turns": 1,
+      "repeat_save": {
+       "repeat": true
+      }
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "hold-monster",
+  "data": {
+   "mechanics": {
+    "save": "wis",
+    "effects": [
+     {
+      "on": "fail",
+      "type": "condition",
+      "condition": "paralyzed",
+      "expires": "end_of_turn",
+      "of": "target",
+      "turns": 1,
+      "repeat_save": {
+       "repeat": true
+      }
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "blindness-deafness",
+  "data": {
+   "mechanics": {
+    "save": "con",
+    "effects": [
+     {
+      "on": "fail",
+      "type": "condition",
+      "condition": "blinded",
+      "expires": "end_of_turn",
+      "of": "target",
+      "turns": 1,
+      "repeat_save": {
+       "repeat": true
+      }
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "fear",
+  "data": {
+   "mechanics": {
+    "save": "wis",
+    "area": {
+     "shape": "cone",
+     "size": 30
+    },
+    "effects": [
+     {
+      "on": "fail",
+      "type": "condition",
+      "condition": "frightened",
+      "expires": "end_of_turn",
+      "of": "target",
+      "turns": 1,
+      "repeat_save": {
+       "repeat": true
+      }
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "hypnotic-pattern",
+  "data": {
+   "mechanics": {
+    "save": "wis",
+    "area": {
+     "shape": "cube",
+     "size": 30
+    },
+    "effects": [
+     {
+      "on": "fail",
+      "type": "condition",
+      "condition": "incapacitated",
+      "ends_on_damage": true,
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 10
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "slow",
+  "data": {
+   "mechanics": {
+    "save": "wis",
+    "area": {
+     "shape": "cube",
+     "size": 40
+    },
+    "effects": [
+     {
+      "on": "fail",
+      "type": "speed_penalty",
+      "amount": 15,
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 10
+     },
+     {
+      "on": "fail",
+      "type": "ac_bonus",
+      "amount": -2,
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 10
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "haste",
+  "data": {
+   "mechanics": {
+    "effects": [
+     {
+      "on": "apply",
+      "type": "ac_bonus",
+      "amount": 2,
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 10
+     },
+     {
+      "on": "apply",
+      "type": "speed_penalty",
+      "amount": -30,
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 10
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "faerie-fire",
+  "data": {
+   "mechanics": {
+    "save": "dex",
+    "area": {
+     "shape": "cube",
+     "size": 20
+    },
+    "effects": [
+     {
+      "on": "fail",
+      "type": "advantage_to_attackers",
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 10
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "bane",
+  "data": {
+   "mechanics": {
+    "save": "cha",
+    "max_targets": 3,
+    "upcast_targets": 1,
+    "effects": [
+     {
+      "on": "fail",
+      "type": "penalty_die",
+      "die": "1d4",
+      "applies": [
+       "attack",
+       "save"
+      ],
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 10
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "confusion",
+  "data": {
+   "mechanics": {
+    "save": "wis",
+    "area": {
+     "shape": "sphere",
+     "size": 10
+    },
+    "effects": [
+     {
+      "on": "fail",
+      "type": "condition",
+      "condition": "incapacitated",
+      "expires": "end_of_turn",
+      "of": "target",
+      "turns": 1,
+      "repeat_save": {
+       "repeat": true
+      }
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "banishment",
+  "data": {
+   "mechanics": {
+    "save": "cha",
+    "effects": [
+     {
+      "on": "fail",
+      "type": "condition",
+      "condition": "incapacitated",
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 10
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "power-word-stun",
+  "data": {
+   "mechanics": {
+    "hostile": true,
+    "effects": [
+     {
+      "on": "apply",
+      "type": "condition",
+      "condition": "stunned",
+      "expires": "end_of_turn",
+      "of": "target",
+      "turns": 1,
+      "repeat_save": {
+       "repeat": true
+      },
+      "save_ability": "con"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "false-life",
+  "data": {
+   "mechanics": {
+    "effects": [
+     {
+      "on": "apply",
+      "self": true,
+      "type": "temp_hp",
+      "dice": "2d4+4"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "mage-armor",
+  "data": {
+   "mechanics": {
+    "effects": [
+     {
+      "on": "apply",
+      "type": "base_ac",
+      "amount": 13,
+      "expires": "",
+      "of": "target"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "barkskin",
+  "data": {
+   "mechanics": {
+    "effects": [
+     {
+      "on": "apply",
+      "type": "ac_floor",
+      "amount": 17,
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 600
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "stoneskin",
+  "data": {
+   "mechanics": {
+    "effects": [
+     {
+      "on": "apply",
+      "type": "resistance",
+      "damage": [
+       "bludgeoning",
+       "piercing",
+       "slashing"
+      ],
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 600
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "blur",
+  "data": {
+   "mechanics": {
+    "effects": [
+     {
+      "on": "apply",
+      "self": true,
+      "type": "disadvantage_to_attackers",
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 10
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "greater-invisibility",
+  "data": {
+   "mechanics": {
+    "effects": [
+     {
+      "on": "apply",
+      "type": "condition",
+      "condition": "invisible",
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 10
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "invisibility",
+  "data": {
+   "mechanics": {
+    "effects": [
+     {
+      "on": "apply",
+      "type": "condition",
+      "condition": "invisible",
+      "ends_on_attack": true,
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 600
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "heal",
+  "data": {
+   "mechanics": {
+    "healing": "70",
+    "upcast_heal_flat": 10
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "hunters-mark",
+  "data": {
+   "replace": true,
+   "mechanics": {
+    "hostile": true,
+    "effects": [
+     {
+      "on": "apply",
+      "type": "marked",
+      "dice": "1d6",
+      "damage_type": "force",
+      "expires": "",
+      "of": "target"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "hex",
+  "data": {
+   "replace": true,
+   "mechanics": {
+    "hostile": true,
+    "effects": [
+     {
+      "on": "apply",
+      "type": "marked",
+      "dice": "1d6",
+      "damage_type": "necrotic",
+      "expires": "",
+      "of": "target"
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "divine-favor",
+  "data": {
+   "replace": true,
+   "mechanics": {
+    "effects": [
+     {
+      "on": "apply",
+      "self": true,
+      "type": "weapon_rider",
+      "dice": "1d4",
+      "damage_type": "radiant",
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 10
+     }
+    ]
+   }
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "divine-smite",
+  "data": {
+   "disabled": true
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "searing-smite",
+  "data": {
+   "disabled": true
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "shining-smite",
+  "data": {
+   "disabled": true
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "ensnaring-strike",
+  "data": {
+   "disabled": true
+  }
+ },
+ {
+  "kind": "spell_override",
+  "slug": "flame-blade",
+  "data": {
+   "disabled": true
+  }
+ }
+]

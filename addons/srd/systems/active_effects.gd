@@ -76,6 +76,32 @@ func ac_bonus() -> int:
 	return total
 
 ## Die sizes added to a roll of this kind ("attack", "save", "check"), e.g. [4] for Bless.
+## Base AC while unarmored (Mage Armor: 13); 0 = none. Add DEX.
+func base_ac() -> int:
+	var best := 0
+	for e in of_type("base_ac"):
+		best = maxi(best, int(e.get("amount", 0)))
+	return best
+
+## AC can't be lower than this (Barkskin: 17); 0 = no floor.
+func ac_floor() -> int:
+	var best := 0
+	for e in of_type("ac_floor"):
+		best = maxi(best, int(e.get("amount", 0)))
+	return best
+
+## Resistance from an effect ("resistance", damage: ["bludgeoning", ...]).
+func resists(damage_type: SRD.DamageType) -> bool:
+	var key := String(SRD.DamageType.keys()[damage_type]).to_lower()
+	return _effects.any(func(e): return e.type == "resistance" and key in e.get("damage", []))
+
+## Sum of `amount` over effects of a type (Innate Sorcery's +1 DC).
+func total(type: String) -> int:
+	var sum := 0
+	for e in of_type(type):
+		sum += int(e.get("amount", 0))
+	return sum
+
 func bonus_dice(kind: String) -> Array[int]:
 	var out: Array[int] = []
 	for e in of_type("bonus_die"):
@@ -88,6 +114,11 @@ func roll_bonus(kind: String) -> int:
 	var total := 0
 	for sides in bonus_dice(kind):
 		total += Dice.roll(sides)
+	for e in of_type("penalty_die"):  # Bane
+		if kind in e.get("applies", []):
+			total -= Dice.roll(int(str(e.get("die", "1d4")).get_slice("d", 1)))
+	for e in of_type("bonus_die").filter(func(x): return x.get("one_shot", false) and kind in x.get("applies", [])):
+		_remove(e)  # Bardic Inspiration: spent when rolled
 	return total
 
 ## Speed reduction: different sources stack; Slow mastery caps itself at 10 by sharing an id.

@@ -22,6 +22,16 @@ var bonus_damage: int = 0
 var bonus_ac: int = 0
 var crit_threshold: int = 20
 
+## Gear: bare values ItemEffects restores before folding mods in, and what gear adds.
+var gear_base: Dictionary = {}
+var crit_immune: bool = false
+## Added to Initiative on top of the modifier (Alert, gear).
+var initiative_extra: int = 0
+## Advantage on Initiative (Remarkable Athlete).
+var initiative_advantage: bool = false
+## Advantage on Concentration saves (Eldritch Mind).
+var concentration_advantage: bool = false
+
 # Monster special trait flags
 var has_undead_fortitude: bool = false
 var undead_fortitude_immune_to_radiant: bool = true
@@ -43,6 +53,9 @@ var bonus_actions: Array = []
 var reactions: Array = []
 var monster_uses: Dictionary = {}
 var hit_riders: Array = []
+## Monster "Spellcasting" action and "<Ability> Saving Throw" actions (MonsterSpells).
+var monster_spells: Dictionary = {}
+var save_actions: Array = []
 ## Initiative modifier: the stat block's Initiative for monsters; -999 = use the DEX modifier.
 var initiative_override: int = -999
 ## The last Undead Fortitude save take_damage() rolled (or refused), for the game's log:
@@ -78,7 +91,11 @@ var current_hp: int:
 	get: return stats.current_hp
 
 var armor_class: int:
-	get: return equipment.current_ac(stats) + effects.ac_bonus() + _style_ac_bonus() + bonus_ac
+	get:
+		var base := equipment.current_ac(stats)
+		if equipment.armor == null and equipment.natural_ac == 0:
+			base = maxi(base, effects.base_ac() + stats.ability_modifier(SRD.Ability.DEXTERITY))  # Mage Armor
+		return maxi(base + effects.ac_bonus() + _style_ac_bonus() + bonus_ac, effects.ac_floor())  # Barkskin
 
 ## Speed after reductions (Ray of Frost, Slow), never below 0.
 var speed: int:
@@ -90,18 +107,20 @@ var is_bloodied: bool:
 
 func _style_ac_bonus() -> int:
 	# Defense fighting style: +1 AC while wearing Light, Medium, or Heavy armor
-	if kit != null and kit.fighting_style() == "defense" and equipment.armor != null:
+	if kit != null and kit.has_style("defense") and equipment.armor != null:
 		return 1
 	return 0
 
 var initiative_bonus: int:
-	get: return initiative_override if initiative_override != -999 \
-		else stats.ability_modifier(SRD.Ability.DEXTERITY)
+	get: return initiative_extra + (initiative_override if initiative_override != -999 \
+		else stats.ability_modifier(SRD.Ability.DEXTERITY))
 
 ## Apply damage and handle Undead Fortitude if applicable.
 ## Returns actual damage dealt. last_undead_fortitude describes the save, if any.
 func take_damage(amount: int, damage_type: SRD.DamageType,
 		is_crit: bool = false, fixed_d20: int = -1) -> int:
+	if effects.resists(damage_type) and not stats.has_resistance(damage_type):
+		amount /= 2  # Stoneskin and the like
 	var actual := DamageResolver.apply(stats, amount, damage_type)
 	last_undead_fortitude = {}
 	if actual > 0:

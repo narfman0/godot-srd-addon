@@ -37,6 +37,15 @@ var vulnerability_mask: int = 0
 # XP
 var xp: int = 0
 
+## Flat bonuses from gear and features (ItemEffects).
+var save_bonus: int = 0
+var spell_dc_bonus: int = 0
+var spell_attack_mod: int = 0
+## Monsters: the stat block's Proficiency Bonus (their level stays 1). 0 = from the level.
+var pb_override: int = 0
+## Jack of All Trades: half Proficiency Bonus on checks without proficiency.
+var half_proficiency_unskilled: bool = false
+
 func _init() -> void:
 	reset()
 
@@ -71,7 +80,7 @@ func ability_modifier(ability: SRD.Ability) -> int:
 	return SRDRules.ability_modifier(get_ability(ability))
 
 func proficiency_bonus() -> int:
-	return SRDRules.proficiency_bonus(level)
+	return pb_override if pb_override > 0 else SRDRules.proficiency_bonus(level)
 
 # --- Hit Points ---
 
@@ -119,7 +128,7 @@ func set_save_proficiency(ability: SRD.Ability, proficient: bool) -> void:
 
 func saving_throw_bonus(ability: SRD.Ability) -> int:
 	var mod := ability_modifier(ability)
-	return mod + (proficiency_bonus() if is_save_proficient(ability) else 0)
+	return mod + save_bonus + (proficiency_bonus() if is_save_proficient(ability) else 0)
 
 # --- Skill proficiencies ---
 

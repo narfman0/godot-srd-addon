@@ -7,7 +7,7 @@ extends RefCounted
 ## {d20, rolls, bonus, total, surprised, advantage, disadvantage}. fixed: preset d20s.
 static func roll(c: Combatant, surprised: bool = false, fixed: Array = []) -> Dictionary:
 	var dis := surprised or c.conditions.is_incapacitated()
-	var adv := c.conditions.has(SRD.Condition.INVISIBLE)
+	var adv := c.conditions.has(SRD.Condition.INVISIBLE) or c.initiative_advantage
 	var mode := 0 if adv == dis else (1 if adv else -1)
 	var rolls := [int(fixed[0]) if fixed.size() > 0 else Dice.roll_d20()]
 	if mode != 0:
