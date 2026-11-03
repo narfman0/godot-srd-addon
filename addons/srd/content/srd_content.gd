@@ -16,6 +16,9 @@ const TAG_PARTIAL := "partial"
 ## spells, or mechanics the extractor's heuristics miss. They need hand-authored effects.
 const TAG_NO_MECHANICS := "no_mechanics"
 
+## Pseudo condition immunity: "magic can't put it to sleep" (Elves' Trance and the like).
+const MAGICAL_SLEEP := "magical-sleep"
+
 var pack: SRDContentPack
 
 func _init(content_pack: SRDContentPack = null) -> void:
@@ -439,7 +442,10 @@ func make_monster(slug: String, id: int = 0) -> Combatant:
 	s.max_hp = int(d.get("hp", 1))
 	var hp_dice := parse_dice(str(d.get("hp_dice", "1d8")))
 	s.hit_die = maxi(hp_dice.sides, 4)
-	s.speed = int(d.get("speed", {}).get("walk", 30))
+	var spd: Dictionary = d.get("speed", {})
+	s.speed = int(spd.get("walk", 30))
+	if s.speed == 0:
+		s.speed = int(spd.get("fly", spd.get("swim", 0)))  # flyers like a floating skull
 	s.reset()
 	for t in d.get("damage_immunities", []):
 		s.set_immunity(damage_type_from(t), true)
@@ -455,9 +461,12 @@ func make_monster(slug: String, id: int = 0) -> Combatant:
 	c.size = str(d.get("size", "medium")).split(" ")[0]
 	for ci in d.get("condition_immunities", []):
 		c.condition_immunities.append(str(ci))
+	var no_sleep := RegEx.create_from_string("can.t put (?:it|you) to sleep")
 	for t in d.get("traits", []):
 		if t.get("name", "") == "Undead Fortitude":
 			c.has_undead_fortitude = true
+		if no_sleep.search(str(t.get("text", ""))) != null:
+			c.condition_immunities.append(MAGICAL_SLEEP)
 	return c
 
 func monster_xp(slug: String) -> int:

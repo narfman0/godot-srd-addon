@@ -265,3 +265,9 @@ func test_spiritual_weapon():
 	assert_eq(ev[0].damage_dealt, 4 + 3, "1d8 + spellcasting modifier")
 	assert_eq(ev[0].summon.repeat_as, "bonus_action")
 	assert_eq(ab.upcasted_damage_dice(3), 2)
+
+func test_sleep_skips_creatures_magic_cannot_put_to_sleep():
+	var t := _dummy("Elf-like")
+	t.condition_immunities.append(SRDContent.MAGICAL_SLEEP)
+	var ev := resolver.cast(_wizard(), _wiz_spell("sleep"), [t], 1, null, {"save_d20": 1})
+	assert_true(ev[0].saved)

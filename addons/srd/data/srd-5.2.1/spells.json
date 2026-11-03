@@ -10439,7 +10439,8 @@
      }
     ],
     "immune_if": [
-     "exhaustion"
+     "exhaustion",
+     "magical-sleep"
     ]
    }
   }

@@ -312,7 +312,9 @@ SPELL_OVERRIDES = {
          "expires": "end_of_turn", "of": "target", "turns": 1,
          "repeat_save": {"on_fail": {"type": "condition", "condition": "unconscious", "ends_on_damage": True,
                                      "expires": "start_of_turn", "of": "caster", "turns": 10}}}],
-        "immune_if": ["exhaustion"]},
+        # "Creatures that don't sleep, such as elves, or that have Immunity to the Exhaustion
+        # condition automatically succeed"; magical-sleep marks "magic can't put it to sleep"
+        "immune_if": ["exhaustion", "magical-sleep"]},
     # Shield also negates Magic Missile; the trigger is "hit by an attack roll or targeted by Magic Missile".
     "shield": {"effects": [
         {"on": "apply", "type": "ac_bonus", "amount": 5, "self": True,
