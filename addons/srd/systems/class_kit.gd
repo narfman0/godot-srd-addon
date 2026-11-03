@@ -176,10 +176,6 @@ func short_rest() -> void:
 func long_rest() -> void:
 	for r in resources.values():
 		r.current = r.max
-	restored_this_day = false
-
-## Sorcerous Restoration: spent until the next Long Rest.
-var restored_this_day := false
 
 ## Rest-time features: a Short Rest recovers these. Returns log lines.
 ## SRD: Arcane Recovery, Natural Recovery (highest slots first, total levels up to half the
@@ -198,12 +194,12 @@ func rest_recoveries(c: Combatant) -> Array:
 					c.energy_slots.recover_slot(int(sl), 1)
 				out.append("%s recovers level %s slots." % [feat.capitalize().replace("-", " "),
 					", ".join(picks.map(func(p): return str(p)))])
-	if has_feature("sorcerous-restoration") and not restored_this_day and resources.has("sorcery_points"):
+	if has_feature("sorcerous-restoration") and uses_left("sorcerous_restoration") > 0 and resources.has("sorcery_points"):
 		var r: Dictionary = resources.sorcery_points
 		var got := mini(level / 2, int(r.max) - int(r.current))
 		if got > 0:
 			r.current += got
-			restored_this_day = true
+			spend("sorcerous_restoration")
 			out.append("Sorcerous Restoration: %d Sorcery Points." % got)
 	if has_feature("magical-cunning") and uses_left("magical_cunning") > 0 and c.energy_slots != null:
 		var slots := c.energy_slots
@@ -256,6 +252,7 @@ func finish(c: Combatant) -> void:
 				s.speed += 10
 		"sorcerer":
 			add_resource("innate_sorcery", 2)
+			add_resource("sorcerous_restoration", 1 if has_feature("sorcerous-restoration") else 0)
 			if has_feature("draconic-resilience"):
 				s.max_hp += level
 				s.current_hp = s.max_hp
