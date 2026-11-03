@@ -1,0 +1,205 @@
+[
+ {
+  "kind": "armor",
+  "slug": "padded-armor",
+  "name": "Padded Armor",
+  "page": 0,
+  "data": {
+   "type": "light",
+   "ac_raw": "11 + Dex modifier",
+   "weight": "8 lb.",
+   "cost": "5 GP",
+   "base_ac": 11,
+   "dex": true,
+   "stealth_disadvantage": true
+  }
+ },
+ {
+  "kind": "armor",
+  "slug": "leather-armor",
+  "name": "Leather Armor",
+  "page": 0,
+  "data": {
+   "type": "light",
+   "ac_raw": "11 + Dex modifier",
+   "weight": "10 lb.",
+   "cost": "10 GP",
+   "base_ac": 11,
+   "dex": true,
+   "stealth_disadvantage": false
+  }
+ },
+ {
+  "kind": "armor",
+  "slug": "studded-leather-armor",
+  "name": "Studded Leather Armor",
+  "page": 0,
+  "data": {
+   "type": "light",
+   "ac_raw": "12 + Dex modifier",
+   "weight": "13 lb.",
+   "cost": "45 GP",
+   "base_ac": 12,
+   "dex": true,
+   "stealth_disadvantage": false
+  }
+ },
+ {
+  "kind": "armor",
+  "slug": "hide-armor",
+  "name": "Hide Armor",
+  "page": 0,
+  "data": {
+   "type": "medium",
+   "ac_raw": "12 + Dex modifier (max 2)",
+   "weight": "12 lb.",
+   "cost": "10 GP",
+   "base_ac": 12,
+   "dex": true,
+   "dex_cap": 2,
+   "stealth_disadvantage": false
+  }
+ },
+ {
+  "kind": "armor",
+  "slug": "chain-shirt",
+  "name": "Chain Shirt",
+  "page": 0,
+  "data": {
+   "type": "medium",
+   "ac_raw": "13 + Dex modifier (max 2)",
+   "weight": "20 lb.",
+   "cost": "50 GP",
+   "base_ac": 13,
+   "dex": true,
+   "dex_cap": 2,
+   "stealth_disadvantage": false
+  }
+ },
+ {
+  "kind": "armor",
+  "slug": "scale-mail",
+  "name": "Scale Mail",
+  "page": 0,
+  "data": {
+   "type": "medium",
+   "ac_raw": "14 + Dex modifier (max 2)",
+   "weight": "45 lb.",
+   "cost": "50 GP",
+   "base_ac": 14,
+   "dex": true,
+   "dex_cap": 2,
+   "stealth_disadvantage": true
+  }
+ },
+ {
+  "kind": "armor",
+  "slug": "breastplate",
+  "name": "Breastplate",
+  "page": 0,
+  "data": {
+   "type": "medium",
+   "ac_raw": "14 + Dex modifier (max 2)",
+   "weight": "20 lb. 400 GP",
+   "cost": "",
+   "base_ac": 14,
+   "dex": true,
+   "dex_cap": 2,
+   "stealth_disadvantage": false
+  }
+ },
+ {
+  "kind": "armor",
+  "slug": "half-plate-armor",
+  "name": "Half Plate Armor",
+  "page": 0,
+  "data": {
+   "type": "medium",
+   "ac_raw": "15 + Dex modifier (max 2)",
+   "weight": "40 lb. 750 GP",
+   "cost": "",
+   "base_ac": 15,
+   "dex": true,
+   "dex_cap": 2,
+   "stealth_disadvantage": true
+  }
+ },
+ {
+  "kind": "armor",
+  "slug": "ring-mail",
+  "name": "Ring Mail",
+  "page": 0,
+  "data": {
+   "type": "heavy",
+   "ac_raw": "14",
+   "weight": "40 lb.",
+   "cost": "30 GP",
+   "base_ac": 14,
+   "dex": false,
+   "stealth_disadvantage": true
+  }
+ },
+ {
+  "kind": "armor",
+  "slug": "chain-mail",
+  "name": "Chain Mail",
+  "page": 0,
+  "data": {
+   "type": "heavy",
+   "ac_raw": "16",
+   "weight": "55 lb.",
+   "cost": "75 GP",
+   "base_ac": 16,
+   "dex": false,
+   "strength": 13,
+   "stealth_disadvantage": true
+  }
+ },
+ {
+  "kind": "armor",
+  "slug": "splint-armor",
+  "name": "Splint Armor",
+  "page": 0,
+  "data": {
+   "type": "heavy",
+   "ac_raw": "17",
+   "weight": "60 lb. 200 GP",
+   "cost": "",
+   "base_ac": 17,
+   "dex": false,
+   "strength": 15,
+   "stealth_disadvantage": true
+  }
+ },
+ {
+  "kind": "armor",
+  "slug": "plate-armor",
+  "name": "Plate Armor",
+  "page": 0,
+  "data": {
+   "type": "heavy",
+   "ac_raw": "18",
+   "weight": "65 lb. 1,500 GP",
+   "cost": "",
+   "base_ac": 18,
+   "dex": false,
+   "strength": 15,
+   "stealth_disadvantage": true
+  }
+ },
+ {
+  "kind": "armor",
+  "slug": "shield",
+  "name": "Shield",
+  "page": 0,
+  "data": {
+   "type": "shield",
+   "ac_raw": "+2",
+   "weight": "6 lb.",
+   "cost": "10 GP",
+   "ac_bonus": 2,
+   "dex": false,
+   "stealth_disadvantage": false
+  }
+ }
+]

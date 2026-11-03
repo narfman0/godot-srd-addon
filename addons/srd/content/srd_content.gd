@@ -1,16 +1,19 @@
 ## Builds the addon's runtime resources (ClassData, WeaponData, ArmorData, AbilityData,
-## monster Combatants) from SRD 5.2.1 content-pack rows.
+## monster Combatants) from rows extracted from the SRD 5.2.1 PDF (tools/extract_srd.py).
 ##
-##   var srd := SRDContent.new()          # loads res://addons/srd/data/srd-5.2
+##   var srd := SRDContent.new()          # loads res://addons/srd/data/srd-5.2.1
 ##   var wizard := srd.make_class("wizard")
-##   var goblin := srd.make_monster("goblin", 1)
+##   var goblin := srd.make_monster("goblin-warrior", 1)
 ##   var fireball := srd.make_spell("fireball", SRD.Ability.INTELLIGENCE)
 class_name SRDContent
 extends RefCounted
 
-## Tag on AbilityData whose pack row has effects AbilityData can't express yet
+## Tag on AbilityData whose spell has effects AbilityData can't express yet
 ## (multi-part damage, flat bonuses, darts, riders). The dice it does carry are correct.
 const TAG_PARTIAL := "partial"
+## Tag on AbilityData for spells with no damage or healing detected: utility spells, or
+## mechanics the extractor's heuristics miss. They need hand-authored effects to do anything.
+const TAG_NO_MECHANICS := "no_mechanics"
 
 var pack: SRDContentPack
 
@@ -26,19 +29,28 @@ func make_class(slug: String) -> ClassData:
 	var d: Dictionary = row.data
 	var c := ClassData.new()
 	c.class_name_str = row.name
-	c.hit_die = int(d.get("hitDie", 8))
+	c.hit_die = int(d.get("hit_die", 8))
 	c.save_proficiencies.assign(_abilities(d.get("saves", [])))
-	c.primary_abilities.assign(_abilities(d.get("primaryAbility", [])))
-	var skills: Dictionary = d.get("skillChoices", {})
-	c.skill_choices_count = int(skills.get("pick", 2))
-	for s in skills.get("from", []):
-		var skill := skill_from(s)
-		if skill >= 0:
-			c.skill_options.append(skill)
-	c.armor_proficiencies.assign(d.get("armorProficiencies", []))
-	c.weapon_proficiencies.assign(d.get("weaponProficiencies", []))
+	for a in SRD.ABILITY_NAMES:
+		if a in str(d.get("primary_ability", "")):
+			c.primary_abilities.append(SRD.ABILITY_NAMES.find(a))
+	var skills: Dictionary = d.get("skill_choices", {})
+	c.skill_choices_count = int(skills.get("count", 2))
+	for s in skills.get("options", []):
+		if s == "any":
+			for i in SRD.Skill.size():
+				c.skill_options.append(i)
+		elif skill_from(s) >= 0:
+			c.skill_options.append(skill_from(s))
+	var armor := str(d.get("armor_training", ""))
+	for kind in ["Light", "Medium", "Heavy"]:
+		if kind in armor:
+			c.armor_proficiencies.append(kind.to_lower())
+	if "Shield" in armor:
+		c.armor_proficiencies.append("shield")
+	c.weapon_proficiencies.assign(_weapon_proficiency_keys(str(d.get("weapon_proficiencies", ""))))
 	var casting: Variant = d.get("spellcasting")
-	c.slot_progression = _progression((casting as Dictionary).get("progression", "") if casting is Dictionary else "")
+	c.slot_progression = _progression(casting.get("progression", "") if casting is Dictionary else "")
 	return c
 
 ## SRD.Ability the class casts with, or -1 for non-casters.
@@ -46,12 +58,18 @@ func spellcasting_ability(class_slug: String) -> int:
 	var casting: Variant = _require("class", class_slug).get("data", {}).get("spellcasting")
 	return ability_from(casting.get("ability", "")) if casting is Dictionary else -1
 
-## Class features gained at exactly this level (rows from the "feature" kind).
-func class_features_at(class_slug: String, level: int) -> Array:
+## "Simple and Martial weapons" -> ["simple", "martial"]; restricted martial access becomes
+## "martial-light" (Monk) or "martial-finesse-or-light" (Rogue).
+static func _weapon_proficiency_keys(text: String) -> Array:
 	var out := []
-	for f in _require("class", class_slug).get("data", {}).get("features", []):
-		if int(f.level) == level and pack.has_row("feature", f.slug):
-			out.append(pack.get_row("feature", f.slug))
+	if "Simple" in text:
+		out.append("simple")
+	if "Martial weapons that have the Finesse or Light" in text:
+		out.append("martial-finesse-or-light")
+	elif "Martial weapons that have the Light" in text:
+		out.append("martial-light")
+	elif "Martial" in text:
+		out.append("martial")
 	return out
 
 ## Build a player character: level-1 max HP from the hit die, average HP per level after,
@@ -99,8 +117,8 @@ static func is_weapon_proficient(class_data: ClassData, weapon: WeaponData) -> b
 		return true
 	var light := weapon.has_property(SRD.WeaponProperty.LIGHT)
 	var finesse := weapon.has_property(SRD.WeaponProperty.FINESSE)
-	if "martial-light-finesse" in profs:
-		return light  # Monk, SRD 5.2.1: "Martial weapons that have the Light property"
+	if "martial-light" in profs:
+		return light  # Monk: "Martial weapons that have the Light property"
 	if "martial-finesse-or-light" in profs:
 		return light or finesse
 	return false
@@ -108,106 +126,96 @@ static func is_weapon_proficient(class_data: ClassData, weapon: WeaponData) -> b
 # ── Equipment ─────────────────────────────────────────────────────────────────
 
 func make_weapon(slug: String) -> WeaponData:
-	var row := _require("item", slug)
+	var row := _require("weapon", slug)
 	if row.is_empty():
 		return null
 	var d: Dictionary = row.data
 	var w := WeaponData.new()
 	w.weapon_name = row.name
-	w.weapon_type = SRD.WeaponType.MARTIAL if str(d.get("weaponType", "")).begins_with("martial") \
+	w.weapon_type = SRD.WeaponType.MARTIAL if str(d.category).begins_with("martial") \
 		else SRD.WeaponType.SIMPLE
 	w.properties = _weapon_properties(d.get("properties", []))
-	var attack: Dictionary = _first_activity(d, "attack").get("attack", {})
-	var dmg: Array = attack.get("damage", [])
-	if not dmg.is_empty():
-		var dice := parse_dice(dmg[0].dice)
-		w.die_count = dice.count; w.die_sides = dice.sides
-		w.damage_type = damage_type_from(dmg[0].type)
-	var versatile: Variant = d.get("versatileDamage")
-	if versatile is Dictionary or versatile is String:
-		var vd := parse_dice(versatile.dice if versatile is Dictionary else versatile)
+	var dmg := parse_dice(str(d.get("damage", "")))
+	w.die_count = dmg.count; w.die_sides = dmg.sides
+	w.damage_type = damage_type_from(str(d.get("damage_type", "")))
+	if d.has("versatile"):
+		var vd := parse_dice(d.versatile)
 		w.versatile_die_count = vd.count; w.versatile_die_sides = vd.sides
-	# Thrown melee weapons (thrownRange) keep melee reach so they still attack with STR
-	var rng: Variant = d.get("range")
-	if rng is Dictionary:
-		w.range_normal = int(rng.get("normal", 5)); w.range_long = int(rng.get("long", w.range_normal))
+	# Thrown melee weapons keep melee reach so they still attack with STR
+	if str(d.category).ends_with("ranged") and d.has("range"):
+		w.range_normal = int(d.range[0]); w.range_long = int(d.range[1])
 	return w
 
 func make_armor(slug: String) -> ArmorData:
-	var row := _require("item", slug)
+	var row := _require("armor", slug)
 	if row.is_empty():
 		return null
 	var d: Dictionary = row.data
 	var a := ArmorData.new()
 	a.armor_name = row.name
-	a.armor_type = _armor_type(d.get("armorType", "light"))
-	var formula: Dictionary = d.get("armorClassFormula", {})
-	a.base_ac = int(formula.get("base", 2 if a.armor_type == SRD.ArmorType.SHIELD else 10))
-	if formula.get("ability") == null:
+	a.armor_type = _armor_type(str(d.get("type", "light")))
+	a.base_ac = int(d.get("base_ac", d.get("ac_bonus", 10)))
+	if not d.get("dex", false):
 		a.max_dex_bonus = 0
 	else:
-		a.max_dex_bonus = int(formula.get("abilityCap", -1))
-	a.strength_requirement = int(d.get("strRequired", 0))
-	a.stealth_disadvantage = bool(d.get("stealthDisadvantage", false))
+		a.max_dex_bonus = int(d.get("dex_cap", -1))
+	a.strength_requirement = int(d.get("strength", 0))
+	a.stealth_disadvantage = bool(d.get("stealth_disadvantage", false))
 	return a
 
 # ── Spells ────────────────────────────────────────────────────────────────────
 
-## True when the pack row carries mechanics (an activity) rather than just a stub.
+## True when extraction detected damage or healing for this spell.
 func spell_has_mechanics(slug: String) -> bool:
-	var acts: Variant = _require("spell", slug).get("data", {}).get("activities")
-	return acts is Array and not acts.is_empty()
+	var mech: Dictionary = _require("spell", slug).get("data", {}).get("mechanics", {})
+	return mech.has("damage") or mech.has("healing")
 
 func make_spell(slug: String, casting_ability: SRD.Ability = SRD.Ability.INTELLIGENCE) -> AbilityData:
 	var row := _require("spell", slug)
 	if row.is_empty():
 		return null
 	var d: Dictionary = row.data
+	var mech: Dictionary = d.get("mechanics", {})
 	var ab := AbilityData.new()
 	ab.ability_name = row.name
-	ab.description = str(d.get("description", ""))
+	ab.description = str(d.get("text", ""))
 	ab.slot_level = int(d.get("level", 0))
 	ab.concentration = bool(d.get("concentration", false))
 	ab.casting_ability = casting_ability
 	ab.tags.assign(["spell", str(d.get("school", ""))])
-	var rng: Variant = d.get("range")
-	if rng is Dictionary:
-		match str(rng.get("units", "")):
-			"ft": ab.range_feet = int(rng.get("value", 30))
-			"touch": ab.range_feet = -1
-			"self": ab.range_feet = 0
+	var rng: Dictionary = d.get("range", {})
+	if rng.has("feet"):
+		ab.range_feet = int(rng.feet)
+	elif rng.get("touch", false):
+		ab.range_feet = -1
+	elif rng.get("self", false):
+		ab.range_feet = 0
+	if mech.has("area"):
+		ab.target_type = "area"
+		ab.area_shape = _aoe_shape(str(mech.area.shape))
+		ab.area_size = int(mech.area.size)
 
-	var act := _first_damaging_activity(d)
-	if act.is_empty():
+	if not mech.has("damage"):
 		ab.damage_die_count = 0
-		if not spell_has_mechanics(slug):
-			ab.tags.append("stub")
+		if not mech.has("healing"):
+			ab.tags.append(TAG_NO_MECHANICS)
 		return ab
-
-	ab.uses_save = act.type == "save"
+	ab.uses_save = mech.has("save") and not mech.has("attack")
 	if ab.uses_save:
-		ab.save_ability = ability_from(act.save.get("ability", "dex")) as SRD.Ability
-	var parts := _damage_parts(act)
+		ab.save_ability = ability_from(mech.save) as SRD.Ability
+	var parts: Array = mech.damage
 	var dice := parse_dice(parts[0].dice)
 	ab.damage_die_count = dice.count
 	ab.damage_die_sides = dice.sides
 	ab.damage_type = damage_type_from(parts[0].type)
-	ab.save_effect = SRD.SaveEffect.HALF if parts[0].get("halfOnSave", false) else SRD.SaveEffect.NONE
-	var scaling: Dictionary = act.get("damage", {}).get("scalesWithSlotLevel", {})
-	if scaling.has("addDice"):
-		ab.upcast_bonus_die_count = parse_dice(scaling.addDice).count
-	if parts.size() > 1 or dice.bonus != 0 or scaling.has("addDarts") \
-			or act.get("damage", {}).has("perDart"):
+	ab.save_effect = SRD.SaveEffect.HALF if mech.get("half_on_save", false) else SRD.SaveEffect.NONE
+	if mech.has("upcast_dice"):
+		ab.upcast_bonus_die_count = parse_dice(mech.upcast_dice).count
+	if parts.size() > 1 or dice.bonus != 0:
 		ab.tags.append(TAG_PARTIAL)
-
-	var target: Dictionary = act.get("target", {})
-	if target.get("affects", "") == "area":
-		ab.target_type = "area"
-		ab.area_shape = _aoe_shape(str(target.get("shape", "sphere")))
-		ab.area_size = int(target.get("radius", target.get("size", target.get("length", 0))))
 	return ab
 
-## Spell slugs available to a class, optionally limited to one spell level.
+## Spell slugs on a class's spell list, optionally limited to one spell level.
 func class_spell_slugs(class_slug: String, spell_level: int = -1) -> Array:
 	var out := []
 	for row in pack.rows("spell"):
@@ -229,28 +237,26 @@ func make_monster(slug: String, id: int = 0) -> Combatant:
 	var s := CharacterStats.new()
 	s.character_name = row.name + ("" if id == 0 else " %d" % id)
 	s.level = 1
-	var scores: Dictionary = d.get("abilityScores", {})
-	for key in scores:
+	var abilities: Dictionary = d.get("abilities", {})
+	for key in abilities:
 		var ab := ability_from(key)
-		if ab >= 0:
-			s.set_ability(ab as SRD.Ability, int(scores[key]))
-	var hp: Dictionary = d.get("hp", {})
-	var hp_dice := parse_dice(str(hp.get("formula", "1d8")))
-	s.max_hp = int(hp.get("max", 1))
-	s.hit_die = hp_dice.sides
+		if ab < 0:
+			continue
+		s.set_ability(ab as SRD.Ability, int(abilities[key].score))
+		# The stat block lists save totals; a save above the plain modifier means proficiency
+		if int(abilities[key].save) > int(abilities[key].mod):
+			s.set_save_proficiency(ab as SRD.Ability, true)
+	s.max_hp = int(d.get("hp", 1))
+	var hp_dice := parse_dice(str(d.get("hp_dice", "1d8")))
+	s.hit_die = maxi(hp_dice.sides, 4)
 	s.speed = int(d.get("speed", {}).get("walk", 30))
 	s.reset()
-	for entry in d.get("immunities", []):
-		if str(entry).ends_with("-damage"):
-			s.set_immunity(damage_type_from(str(entry).trim_suffix("-damage")), true)
-	for entry in d.get("resistances", []):
-		s.set_resistance(damage_type_from(str(entry).trim_suffix("-damage")), true)
-	for entry in d.get("vulnerabilities", []):
-		s.set_vulnerability(damage_type_from(str(entry).trim_suffix("-damage")), true)
-	for key in d.get("saves", {}):
-		var ab := ability_from(key)
-		if ab >= 0:
-			s.set_save_proficiency(ab as SRD.Ability, true)
+	for t in d.get("damage_immunities", []):
+		s.set_immunity(damage_type_from(t), true)
+	for t in d.get("resistances", []):
+		s.set_resistance(damage_type_from(t), true)
+	for t in d.get("vulnerabilities", []):
+		s.set_vulnerability(damage_type_from(t), true)
 
 	var eq := EquipmentSlots.new()
 	eq.natural_ac = int(d.get("ac", 10))
@@ -272,23 +278,23 @@ func monster_cr(slug: String) -> float:
 		return float(p[0]) / float(p[1])
 	return float(cr)
 
+## First action with an attack roll becomes the monster's weapon.
 func _monster_weapon(actions: Array) -> WeaponData:
 	for a in actions:
-		if a.get("type", "") != "attack" or a.get("damage", []).is_empty():
+		var atk: Variant = a.get("attack")
+		if not atk is Dictionary or atk.get("damage", []).is_empty():
 			continue
 		var w := WeaponData.new()
 		w.weapon_name = a.name
-		var dice := parse_dice(a.damage[0].dice)
+		var dice := parse_dice(atk.damage[0].dice)
 		w.die_count = dice.count; w.die_sides = dice.sides
-		w.damage_type = damage_type_from(a.damage[0].type)
-		w.fixed_attack_bonus = int(a.get("attackBonus", 0))
+		w.damage_type = damage_type_from(atk.damage[0].type)
+		w.fixed_attack_bonus = int(atk.bonus)
 		w.fixed_damage_bonus = dice.bonus
-		if a.get("range", "melee") == "ranged":
-			var bands: Dictionary = a.get("rangeBands", {})
-			w.range_normal = int(bands.get("normal", 80))
-			w.range_long = int(bands.get("long", w.range_normal))
-		else:  # melee, or melee-or-thrown (fights in melee by default)
-			w.range_normal = int(a.get("reach", 5)); w.range_long = w.range_normal
+		if atk.kind == "ranged" and atk.has("range"):
+			w.range_normal = int(atk.range[0]); w.range_long = int(atk.range[1])
+		else:  # melee, or melee_or_ranged (fights in melee by default)
+			w.range_normal = int(atk.get("reach", 5)); w.range_long = w.range_normal
 		return w
 	return null
 
@@ -358,25 +364,3 @@ static func _weapon_properties(props: Array) -> int:
 	for p in props:
 		mask |= int(SRD.WeaponProperty.get(str(p).to_upper().replace("-", "_"), 0))
 	return mask
-
-static func _first_activity(d: Dictionary, type: String) -> Dictionary:
-	for a in d.get("activities", []):
-		if a.get("type", "") == type:
-			return a
-	return {}
-
-static func _first_damaging_activity(d: Dictionary) -> Dictionary:
-	var acts: Variant = d.get("activities")
-	if not acts is Array:
-		return {}
-	for a in acts:
-		if a.get("type", "") in ["save", "attack", "damage"] and not _damage_parts(a).is_empty():
-			return a
-	return {}
-
-## Damage parts live under activity.damage.parts (save/damage) or activity.attack.damage (attack).
-static func _damage_parts(act: Dictionary) -> Array:
-	var dmg: Variant = act.get("damage")
-	if dmg is Dictionary and dmg.has("parts"):
-		return dmg.parts
-	return act.get("attack", {}).get("damage", [])

@@ -1,9 +1,10 @@
-## A directory of JSON content rows ({kind, slug, name, data}) indexed by kind and slug.
-## Shares its format with grimoire's content packs, so one SRD dataset feeds both projects.
+## A directory of JSON content rows ({kind, slug, name, page, data}) indexed by kind and slug.
+## The default pack is extracted from the SRD 5.2.1 PDF by tools/extract_srd.py; a game can
+## layer its own rows (homebrew monsters, renamed setting content) with a second load_dir().
 class_name SRDContentPack
 extends RefCounted
 
-const DEFAULT_DIR := "res://addons/srd/data/srd-5.2"
+const DEFAULT_DIR := "res://addons/srd/data/srd-5.2.1"
 
 var meta: Dictionary = {}
 var _rows: Dictionary = {}  # kind -> { slug -> row }
@@ -44,15 +45,6 @@ func slugs(kind: String) -> Array:
 
 func rows(kind: String) -> Array:
 	return _rows.get(kind, {}).values()
-
-## Items share one kind; filter by data.category ("weapon", "armor", ...).
-func item_slugs(category: String) -> Array:
-	var out := []
-	for row in rows("item"):
-		if row.data.get("category", "") == category:
-			out.append(row.slug)
-	out.sort()
-	return out
 
 func count(kind: String) -> int:
 	return _rows.get(kind, {}).size()

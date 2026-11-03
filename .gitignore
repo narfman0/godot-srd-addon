@@ -1,3 +1,5 @@
 .godot/
 *.import
 # addons/gut/  # managed as git submodule
+tools/.venv/
+tools/srd_source/*.pdf

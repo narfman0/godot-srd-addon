@@ -1,0 +1,389 @@
+[
+ {
+  "kind": "class",
+  "slug": "barbarian",
+  "name": "Barbarian",
+  "page": 28,
+  "data": {
+   "primary_ability": "Strength",
+   "hit_die": 12,
+   "saves": [
+    "str",
+    "con"
+   ],
+   "skill_choices": {
+    "count": 2,
+    "options": [
+     "animal-handling",
+     "athletics",
+     "intimidation",
+     "nature",
+     "perception",
+     "survival"
+    ]
+   },
+   "weapon_proficiencies": "Simple and Martial weapons",
+   "armor_training": "Light and Medium armor and Shields",
+   "tool_proficiencies": "",
+   "starting_equipment": "Choose A or B: (A) Greataxe, 4 Handaxes, Explorer’s Pack, and 15 GP; or (B) 75 GP"
+  }
+ },
+ {
+  "kind": "class",
+  "slug": "bard",
+  "name": "Bard",
+  "page": 31,
+  "data": {
+   "primary_ability": "Charisma",
+   "hit_die": 8,
+   "saves": [
+    "dex",
+    "cha"
+   ],
+   "skill_choices": {
+    "count": 3,
+    "options": [
+     "any"
+    ]
+   },
+   "weapon_proficiencies": "Simple weapons",
+   "armor_training": "Light armor",
+   "tool_proficiencies": "Choose 3 Musical Instruments (see “Equipment”)",
+   "starting_equipment": "Choose A or B: (A) Leather Armor, 2 Daggers, Musical Instrument of your choice, Entertainer’s Pack, and 19 GP; or (B) 90 GP",
+   "spellcasting": {
+    "ability": "cha",
+    "progression": "full"
+   }
+  }
+ },
+ {
+  "kind": "class",
+  "slug": "cleric",
+  "name": "Cleric",
+  "page": 36,
+  "data": {
+   "primary_ability": "Wisdom",
+   "hit_die": 8,
+   "saves": [
+    "wis",
+    "cha"
+   ],
+   "skill_choices": {
+    "count": 2,
+    "options": [
+     "history",
+     "insight",
+     "medicine",
+     "persuasion",
+     "religion"
+    ]
+   },
+   "weapon_proficiencies": "Simple weapons",
+   "armor_training": "Light and Medium armor and Shields",
+   "tool_proficiencies": "",
+   "starting_equipment": "Choose A or B: (A) Chain Shirt, Shield, Mace, Holy Symbol, Priest’s Pack, and 7 GP; or (B) 110 GP",
+   "spellcasting": {
+    "ability": "wis",
+    "progression": "full"
+   }
+  }
+ },
+ {
+  "kind": "class",
+  "slug": "druid",
+  "name": "Druid",
+  "page": 41,
+  "data": {
+   "primary_ability": "Wisdom",
+   "hit_die": 8,
+   "saves": [
+    "int",
+    "wis"
+   ],
+   "skill_choices": {
+    "count": 2,
+    "options": [
+     "animal-handling",
+     "arcana",
+     "insight",
+     "medicine",
+     "nature",
+     "perception",
+     "religion",
+     "survival"
+    ]
+   },
+   "weapon_proficiencies": "Simple weapons",
+   "armor_training": "Light armor and Shields",
+   "tool_proficiencies": "Herbalism Kit",
+   "starting_equipment": "Choose A or B: (A) Leather Armor, Shield, Sickle, Druidic Focus (Quarterstaff), Explorer’s Pack, Herbalism Kit, and 9 GP; or (B) 50 GP",
+   "spellcasting": {
+    "ability": "wis",
+    "progression": "full"
+   }
+  }
+ },
+ {
+  "kind": "class",
+  "slug": "fighter",
+  "name": "Fighter",
+  "page": 47,
+  "data": {
+   "primary_ability": "Strength or Dexterity",
+   "hit_die": 10,
+   "saves": [
+    "str",
+    "con"
+   ],
+   "skill_choices": {
+    "count": 2,
+    "options": [
+     "acrobatics",
+     "animal-handling",
+     "athletics",
+     "history",
+     "insight",
+     "intimidation",
+     "persuasion",
+     "perception",
+     "survival"
+    ]
+   },
+   "weapon_proficiencies": "Simple and Martial weapons",
+   "armor_training": "Light, Medium, and Heavy armor and Shields",
+   "tool_proficiencies": "",
+   "starting_equipment": "Choose A, B, or C: (A) Chain Mail, Greatsword, Flail, 8 Javelins, Dungeoneer’s Pack, and 4 GP; (B) Studded Leather Armor, Scimitar, Shortsword, Longbow, 20 Arrows, Quiver, Dungeoneer’s Pack, and 11 GP; or (C) 155 GP"
+  }
+ },
+ {
+  "kind": "class",
+  "slug": "monk",
+  "name": "Monk",
+  "page": 49,
+  "data": {
+   "primary_ability": "",
+   "hit_die": 8,
+   "saves": [
+    "str",
+    "dex"
+   ],
+   "skill_choices": {
+    "count": 2,
+    "options": [
+     "acrobatics",
+     "athletics",
+     "history",
+     "insight",
+     "religion",
+     "stealth"
+    ]
+   },
+   "weapon_proficiencies": "Simple weapons and Martial weapons that have the Light property",
+   "armor_training": "None",
+   "tool_proficiencies": "Choose one type of Artisan’s Tools or Musical Instrument (see “Equipment”)",
+   "starting_equipment": "Choose A or B: (A) Spear, 5 Daggers, Artisan’s Tools or Musical Instrument chosen for the tool proficiency above, Explorer’s Pack, and 11 GP; or (B) 50 GP"
+  }
+ },
+ {
+  "kind": "class",
+  "slug": "paladin",
+  "name": "Paladin",
+  "page": 53,
+  "data": {
+   "primary_ability": "Strength and Charisma",
+   "hit_die": 10,
+   "saves": [
+    "wis",
+    "cha"
+   ],
+   "skill_choices": {
+    "count": 2,
+    "options": [
+     "athletics",
+     "insight",
+     "intimidation",
+     "medicine",
+     "persuasion",
+     "religion"
+    ]
+   },
+   "weapon_proficiencies": "Simple and Martial weapons",
+   "armor_training": "Light, Medium, and Heavy armor and Shields",
+   "tool_proficiencies": "",
+   "starting_equipment": "Choose A or B: (A) Chain Mail, Shield, Longsword, 6 Javelins, Holy Symbol, Priest’s Pack, and 9 GP; or (B) 150 GP",
+   "spellcasting": {
+    "ability": "cha",
+    "progression": "half"
+   }
+  }
+ },
+ {
+  "kind": "class",
+  "slug": "ranger",
+  "name": "Ranger",
+  "page": 57,
+  "data": {
+   "primary_ability": "Dexterity and Wisdom",
+   "hit_die": 10,
+   "saves": [
+    "str",
+    "dex"
+   ],
+   "skill_choices": {
+    "count": 3,
+    "options": [
+     "animal-handling",
+     "athletics",
+     "insight",
+     "investigation",
+     "nature",
+     "perception",
+     "stealth",
+     "survival"
+    ]
+   },
+   "weapon_proficiencies": "Simple and Martial weapons",
+   "armor_training": "Light and Medium armor and Shields",
+   "tool_proficiencies": "",
+   "starting_equipment": "Choose A or B: (A) Studded Leather Armor, Scimitar, Shortsword, Longbow, 20 Arrows, Quiver, Druidic Focus (sprig of mistletoe), Explorer’s Pack, and 7 GP; or (B) 150 GP",
+   "spellcasting": {
+    "ability": "wis",
+    "progression": "half"
+   }
+  }
+ },
+ {
+  "kind": "class",
+  "slug": "rogue",
+  "name": "Rogue",
+  "page": 61,
+  "data": {
+   "primary_ability": "Dexterity",
+   "hit_die": 8,
+   "saves": [
+    "dex",
+    "int"
+   ],
+   "skill_choices": {
+    "count": 4,
+    "options": [
+     "acrobatics",
+     "athletics",
+     "deception",
+     "insight",
+     "intimidation",
+     "investigation",
+     "perception",
+     "persuasion",
+     "sleight-of-hand",
+     "stealth"
+    ]
+   },
+   "weapon_proficiencies": "Simple weapons and Martial weapons that have the Finesse or Light property",
+   "armor_training": "Light armor",
+   "tool_proficiencies": "Thieves’ Tools",
+   "starting_equipment": "Choose A or B: (A) Leather Armor, 2 Daggers, Shortsword, Shortbow, 20 Arrows, Quiver, Thieves’ Tools, Burglar’s Pack, and 8 GP; or (B) 100 GP"
+  }
+ },
+ {
+  "kind": "class",
+  "slug": "sorcerer",
+  "name": "Sorcerer",
+  "page": 64,
+  "data": {
+   "primary_ability": "Charisma",
+   "hit_die": 6,
+   "saves": [
+    "con",
+    "cha"
+   ],
+   "skill_choices": {
+    "count": 2,
+    "options": [
+     "arcana",
+     "deception",
+     "insight",
+     "intimidation",
+     "persuasion",
+     "religion"
+    ]
+   },
+   "weapon_proficiencies": "Simple weapons",
+   "armor_training": "None",
+   "tool_proficiencies": "",
+   "starting_equipment": "Choose A or B: (A) Spear, 2 Daggers, Arcane Focus (crystal), Dungeoneer’s Pack, and 28 GP; or (B) 50 GP",
+   "spellcasting": {
+    "ability": "cha",
+    "progression": "full"
+   }
+  }
+ },
+ {
+  "kind": "class",
+  "slug": "warlock",
+  "name": "Warlock",
+  "page": 70,
+  "data": {
+   "primary_ability": "Charisma",
+   "hit_die": 8,
+   "saves": [
+    "wis",
+    "cha"
+   ],
+   "skill_choices": {
+    "count": 2,
+    "options": [
+     "arcana",
+     "deception",
+     "history",
+     "intimidation",
+     "investigation",
+     "nature",
+     "religion"
+    ]
+   },
+   "weapon_proficiencies": "Simple weapons",
+   "armor_training": "Light armor",
+   "tool_proficiencies": "",
+   "starting_equipment": "Choose A or B: (A) Leather Armor, Sickle, 2 Daggers, Arcane Focus (orb), Book (occult lore), Scholar’s Pack, and 15 GP; or (B) 100 GP",
+   "spellcasting": {
+    "ability": "cha",
+    "progression": "pact"
+   }
+  }
+ },
+ {
+  "kind": "class",
+  "slug": "wizard",
+  "name": "Wizard",
+  "page": 77,
+  "data": {
+   "primary_ability": "Intelligence",
+   "hit_die": 6,
+   "saves": [
+    "int",
+    "wis"
+   ],
+   "skill_choices": {
+    "count": 2,
+    "options": [
+     "arcana",
+     "history",
+     "insight",
+     "investigation",
+     "medicine",
+     "nature",
+     "religion"
+    ]
+   },
+   "weapon_proficiencies": "Simple weapons",
+   "armor_training": "None",
+   "tool_proficiencies": "",
+   "starting_equipment": "Choose A or B: (A) 2 Daggers, Arcane Focus (Quarterstaff), Robe, Spellbook, Scholar’s Pack, and 5 GP; or (B) 55 GP",
+   "spellcasting": {
+    "ability": "int",
+    "progression": "full"
+   }
+  }
+ }
+]
