@@ -21,7 +21,12 @@ Coverage grows a section at a time:
 | Subclasses (12) | Tagline, intro, features, always-prepared spells |
 | Class options (38) | Metamagic (cost) and Eldritch Invocations (prerequisite) |
 | Species (9), Backgrounds (4), Feats (17) | Traits, ability scores, feat categories and prerequisites |
-| Magic items, rules glossary | Not yet |
+| Magic items (258) | Category, rarity (per +N variant), attunement and prerequisites, text; values in `SRDItems` |
+| Rules glossary | Not yet |
+
+`addons/srd/data/authored/spell_overrides.json` is hand-written on top of the extraction:
+mechanics the text parser can't read (Hold Person, Haste, Hunter's Mark, Mage Armor...), and
+`disabled` for spells that aren't ordinary casts (the smites). `SRDContent.make_spell` merges it.
 
 ```bash
 python3 -m venv tools/.venv && tools/.venv/bin/pip install pymupdf
@@ -115,3 +120,23 @@ Portions of this content are from the System Reference Document 5.2.1 © 2025 Wi
 the Coast LLC, available at <https://dnd.wizards.com/resources/systems-reference-document>
 under the Creative Commons Attribution 4.0 International License. Wizards of the Coast
 endorsement is not implied.
+
+## Progression, gear and high-level play
+
+- **`SRDProgression`**: `summary()` (what a level grants), `choices()` (what it asks: ASI or feat,
+  masteries, Expertise, cantrips, prepared spells, Invocations, Metamagic, Mystic Arcanum, subclass
+  options), `resolve()` (a plain build at a level -> scores, options, spells), `auto_answer()`.
+- **`SRDRest`**: `short_rest_combatant(c, dice)` and `long_rest_combatant(c)` follow 5.2.1 (all Hit
+  Point Dice back on a Long Rest) and fire rest-time features (Arcane Recovery, Natural Recovery,
+  Sorcerous Restoration, Magical Cunning). The older `short_rest`/`long_rest` stay for other games.
+- **`ItemEffects.apply(c, mods_list)`**: worn gear as plain `mods` Dictionaries; it resets to the
+  bare character and folds them in, retroactive CON included.
+- **`ClassKit`**: `finish(c)` applies passives (Unarmored Defense, speed, Slippery Mind, resistances);
+  `FEATURE_ACTIONS`, `feature_actions()`, `can_use()`, `use_feature()` give a game a hotbar;
+  `on_hit_extras()` feeds `AttackResolver` (Radiant Strikes, Colossus Slayer, Primal Strike), which
+  also reads Hunter's Mark and Hex (`marked` effects), Cunning Strike and Savage Attacker.
+  `IMPLEMENTED` lists what the engine or its game apply.
+- **`MonsterSpells`**: stat-block Spellcasting (`parse`, `available`, `make_ability`) and save actions
+  (`parse_save_actions`, `save_ability`, Recharge), resolved through `SpellResolver`.
+- **`SpellPlanner`**: weighs candidate spells, in expected damage, against the plain attack and how
+  long the fight will last.
