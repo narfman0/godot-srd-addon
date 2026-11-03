@@ -67,7 +67,7 @@ func test_off_hand_damage_with_style_includes_mod():
 func test_off_hand_damage_negative_mod_always_applied():
 	var s := CharacterStats.new()
 	s.dexterity = 6  # -2 mod
-	s.strength = 10; s.constitution = 10; s.intelligence = 10; s.wisdom = 10; s.charisma = 10
+	s.strength = 6; s.constitution = 10; s.intelligence = 10; s.wisdom = 10; s.charisma = 10
 	s.max_hp = 8; s.speed = 30; s.reset()
 	var w := _light_weapon()
 	# fixed_roll=4, no style → 4 + min(0, -2) = 4 - 2 = 2

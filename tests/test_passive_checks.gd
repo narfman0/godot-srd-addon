@@ -14,16 +14,16 @@ func test_passive_perception_no_proficiency():
 	assert_eq(SRDRules.passive_check(s, SRD.Skill.PERCEPTION), 13)
 
 func test_passive_perception_with_proficiency():
-	var s := _make_char()  # WIS 16 → +3, level 4 → prof +3
+	var s := _make_char()  # WIS 16 → +3, level 4 → prof +2
 	s.set_skill_proficiency(SRD.Skill.PERCEPTION, true)
-	# 10 + 3 + 3 = 16
-	assert_eq(SRDRules.passive_check(s, SRD.Skill.PERCEPTION), 16)
+	# 10 + 3 + 2 = 15
+	assert_eq(SRDRules.passive_check(s, SRD.Skill.PERCEPTION), 15)
 
 func test_passive_perception_with_expertise():
-	var s := _make_char()  # WIS +3, prof +3 doubled = +6
+	var s := _make_char()  # WIS +3, prof +2 doubled = +4
 	s.set_skill_proficiency(SRD.Skill.PERCEPTION, true, true)
-	# 10 + 3 + 6 = 19
-	assert_eq(SRDRules.passive_check(s, SRD.Skill.PERCEPTION), 19)
+	# 10 + 3 + 4 = 17
+	assert_eq(SRDRules.passive_check(s, SRD.Skill.PERCEPTION), 17)
 
 func test_passive_stealth_dex_based():
 	var s := _make_char()  # DEX 14 → +2

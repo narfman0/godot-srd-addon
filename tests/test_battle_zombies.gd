@@ -61,6 +61,7 @@ func test_undead_fortitude_disabled_on_crit():
 
 func test_party_wins_vs_4_zombies():
 	var sim := _make_sim()
+	sim.fixed_save_d20 = 1  # a fixed 15 always passes Fortitude vs average damage; let it fail
 	var party := SRDFixtures.make_party_of_5()
 	var enemies := SRDMonsters.make_zombie_group(4)
 	var result := sim.run(party, enemies)
@@ -107,6 +108,7 @@ func test_zombie_attacks_deal_damage_to_party():
 func test_party_wins_vs_3_zombies_without_losses():
 	# 3 zombies is more manageable — expect clean win
 	var sim := _make_sim()
+	sim.fixed_save_d20 = 1  # a fixed 15 always passes Fortitude vs average damage; let it fail
 	var party := SRDFixtures.make_party_of_5()
 	var enemies := SRDMonsters.make_zombie_group(3)
 	var result := sim.run(party, enemies)

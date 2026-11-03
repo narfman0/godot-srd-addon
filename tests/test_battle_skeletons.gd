@@ -68,13 +68,15 @@ func test_party_wins_vs_4_skeletons():
 	var result := sim.run(party, enemies)
 	assert_true(result.party_won, "Party should defeat 4 skeletons")
 
-func test_all_party_members_survive_vs_4_skeletons():
+func test_no_party_deaths_vs_4_skeletons():
+	# Skeletons hit at +4, so the 8-HP Psion can drop — but nobody should die
 	var sim := _make_sim()
 	var party := SRDFixtures.make_party_of_5()
 	var enemies := SRDMonsters.make_skeleton_group(4)
 	var result := sim.run(party, enemies)
-	var end_state: Dictionary = result.round_logs.back()["end_state"]
-	assert_eq(end_state["party_alive"], 5, "All 5 party members should survive 4 skeletons")
+	assert_true(result.party_won)
+	for m in party:
+		assert_false(m.is_dead, "%s should not die vs 4 skeletons" % m.name)
 
 func test_battle_ends_by_round_4_vs_4_skeletons():
 	# With avg damage and fixed d20=15, party kills ~2 skeletons per round

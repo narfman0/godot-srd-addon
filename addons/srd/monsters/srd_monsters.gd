@@ -22,6 +22,7 @@ static func make_skeleton(id: int = 0) -> Combatant:
 	shortsword.weapon_type = SRD.WeaponType.MARTIAL
 	shortsword.damage_type = SRD.DamageType.PIERCING
 	shortsword.die_count = 1; shortsword.die_sides = 6
+	shortsword.properties = SRD.WeaponProperty.FINESSE | SRD.WeaponProperty.LIGHT
 	shortsword.range_normal = 5
 
 	var eq := EquipmentSlots.new()
@@ -33,6 +34,7 @@ static func make_skeleton(id: int = 0) -> Combatant:
 
 	var c := Combatant.new(s, shortsword, eq)
 	c.is_proficient_with_weapon = true  # +4 = DEX mod(+2) + prof(+2)
+	c.dies_at_zero_hp = true
 	return c
 
 # ── Zombie (CR 1/4, 50 XP) ──────────────────────────────────────────────────
@@ -66,6 +68,7 @@ static func make_zombie(id: int = 0) -> Combatant:
 	var c := Combatant.new(s, slam, eq)
 	c.is_proficient_with_weapon = true  # +3 = STR mod(+1) + prof(+2)
 	c.has_undead_fortitude = true
+	c.dies_at_zero_hp = true
 	return c
 
 # ── Group factories ──────────────────────────────────────────────────────────

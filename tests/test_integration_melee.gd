@@ -84,6 +84,10 @@ func test_full_combat_loop_one_character_wins():
 	for _round in max_rounds:
 		var current := order.current()
 		var other := beta if current == alpha else alpha
+		if not current.is_alive():
+			# Downed combatants don't act; their death saves are rolled on the other's turn
+			order.advance()
+			continue
 
 		if not other.is_alive():
 			# Other is already dying — check death saves

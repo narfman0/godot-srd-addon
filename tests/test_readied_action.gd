@@ -45,11 +45,11 @@ func test_trigger_returns_false_without_reaction():
 
 func test_trigger_invokes_callback():
 	var actor := _make_combatant()
-	var called := false
-	var cb := func(_a, _t): called = true
+	var calls := []  # lambdas capture locals by value; mutate a reference type
+	var cb := func(_a, _t): calls.append(true)
 	var ra := ReadiedAction.declare(actor, SRDActionTypes.Action.ATTACK, "trigger", cb)
 	ra.trigger(actor)
-	assert_true(called)
+	assert_eq(calls.size(), 1)
 
 func test_on_round_end_ends_concentration():
 	var actor := _make_combatant()

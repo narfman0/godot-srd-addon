@@ -70,8 +70,9 @@ func test_save_succeeds_target_takes_half():
 	assert_true(result_pass["damage"] <= result_fail["damage"])
 
 func test_slot_consumed_on_cast():
-	var slots := EnergySlots.make_full_caster(5)
+	var slots := EnergySlots.make_full_caster(7)  # level 7 full caster has 4th-level slots
 	var initial := slots.slots_remaining_at(4)
+	assert_gt(initial, 0)
 	slots.use_slot(4)
 	assert_eq(slots.slots_remaining_at(4), initial - 1)
 

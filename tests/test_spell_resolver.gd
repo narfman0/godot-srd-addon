@@ -1,5 +1,14 @@
 extends GutTest
 
+# Subclass that cancels every cast
+class CancelResolver extends SpellResolver:
+	func before_cast(_c, _a, _t) -> bool: return false
+
+# Subclass that always rolls max damage
+class MaxDmgResolver extends SpellResolver:
+	func roll_damage(ab: AbilityData, _cl: int, _cal: int) -> int:
+		return ab.damage_die_count * ab.damage_die_sides  # max
+
 # ── Fixtures ──────────────────────────────────────────────────────────────────
 
 func _make_psion(level: int = 5) -> Combatant:
@@ -76,7 +85,7 @@ func test_save_spell_successful_save_deals_half_damage():
 	var ev := resolver._resolve_save_spell(caster, ability, target, 1, 20)
 	assert_true(ev["saved"])
 	# half damage — damage_rolled should be > 0 but halved
-	assert_ge(ev["damage_dealt"], 0)
+	assert_gte(ev["damage_dealt"], 0)
 
 func test_save_spell_none_effect_on_save_deals_zero():
 	var caster := _make_psion()
@@ -164,11 +173,6 @@ func test_cast_before_cast_can_cancel():
 	var caster := _make_psion()
 	var target := _make_target(10, 30)
 	var ability := _make_save_ability()
-
-	# Subclass that cancels every cast
-	class CancelResolver extends SpellResolver:
-		func before_cast(_c, _a, _t) -> bool: return false
-
 	var resolver := CancelResolver.new()
 	var events := resolver.cast(caster, ability, [target])
 	assert_eq(events.size(), 0)
@@ -178,12 +182,6 @@ func test_cast_subclass_can_override_damage():
 	var caster := _make_psion()
 	var target := _make_target(10, 100)
 	var ability := _make_save_ability()
-
-	# Subclass that always rolls max damage
-	class MaxDmgResolver extends SpellResolver:
-		func roll_damage(ab: AbilityData, _cl: int, _cal: int) -> int:
-			return ab.damage_die_count * ab.damage_die_sides  # max
-
 	var resolver := MaxDmgResolver.new()
 	# inject d20=1 so target fails save, gets full damage
 	var ev := resolver._resolve_save_spell(caster, ability, target, 1, 1)

@@ -11,6 +11,9 @@ var conditions: ConditionTracker
 var energy_slots: EnergySlots
 var is_proficient_with_weapon: bool = true
 
+# SRD: monsters die outright at 0 HP; player characters fall unconscious and make death saves
+var dies_at_zero_hp: bool = false
+
 # Monster special trait flags
 var has_undead_fortitude: bool = false
 var undead_fortitude_immune_to_radiant: bool = true
@@ -57,6 +60,8 @@ func take_damage(amount: int, damage_type: SRD.DamageType,
 			var bonus := stats.ability_modifier(SRD.Ability.CONSTITUTION)
 			if d20 + bonus >= dc:
 				stats.current_hp = 1  # Undead Fortitude saves it
+	if stats.is_at_zero_hp() and dies_at_zero_hp:
+		death_saves.is_dead = true
 	return actual
 
 ## True if this combatant can still meaningfully act.

@@ -9,6 +9,7 @@ extends RefCounted
 
 ## Options
 var fixed_d20: int = 0          # 0 = random; 1-20 = always use this value
+var fixed_save_d20: int = 0     # 0 = follow fixed_d20; 1-20 = pin saving throws (e.g. Undead Fortitude) separately
 var use_average_damage: bool = false
 var max_rounds: int = 20
 
@@ -140,7 +141,8 @@ func _resolve_attack(actor: Combatant, target: Combatant) -> Dictionary:
 		damage = _roll_damage(weapon, actor.stats)
 		if crit:
 			damage += _roll_damage_dice_only(weapon)
-		damage_dealt = target.take_damage(damage, weapon.damage_type, crit, fixed_d20)
+		damage_dealt = target.take_damage(damage, weapon.damage_type, crit,
+				fixed_save_d20 if fixed_save_d20 > 0 else fixed_d20)
 
 	return {
 		"type": "attack",
