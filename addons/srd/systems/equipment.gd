@@ -6,8 +6,13 @@ var shield: ArmorData = null
 var main_hand: WeaponData = null
 var off_hand: WeaponData = null  # light weapon or shield stored here too
 
+## Monster stat-block AC; 0 = derive from armor/shield/DEX.
+var natural_ac: int = 0
+
 ## Compute total AC for a character given their equipped armor + shield.
 func current_ac(char: CharacterStats) -> int:
+	if natural_ac > 0:
+		return natural_ac  # stat-block AC already includes armor, shield, and DEX
 	var base := 10 + char.ability_modifier(SRD.Ability.DEXTERITY)  # unarmored
 	if armor != null and armor.armor_type != SRD.ArmorType.SHIELD:
 		base = armor.equipped_ac(char)

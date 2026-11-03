@@ -95,7 +95,7 @@ enum WeaponProperty {
 	SPECIAL     = 256,
 }
 
-enum SlotProgression { NONE, FULL, HALF, THIRD }
+enum SlotProgression { NONE, FULL, HALF, THIRD, PACT }
 
 enum AoEShape { SPHERE, CONE, LINE, CUBE, CYLINDER }
 

@@ -1,0 +1,174 @@
+[
+  {
+    "kind": "feature",
+    "slug": "spellcasting-cleric",
+    "version": 1,
+    "name": "Spellcasting (Cleric)",
+    "data": {
+      "description": "You cast cleric spells using Wisdom as your spellcasting ability. You know all cleric spells of levels for which you have spell slots and can prepare a number of them equal to your Wisdom modifier + your cleric level each day.",
+      "ownerKind": "class",
+      "ownerSlug": "cleric",
+      "minLevel": 1,
+      "modifiers": [
+        {
+          "kind": "stat-modifier",
+          "target": "spellcasting.ability",
+          "mode": "OVERRIDE",
+          "value": "wis"
+        }
+      ]
+    }
+  },
+  {
+    "kind": "feature",
+    "slug": "divine-order",
+    "version": 1,
+    "name": "Divine Order",
+    "data": {
+      "description": "Choose one of two divine callings — Protector or Thaumaturge — that shapes your martial or mystical focus as a cleric.",
+      "ownerKind": "class",
+      "ownerSlug": "cleric",
+      "minLevel": 1,
+      "note": "SRD 5.2: Choose Protector or Thaumaturge at L1. Player pick stored in character.featureChoices.divine-order.feature.feature; the chosen sub-feature row is loaded by the engine.",
+      "choices": {
+        "feature": {
+          "allowedFeatures": [
+            "divine-order-protector",
+            "divine-order-thaumaturge"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "kind": "feature",
+    "slug": "divine-order-protector",
+    "version": 1,
+    "name": "Divine Order: Protector",
+    "data": {
+      "description": "You gain proficiency with Heavy Armor and Martial weapons, allowing you to serve on the front lines as a warrior of your deity.",
+      "ownerKind": "feature",
+      "ownerSlug": "divine-order",
+      "note": "SRD 5.2 Protector: Proficiency with Heavy Armor and Martial weapons.",
+      "modifiers": [
+        { "kind": "stat-modifier", "target": "proficiency.armor.heavy", "mode": "OVERRIDE", "value": true },
+        { "kind": "stat-modifier", "target": "proficiency.weapon.martial", "mode": "OVERRIDE", "value": true }
+      ]
+    }
+  },
+  {
+    "kind": "feature",
+    "slug": "divine-order-thaumaturge",
+    "version": 1,
+    "name": "Divine Order: Thaumaturge",
+    "data": {
+      "description": "You learn one additional cleric cantrip and gain proficiency in one of the following skills: Arcana, History, Nature, or Religion.",
+      "ownerKind": "feature",
+      "ownerSlug": "divine-order",
+      "note": "SRD 5.2 Thaumaturge: Extra cleric cantrip (pick from SRD cantrips) + proficiency in one of Arcana/History/Nature/Religion. WisMod bonus to the chosen skill cannot be gated on the skill pick — engine limitation; omitted.",
+      "choices": {
+        "spell": { "allowedSpells": ["sacred-flame","toll-the-dead","guidance","light"] },
+        "skillProficiencies": { "allowedSkills": ["arcana","history","nature","religion"], "pick": 1 }
+      }
+    }
+  },
+  {
+    "kind": "feature",
+    "slug": "channel-divinity",
+    "version": 1,
+    "name": "Channel Divinity",
+    "data": {
+      "description": "You can channel divine energy to fuel magical effects. You start with Turn Undead and gain additional Channel Divinity options from your subclass. You can use Channel Divinity a number of times per Short Rest that increases as you gain cleric levels.",
+      "ownerKind": "class",
+      "ownerSlug": "cleric",
+      "minLevel": 2,
+      "note": "Uses per short rest scale with cleric level: 2 at L2, 3 at L6, 4 at L18. Uses perClass cleric table for automatic scaling.",
+      "activities": [
+        {
+          "id": "channel-divinity",
+          "type": "utility",
+          "name": "Channel Divinity",
+          "cost": "action",
+          "uses": {
+            "max": { "perClass": "cleric", "table": [2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,4,4,4] },
+            "per": "short-rest"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "kind": "feature",
+    "slug": "turn-undead",
+    "version": 1,
+    "name": "Channel Divinity: Turn Undead",
+    "data": {
+      "description": "As an Action, expend a Channel Divinity use to present your holy symbol. Each undead within 30 feet must make a Wisdom saving throw against your spell save DC or be turned for 1 minute. A turned creature must spend its turns moving away from you and can't willingly move closer.",
+      "ownerKind": "class",
+      "ownerSlug": "cleric",
+      "minLevel": 2,
+      "note": "Consumes a Channel Divinity use; undead in range make a Wisdom save (spell DC) or are turned for 1 minute. v0 surfaces the save action; the resource accounting lives on the Channel Divinity activity.",
+      "activities": [
+        {
+          "id": "turn-undead",
+          "type": "save",
+          "name": "Turn Undead",
+          "cost": "action",
+          "range": {
+            "value": 30,
+            "units": "ft"
+          },
+          "save": {
+            "ability": "wis",
+            "dc": {
+              "calc": "spell"
+            }
+          }
+        }
+      ]
+    }
+  },
+  {
+    "kind": "feature",
+    "slug": "cleric-subclass",
+    "version": 1,
+    "name": "Cleric Subclass",
+    "data": {
+      "description": "Choose a Divine Domain that defines your sacred calling, granting you domain spells and special abilities at 3rd level and again as you advance.",
+      "ownerKind": "class",
+      "ownerSlug": "cleric",
+      "minLevel": 3,
+      "note": "Placeholder for Divine Domain selection (Life / Light / Trickery / War in 2024 SRD 5.2). The chosen subclass slug lives on character.classes[].subclass.",
+      "choice": {
+        "kind": "subclass",
+        "pick": 1,
+        "from": "cleric-subclasses"
+      }
+    }
+  },
+  {
+    "kind": "feature",
+    "slug": "sear-undead",
+    "version": 1,
+    "name": "Sear Undead",
+    "data": {
+      "description": "When you use Turn Undead, you can deal Radiant damage to each undead that fails its saving throw. The damage equals your Wisdom modifier times a d8 (minimum 1 die), though this damage doesn't force the creature to move away.",
+      "ownerKind": "class",
+      "ownerSlug": "cleric",
+      "minLevel": 5,
+      "activities": [
+        {
+          "id": "sear-undead",
+          "type": "damage",
+          "name": "Sear Undead",
+          "cost": "free",
+          "damage": {
+            "parts": [
+              { "dice": { "perAbilityMod": "wis", "dieSize": 8 }, "type": "radiant" }
+            ]
+          }
+        }
+      ]
+    }
+  }
+]

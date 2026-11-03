@@ -1,0 +1,1012 @@
+[
+  {
+    "kind": "spell",
+    "slug": "arcane-eye",
+    "version": 1,
+    "name": "Arcane Eye",
+    "data": {
+      "level": 4,
+      "school": "divination",
+      "castingTime": "action",
+      "range": {
+        "value": 30,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "1 hour",
+      "concentration": true,
+      "ritual": false,
+      "materialComponent": "a bit of bat fur",
+      "classes": [
+        "wizard"
+      ],
+      "activities": [
+        {
+          "id": "arcane-eye-cast",
+          "type": "utility",
+          "name": "Arcane Eye",
+          "cost": "action",
+          "target": {
+            "affects": "self"
+          },
+          "note": "Create an invisible magical eye that you can see through (darkvision 30 ft). Action to move it up to 30 ft in any direction. Concentration, 1 hour."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "banishment",
+    "version": 1,
+    "name": "Banishment",
+    "data": {
+      "level": 4,
+      "school": "abjuration",
+      "castingTime": "action",
+      "range": {
+        "value": 60,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "concentration, up to 1 minute",
+      "concentration": true,
+      "ritual": false,
+      "activities": [
+        {
+          "id": "banishment-cast",
+          "type": "save",
+          "name": "Banishment",
+          "cost": "action",
+          "save": {
+            "ability": "cha",
+            "dc": {
+              "calc": "spell"
+            }
+          },
+          "target": {
+            "affects": "creature",
+            "count": 1
+          },
+          "scalesWithSlotLevel": {
+            "perSlotAbove": 4,
+            "addTargets": 1
+          },
+          "note": "On a failed CHA save, target is banished to a harmless demiplane (if native to your plane) or to its home plane (if outsider, possibly permanent if concentration is maintained for the full minute). v0 cannot model planar shifts — surfaces as a note. Target is Incapacitated while banished and reappears in the space it left when the spell ends."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "black-tentacles",
+    "version": 1,
+    "name": "Black Tentacles",
+    "data": {
+      "level": 4,
+      "school": "conjuration",
+      "castingTime": "action",
+      "range": {
+        "value": 90,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "1 minute",
+      "concentration": true,
+      "ritual": false,
+      "materialComponent": "a piece of tentacle from a giant octopus or a giant squid",
+      "classes": [
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "blight",
+    "version": 1,
+    "name": "Blight",
+    "data": {
+      "level": 4,
+      "school": "necromancy",
+      "castingTime": "action",
+      "range": {
+        "value": 30,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": false,
+      "classes": [
+        "druid",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "confusion",
+    "version": 1,
+    "name": "Confusion",
+    "data": {
+      "level": 4,
+      "school": "enchantment",
+      "castingTime": "action",
+      "range": {
+        "value": 90,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "1 minute",
+      "concentration": true,
+      "ritual": false,
+      "materialComponent": "three nut shells",
+      "classes": [
+        "bard",
+        "druid",
+        "sorcerer",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "conjure-minor-elementals",
+    "version": 1,
+    "name": "Conjure Minor Elementals",
+    "data": {
+      "level": 4,
+      "school": "conjuration",
+      "castingTime": "1 minute",
+      "range": {
+        "value": 90,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "1 hour",
+      "concentration": true,
+      "ritual": false,
+      "classes": [
+        "druid",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "conjure-woodland-beings",
+    "version": 1,
+    "name": "Conjure Woodland Beings",
+    "data": {
+      "level": 4,
+      "school": "conjuration",
+      "castingTime": "action",
+      "range": {
+        "value": 60,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "1 hour",
+      "concentration": true,
+      "ritual": false,
+      "materialComponent": "one holly berry per creature summoned",
+      "classes": [
+        "druid",
+        "ranger"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "control-water",
+    "version": 1,
+    "name": "Control Water",
+    "data": {
+      "level": 4,
+      "school": "transmutation",
+      "castingTime": "action",
+      "range": {
+        "value": 300,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "10 minutes",
+      "concentration": true,
+      "ritual": false,
+      "materialComponent": "a drop of water and a pinch of dust",
+      "classes": [
+        "cleric",
+        "druid",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "death-ward",
+    "version": 1,
+    "name": "Death Ward",
+    "data": {
+      "level": 4,
+      "school": "abjuration",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "touch"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "8 hours",
+      "concentration": false,
+      "ritual": false,
+      "classes": [
+        "cleric",
+        "paladin"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "dimension-door",
+    "version": 1,
+    "name": "Dimension Door",
+    "data": {
+      "level": 4,
+      "school": "conjuration",
+      "castingTime": "action",
+      "range": {
+        "value": 500,
+        "units": "ft"
+      },
+      "components": [
+        "v"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": false,
+      "activities": [
+        {
+          "id": "dimension-door-cast",
+          "type": "utility",
+          "name": "Dimension Door",
+          "cost": "action",
+          "target": {
+            "affects": "self"
+          },
+          "note": "Teleport yourself, plus optionally one willing creature within 5 ft of you (and gear it carries up to its carrying capacity), to any spot within 500 ft you can visualize. If you'd arrive in an occupied space, both teleporters take 4d6 force damage and the spell fails to teleport."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "divination",
+    "version": 1,
+    "name": "Divination",
+    "data": {
+      "level": 4,
+      "school": "divination",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "self"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": true,
+      "materialComponent": "incense and a sacrificial offering appropriate to your religion, together worth at least 25 gp, which the spell consumes",
+      "classes": [
+        "cleric"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "dominate-beast",
+    "version": 1,
+    "name": "Dominate Beast",
+    "data": {
+      "level": 4,
+      "school": "enchantment",
+      "castingTime": "action",
+      "range": {
+        "value": 60,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "1 minute",
+      "concentration": true,
+      "ritual": false,
+      "classes": [
+        "druid",
+        "sorcerer"
+      ],
+      "activities": [
+        {
+          "id": "dominate-beast-cast",
+          "type": "save",
+          "name": "Dominate Beast",
+          "cost": "action",
+          "save": {
+            "ability": "wis",
+            "dc": {
+              "calc": "spell"
+            }
+          },
+          "target": {
+            "affects": "creature",
+            "count": 1
+          },
+          "scalesWithSlotLevel": {
+            "perSlotAbove": 4,
+            "addDurationStep": 1
+          },
+          "note": "Beast target (WIS save negates). On failure, charmed and you may telepathically command. Target re-saves when damaged. Concentration, 1 minute (longer with upcast)."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "fabricate",
+    "version": 1,
+    "name": "Fabricate",
+    "data": {
+      "level": 4,
+      "school": "transmutation",
+      "castingTime": "10 minutes",
+      "range": {
+        "value": 120,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": false,
+      "classes": [
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "faithful-hound",
+    "version": 1,
+    "name": "Faithful Hound",
+    "data": {
+      "level": 4,
+      "school": "conjuration",
+      "castingTime": "action",
+      "range": {
+        "value": 30,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "8 hours",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "a tiny silver whistle, a piece of bone, and a thread",
+      "classes": [
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "fire-shield",
+    "version": 1,
+    "name": "Fire Shield",
+    "data": {
+      "level": 4,
+      "school": "evocation",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "self"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "10 minutes",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "a bit of phosphorus or a firefly",
+      "classes": [
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "freedom-of-movement",
+    "version": 1,
+    "name": "Freedom of Movement",
+    "data": {
+      "level": 4,
+      "school": "abjuration",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "touch"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "1 hour",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "a leather strap, bound around the arm or a similar appendage",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "ranger"
+      ],
+      "activities": [
+        {
+          "id": "freedom-of-movement-cast",
+          "type": "utility",
+          "name": "Freedom of Movement",
+          "cost": "action",
+          "target": {
+            "affects": "creature",
+            "count": 1
+          },
+          "note": "Target's movement is unimpeded by difficult terrain, magical effects that reduce speed, paralysis, or restraints. Underwater movement at normal speed. Duration: 1 hour."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "giant-insect",
+    "version": 1,
+    "name": "Giant Insect",
+    "data": {
+      "level": 4,
+      "school": "transmutation",
+      "castingTime": "action",
+      "range": {
+        "value": 30,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "10 minutes",
+      "concentration": true,
+      "ritual": false,
+      "classes": [
+        "druid"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "greater-invisibility",
+    "version": 1,
+    "name": "Greater Invisibility",
+    "data": {
+      "level": 4,
+      "school": "illusion",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "touch"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "concentration, up to 1 minute",
+      "concentration": true,
+      "ritual": false,
+      "activities": [
+        {
+          "id": "greater-invisibility-cast",
+          "type": "utility",
+          "name": "Greater Invisibility",
+          "cost": "action",
+          "target": {
+            "affects": "creature",
+            "count": 1
+          },
+          "note": "Target (and anything it carries) gains the Invisible condition for the duration. Unlike Invisibility, the spell does NOT end when the target attacks or casts a spell."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "hallucinatory-terrain",
+    "version": 1,
+    "name": "Hallucinatory Terrain",
+    "data": {
+      "level": 4,
+      "school": "illusion",
+      "castingTime": "10 minutes",
+      "range": {
+        "value": 300,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "24 hours",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "a stone, a twig, and a bit of green plant",
+      "classes": [
+        "bard",
+        "druid",
+        "warlock",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "ice-storm",
+    "version": 1,
+    "name": "Ice Storm",
+    "data": {
+      "level": 4,
+      "school": "evocation",
+      "castingTime": "action",
+      "range": {
+        "value": 300,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "a pinch of dust and a few drops of water",
+      "classes": [
+        "druid",
+        "sorcerer",
+        "wizard"
+      ],
+      "activities": [
+        {
+          "id": "ice-storm-cast",
+          "type": "save",
+          "name": "Ice Storm",
+          "cost": "action",
+          "save": {
+            "ability": "dex",
+            "dc": {
+              "calc": "spell"
+            }
+          },
+          "damage": {
+            "parts": [
+              {
+                "dice": "2d8",
+                "type": "bludgeoning",
+                "halfOnSave": true
+              },
+              {
+                "dice": "4d6",
+                "type": "cold",
+                "halfOnSave": true
+              }
+            ],
+            "scalesWithSlotLevel": {
+              "perSlotAbove": 4,
+              "addDice": "1d8",
+              "addDiceType": "bludgeoning"
+            }
+          },
+          "target": {
+            "affects": "area",
+            "shape": "cylinder",
+            "radius": 20,
+            "height": 40
+          },
+          "note": "Each creature in cylinder: DEX save. On failure 2d8 bludgeoning + 4d6 cold (half on success). Area becomes difficult terrain."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "locate-creature",
+    "version": 1,
+    "name": "Locate Creature",
+    "data": {
+      "level": 4,
+      "school": "divination",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "self"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "1 hour",
+      "concentration": true,
+      "ritual": false,
+      "materialComponent": "a bit of fur from a bloodhound",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "paladin",
+        "ranger",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "phantasmal-killer",
+    "version": 1,
+    "name": "Phantasmal Killer",
+    "data": {
+      "level": 4,
+      "school": "illusion",
+      "castingTime": "action",
+      "range": {
+        "value": 120,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "1 minute",
+      "concentration": true,
+      "ritual": false,
+      "classes": [
+        "wizard"
+      ],
+      "activities": [
+        {
+          "id": "phantasmal-killer-cast",
+          "type": "save",
+          "name": "Phantasmal Killer",
+          "cost": "action",
+          "save": {
+            "ability": "wis",
+            "dc": {
+              "calc": "spell"
+            }
+          },
+          "damage": {
+            "parts": [
+              {
+                "dice": "4d10",
+                "type": "psychic"
+              }
+            ],
+            "scalesWithSlotLevel": {
+              "perSlotAbove": 4,
+              "addDice": "1d10"
+            }
+          },
+          "target": {
+            "affects": "creature",
+            "count": 1
+          },
+          "note": "Target makes a WIS save or becomes frightened. While frightened, it makes another WIS save at end of each turn; on failure takes 4d10 psychic."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "polymorph",
+    "version": 1,
+    "name": "Polymorph",
+    "data": {
+      "level": 4,
+      "school": "transmutation",
+      "castingTime": "action",
+      "range": {
+        "value": 60,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "concentration, up to 1 hour",
+      "concentration": true,
+      "ritual": false,
+      "activities": [
+        {
+          "id": "polymorph-cast",
+          "type": "save",
+          "name": "Polymorph",
+          "cost": "action",
+          "save": {
+            "ability": "wis",
+            "dc": {
+              "calc": "spell"
+            }
+          },
+          "target": {
+            "affects": "creature",
+            "count": 1
+          },
+          "note": "On a failed WIS save, the target is transformed into a beast whose CR is no higher than the target's CR (or level). Full statblock replacement (HP, attacks, abilities) is OUT OF SCOPE for v0 — the engine does not model form overlay. The target's game stats are replaced by the beast's; it retains alignment and personality. Reverts on 0 HP or duration end."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "private-sanctum",
+    "version": 1,
+    "name": "Private Sanctum",
+    "data": {
+      "level": 4,
+      "school": "abjuration",
+      "castingTime": "10 minutes",
+      "range": {
+        "value": 120,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "24 hours",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "a thin sheet of lead, a piece of opaque glass, a wad of cotton or cloth, and powdered chrysolite",
+      "classes": [
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "resilient-sphere",
+    "version": 1,
+    "name": "Resilient Sphere",
+    "data": {
+      "level": 4,
+      "school": "evocation",
+      "castingTime": "action",
+      "range": {
+        "value": 30,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "1 minute",
+      "concentration": true,
+      "ritual": false,
+      "materialComponent": "a hemispherical piece of clear crystal and a matching hemispherical piece of gum arabic",
+      "classes": [
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "secret-chest",
+    "version": 1,
+    "name": "Secret Chest",
+    "data": {
+      "level": 4,
+      "school": "conjuration",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "touch"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "an exquisite chest, 3 feet by 2 feet by 2 feet, constructed from rare materials worth at least 5,000 gp, and a Tiny replica made from the same materials worth at least 50 gp",
+      "classes": [
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "stone-shape",
+    "version": 1,
+    "name": "Stone Shape",
+    "data": {
+      "level": 4,
+      "school": "transmutation",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "touch"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "soft clay, which must be worked into roughly the desired shape of the stone object",
+      "classes": [
+        "cleric",
+        "druid",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "stoneskin",
+    "version": 1,
+    "name": "Stoneskin",
+    "data": {
+      "level": 4,
+      "school": "abjuration",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "touch"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "1 hour",
+      "concentration": true,
+      "ritual": false,
+      "materialComponent": "diamond dust worth 100 gp, which the spell consumes",
+      "classes": [
+        "druid",
+        "ranger",
+        "sorcerer",
+        "wizard"
+      ],
+      "activities": [
+        {
+          "id": "stoneskin-cast",
+          "type": "utility",
+          "name": "Stoneskin",
+          "cost": "action",
+          "target": {
+            "affects": "creature",
+            "count": 1
+          },
+          "note": "Target gains resistance to nonmagical bludgeoning, piercing, and slashing damage. Material: 100 gp diamond dust. Concentration, 1 hour."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "wall-of-fire",
+    "version": 1,
+    "name": "Wall of Fire",
+    "data": {
+      "level": 4,
+      "school": "evocation",
+      "castingTime": "action",
+      "range": {
+        "value": 120,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "concentration, up to 1 minute",
+      "concentration": true,
+      "ritual": false,
+      "activities": [
+        {
+          "id": "wall-of-fire-cast",
+          "type": "save",
+          "name": "Wall of Fire",
+          "cost": "action",
+          "save": {
+            "ability": "dex",
+            "dc": {
+              "calc": "spell"
+            }
+          },
+          "damage": {
+            "parts": [
+              {
+                "dice": "5d8",
+                "type": "fire",
+                "halfOnSave": true
+              }
+            ],
+            "scalesWithSlotLevel": {
+              "perSlotAbove": 4,
+              "addDice": "1d8"
+            }
+          },
+          "target": {
+            "affects": "area",
+            "shape": "wall",
+            "length": 60,
+            "height": 20,
+            "width": 1
+          },
+          "note": "Wall is opaque from one side (caster's choice) which deals damage on entry or starting turn within 10 ft. The other side does no damage. Creatures within wall on cast make a DEX save."
+        }
+      ]
+    }
+  }
+]

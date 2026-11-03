@@ -1,0 +1,1247 @@
+[
+  {
+    "kind": "spell",
+    "slug": "animate-objects",
+    "version": 1,
+    "name": "Animate Objects",
+    "data": {
+      "level": 5,
+      "school": "transmutation",
+      "castingTime": "action",
+      "range": {
+        "value": 120,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "1 minute",
+      "concentration": true,
+      "ritual": false,
+      "classes": [
+        "bard",
+        "sorcerer",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "antilife-shell",
+    "version": 1,
+    "name": "Antilife Shell",
+    "data": {
+      "level": 5,
+      "school": "abjuration",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "self",
+        "area": 10
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "1 hour",
+      "concentration": true,
+      "ritual": false,
+      "classes": [
+        "druid"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "arcane-hand",
+    "version": 1,
+    "name": "Arcane Hand",
+    "data": {
+      "level": 5,
+      "school": "evocation",
+      "castingTime": "action",
+      "range": {
+        "value": 120,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "1 minute",
+      "concentration": true,
+      "ritual": false,
+      "materialComponent": "an eggshell and a snakeskin glove",
+      "classes": [
+        "wizard"
+      ],
+      "activities": [
+        {
+          "id": "arcane-hand-cast",
+          "type": "attack",
+          "name": "Arcane Hand (Bigby's Hand)",
+          "cost": "action",
+          "attack": {
+            "ability": "spellcasting",
+            "classification": "spell",
+            "range": "ranged",
+            "damage": [
+              {
+                "dice": "4d8",
+                "type": "force"
+              }
+            ]
+          },
+          "damage": {
+            "parts": [
+              {
+                "dice": "4d8",
+                "type": "force"
+              }
+            ],
+            "scalesWithSlotLevel": {
+              "perSlotAbove": 5,
+              "addDice": "2d8"
+            }
+          },
+          "target": {
+            "affects": "creature",
+            "count": 1
+          },
+          "note": "Conjure a Large hand. Bonus action to direct: Clenched Fist (4d8 force on hit), Forceful Hand (push/shove), Grasping Hand (grapple), Interposing Hand (half cover)."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "awaken",
+    "version": 1,
+    "name": "Awaken",
+    "data": {
+      "level": 5,
+      "school": "transmutation",
+      "castingTime": "8 hours",
+      "range": {
+        "value": 0,
+        "units": "touch"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "an agate worth at least 1,000 gp, which the spell consumes",
+      "classes": [
+        "bard",
+        "druid"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "cloudkill",
+    "version": 1,
+    "name": "Cloudkill",
+    "data": {
+      "level": 5,
+      "school": "conjuration",
+      "castingTime": "action",
+      "range": {
+        "value": 120,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "10 minutes",
+      "concentration": true,
+      "ritual": false,
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "commune",
+    "version": 1,
+    "name": "Commune",
+    "data": {
+      "level": 5,
+      "school": "divination",
+      "castingTime": "1 minute",
+      "range": {
+        "value": 0,
+        "units": "self"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "1 minute",
+      "concentration": false,
+      "ritual": true,
+      "materialComponent": "incense and a vial of holy or unholy water",
+      "classes": [
+        "cleric"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "commune-with-nature",
+    "version": 1,
+    "name": "Commune with Nature",
+    "data": {
+      "level": 5,
+      "school": "divination",
+      "castingTime": "1 minute",
+      "range": {
+        "value": 0,
+        "units": "self"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": true,
+      "classes": [
+        "druid",
+        "ranger"
+      ],
+      "activities": [
+        {
+          "id": "commune-with-nature-cast",
+          "type": "utility",
+          "name": "Commune with Nature",
+          "cost": "1 minute",
+          "target": {
+            "affects": "self"
+          },
+          "note": "Become aware of nature within 3 miles (or 300 ft underground). Learn up to three facts about terrain/bodies of water/plants/creatures/buildings/celestial bodies. Cannot be cast indoors."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "cone-of-cold",
+    "version": 1,
+    "name": "Cone of Cold",
+    "data": {
+      "level": 5,
+      "school": "evocation",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "self"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": false,
+      "activities": [
+        {
+          "id": "cone-of-cold-cast",
+          "type": "save",
+          "name": "Cone of Cold",
+          "cost": "action",
+          "save": {
+            "ability": "con",
+            "dc": {
+              "calc": "spell"
+            }
+          },
+          "damage": {
+            "parts": [
+              {
+                "dice": "8d8",
+                "type": "cold",
+                "halfOnSave": true
+              }
+            ],
+            "scalesWithSlotLevel": {
+              "perSlotAbove": 5,
+              "addDice": "1d8"
+            }
+          },
+          "target": {
+            "affects": "area",
+            "shape": "cone",
+            "length": 60
+          }
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "conjure-elemental",
+    "version": 1,
+    "name": "Conjure Elemental",
+    "data": {
+      "level": 5,
+      "school": "conjuration",
+      "castingTime": "1 minute",
+      "range": {
+        "value": 90,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "1 hour",
+      "concentration": true,
+      "ritual": false,
+      "materialComponent": "burning incense for air, soft clay for earth, sulfur and phosphorus for fire, or water and sand for water",
+      "classes": [
+        "druid",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "contact-other-plane",
+    "version": 1,
+    "name": "Contact Other Plane",
+    "data": {
+      "level": 5,
+      "school": "divination",
+      "castingTime": "1 minute",
+      "range": {
+        "value": 0,
+        "units": "self"
+      },
+      "components": [
+        "v"
+      ],
+      "duration": "1 minute",
+      "concentration": false,
+      "ritual": true,
+      "classes": [
+        "warlock",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "contagion",
+    "version": 1,
+    "name": "Contagion",
+    "data": {
+      "level": 5,
+      "school": "necromancy",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "touch"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "7 days",
+      "concentration": false,
+      "ritual": false,
+      "classes": [
+        "cleric",
+        "druid"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "creation",
+    "version": 1,
+    "name": "Creation",
+    "data": {
+      "level": 5,
+      "school": "illusion",
+      "castingTime": "1 minute",
+      "range": {
+        "value": 30,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "special",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "a tiny piece of matter of the same type of the item you plan to create",
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "dispel-evil-and-good",
+    "version": 1,
+    "name": "Dispel Evil and Good",
+    "data": {
+      "level": 5,
+      "school": "abjuration",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "self"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "1 minute",
+      "concentration": true,
+      "ritual": false,
+      "materialComponent": "holy water or powdered silver and iron",
+      "classes": [
+        "cleric",
+        "paladin"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "dominate-person",
+    "version": 1,
+    "name": "Dominate Person",
+    "data": {
+      "level": 5,
+      "school": "enchantment",
+      "castingTime": "action",
+      "range": {
+        "value": 60,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "1 minute",
+      "concentration": true,
+      "ritual": false,
+      "classes": [
+        "bard",
+        "sorcerer",
+        "wizard"
+      ],
+      "activities": [
+        {
+          "id": "dominate-person-cast",
+          "type": "save",
+          "name": "Dominate Person",
+          "cost": "action",
+          "save": {
+            "ability": "wis",
+            "dc": {
+              "calc": "spell"
+            }
+          },
+          "target": {
+            "affects": "creature",
+            "count": 1
+          },
+          "note": "Humanoid target (WIS save negates). On failure, charmed and you can telepathically command. Target re-saves whenever it takes damage. Concentration, up to 1 minute (longer with higher slots).",
+          "scalesWithSlotLevel": {
+            "perSlotAbove": 5,
+            "addDurationStep": 1
+          }
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "dream",
+    "version": 1,
+    "name": "Dream",
+    "data": {
+      "level": 5,
+      "school": "illusion",
+      "castingTime": "1 minute",
+      "range": {
+        "value": 0,
+        "units": "special"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "8 hours",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "a handful of sand, a dab of ink, and a writing quill plucked from a sleeping bird",
+      "classes": [
+        "bard",
+        "warlock",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "flame-strike",
+    "version": 1,
+    "name": "Flame Strike",
+    "data": {
+      "level": 5,
+      "school": "evocation",
+      "castingTime": "action",
+      "range": {
+        "value": 60,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "pinch of sulfur",
+      "classes": [
+        "cleric"
+      ],
+      "activities": [
+        {
+          "id": "flame-strike-cast",
+          "type": "save",
+          "name": "Flame Strike",
+          "cost": "action",
+          "save": {
+            "ability": "dex",
+            "dc": {
+              "calc": "spell"
+            }
+          },
+          "damage": {
+            "parts": [
+              {
+                "dice": "4d6",
+                "type": "fire",
+                "halfOnSave": true
+              },
+              {
+                "dice": "4d6",
+                "type": "radiant",
+                "halfOnSave": true
+              }
+            ],
+            "scalesWithSlotLevel": {
+              "perSlotAbove": 5,
+              "addDice": "1d6",
+              "addDiceType": "split"
+            }
+          },
+          "target": {
+            "affects": "area",
+            "shape": "cylinder",
+            "radius": 10,
+            "height": 40
+          },
+          "note": "DEX save: 4d6 fire + 4d6 radiant, half on success. Upcast: +1d6 of each per slot above 5th."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "geas",
+    "version": 1,
+    "name": "Geas",
+    "data": {
+      "level": 5,
+      "school": "enchantment",
+      "castingTime": "1 minute",
+      "range": {
+        "value": 60,
+        "units": "ft"
+      },
+      "components": [
+        "v"
+      ],
+      "duration": "30 days",
+      "concentration": false,
+      "ritual": false,
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "paladin",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "greater-restoration",
+    "version": 1,
+    "name": "Greater Restoration",
+    "data": {
+      "level": 5,
+      "school": "abjuration",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "touch"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "diamond dust worth at least 100 gp, which the spell consumes",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid"
+      ],
+      "activities": [
+        {
+          "id": "greater-restoration-cast",
+          "type": "utility",
+          "name": "Greater Restoration",
+          "cost": "action",
+          "target": {
+            "affects": "creature",
+            "count": 1
+          },
+          "note": "Reduce target’s exhaustion by one, OR end charmed/petrified/cursed, one reduction to ability/HP max, or any spell with that effect."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "hallow",
+    "version": 1,
+    "name": "Hallow",
+    "data": {
+      "level": 5,
+      "school": "evocation",
+      "castingTime": "24 hours",
+      "range": {
+        "value": 0,
+        "units": "touch"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "until dispelled",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "herbs, oils, and incense worth at least 1,000 gp, which the spell consumes",
+      "classes": [
+        "cleric"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "hold-monster",
+    "version": 1,
+    "name": "Hold Monster",
+    "data": {
+      "level": 5,
+      "school": "enchantment",
+      "castingTime": "action",
+      "range": {
+        "value": 90,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "concentration, up to 1 minute",
+      "concentration": true,
+      "ritual": false,
+      "activities": [
+        {
+          "id": "hold-monster-cast",
+          "type": "save",
+          "name": "Hold Monster",
+          "cost": "action",
+          "save": {
+            "ability": "wis",
+            "dc": {
+              "calc": "spell"
+            }
+          },
+          "target": {
+            "affects": "creature",
+            "count": 1
+          },
+          "scalesWithSlotLevel": {
+            "perSlotAbove": 5,
+            "addTargets": 1
+          },
+          "note": "Target (non-Undead) on a failed WIS save has the Paralyzed condition for the duration. Target repeats the save at the end of each of its turns to end the effect. Upcast: each additional target must be within 30 ft of the others."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "insect-plague",
+    "version": 1,
+    "name": "Insect Plague",
+    "data": {
+      "level": 5,
+      "school": "conjuration",
+      "castingTime": "action",
+      "range": {
+        "value": 300,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "10 minutes",
+      "concentration": true,
+      "ritual": false,
+      "materialComponent": "a few grains of sugar, some kernels of grain, and a smear of fat",
+      "classes": [
+        "cleric",
+        "druid",
+        "sorcerer"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "legend-lore",
+    "version": 1,
+    "name": "Legend Lore",
+    "data": {
+      "level": 5,
+      "school": "divination",
+      "castingTime": "10 minutes",
+      "range": {
+        "value": 0,
+        "units": "self"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "incense worth at least 250 gp, which the spell consumes, and four ivory strips worth at least 50 gp each",
+      "classes": [
+        "bard",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "mass-cure-wounds",
+    "version": 1,
+    "name": "Mass Cure Wounds",
+    "data": {
+      "level": 5,
+      "school": "evocation",
+      "castingTime": "action",
+      "range": {
+        "value": 60,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": false,
+      "classes": [
+        "bard",
+        "cleric",
+        "druid"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "mislead",
+    "version": 1,
+    "name": "Mislead",
+    "data": {
+      "level": 5,
+      "school": "illusion",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "self"
+      },
+      "components": [
+        "s"
+      ],
+      "duration": "1 hour",
+      "concentration": true,
+      "ritual": false,
+      "classes": [
+        "bard",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "modify-memory",
+    "version": 1,
+    "name": "Modify Memory",
+    "data": {
+      "level": 5,
+      "school": "enchantment",
+      "castingTime": "action",
+      "range": {
+        "value": 30,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "1 minute",
+      "concentration": true,
+      "ritual": false,
+      "classes": [
+        "bard",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "passwall",
+    "version": 1,
+    "name": "Passwall",
+    "data": {
+      "level": 5,
+      "school": "transmutation",
+      "castingTime": "action",
+      "range": {
+        "value": 30,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "1 hour",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "a pinch of sesame seeds",
+      "classes": [
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "planar-binding",
+    "version": 1,
+    "name": "Planar Binding",
+    "data": {
+      "level": 5,
+      "school": "abjuration",
+      "castingTime": "1 hour",
+      "range": {
+        "value": 60,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "24 hours",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "a jewel worth at least 1,000 gp, which the spell consumes",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "raise-dead",
+    "version": 1,
+    "name": "Raise Dead",
+    "data": {
+      "level": 5,
+      "school": "necromancy",
+      "castingTime": "1 hour",
+      "range": {
+        "value": 0,
+        "units": "touch"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "a diamond worth at least 500 gp, which the spell consumes",
+      "classes": [
+        "bard",
+        "cleric",
+        "paladin"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "reincarnate",
+    "version": 1,
+    "name": "Reincarnate",
+    "data": {
+      "level": 5,
+      "school": "transmutation",
+      "castingTime": "1 hour",
+      "range": {
+        "value": 0,
+        "units": "touch"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "rare oils and unguents worth at least 1,000 gp, which the spell consumes",
+      "classes": [
+        "druid"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "scrying",
+    "version": 1,
+    "name": "Scrying",
+    "data": {
+      "level": 5,
+      "school": "divination",
+      "castingTime": "10 minutes",
+      "range": {
+        "value": 0,
+        "units": "self"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "10 minutes",
+      "concentration": true,
+      "ritual": false,
+      "materialComponent": "a focus worth at least 1,000 gp, such as a crystal ball, a silver mirror, or a font filled with holy water",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "warlock",
+        "wizard"
+      ],
+      "activities": [
+        {
+          "id": "scrying-cast",
+          "type": "save",
+          "name": "Scrying",
+          "cost": "10 minutes",
+          "save": {
+            "ability": "wis",
+            "dc": {
+              "calc": "spell"
+            }
+          },
+          "target": {
+            "affects": "creature",
+            "count": 1
+          },
+          "note": "Choose a creature; it makes a WIS save (modifier based on familiarity). On failure, a sensor lets you see/hear from its location for the duration. Concentration, 10 minutes."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "seeming",
+    "version": 1,
+    "name": "Seeming",
+    "data": {
+      "level": 5,
+      "school": "illusion",
+      "castingTime": "action",
+      "range": {
+        "value": 30,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "8 hours",
+      "concentration": false,
+      "ritual": false,
+      "classes": [
+        "bard",
+        "sorcerer",
+        "wizard"
+      ],
+      "activities": [
+        {
+          "id": "seeming-cast",
+          "type": "save",
+          "name": "Seeming",
+          "cost": "action",
+          "save": {
+            "ability": "cha",
+            "dc": {
+              "calc": "spell"
+            }
+          },
+          "target": {
+            "affects": "creature",
+            "count": 1
+          },
+          "note": "Disguise any number of willing creatures (visual illusion only). Unwilling creatures get a CHA save. Physical interaction reveals it. Lasts 8 hours."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "telekinesis",
+    "version": 1,
+    "name": "Telekinesis",
+    "data": {
+      "level": 5,
+      "school": "transmutation",
+      "castingTime": "action",
+      "range": {
+        "value": 60,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "10 minutes",
+      "concentration": true,
+      "ritual": false,
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "telepathic-bond",
+    "version": 1,
+    "name": "Telepathic Bond",
+    "data": {
+      "level": 5,
+      "school": "divination",
+      "castingTime": "action",
+      "range": {
+        "value": 30,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "1 hour",
+      "concentration": false,
+      "ritual": true,
+      "materialComponent": "pieces of eggshell from two different kinds of creatures",
+      "classes": [
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "teleportation-circle",
+    "version": 1,
+    "name": "Teleportation Circle",
+    "data": {
+      "level": 5,
+      "school": "conjuration",
+      "castingTime": "1 minute",
+      "range": {
+        "value": 10,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "m"
+      ],
+      "duration": "1 round",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "rare chalks and inks infused with precious gems with 50 gp, which the spell consumes",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "tree-stride",
+    "version": 1,
+    "name": "Tree Stride",
+    "data": {
+      "level": 5,
+      "school": "conjuration",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "self"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "1 minute",
+      "concentration": true,
+      "ritual": false,
+      "classes": [
+        "druid",
+        "ranger"
+      ],
+      "activities": [
+        {
+          "id": "tree-stride-cast",
+          "type": "utility",
+          "name": "Tree Stride",
+          "cost": "action",
+          "target": {
+            "affects": "self"
+          },
+          "note": "Once per turn, use 5 ft of movement to step into a living tree and emerge from a tree of the same kind within 500 ft. Concentration, 1 minute."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "wall-of-force",
+    "version": 1,
+    "name": "Wall of Force",
+    "data": {
+      "level": 5,
+      "school": "evocation",
+      "castingTime": "action",
+      "range": {
+        "value": 120,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "concentration, up to 10 minutes",
+      "concentration": true,
+      "ritual": false,
+      "activities": [
+        {
+          "id": "wall-of-force-cast",
+          "type": "utility",
+          "name": "Wall of Force",
+          "cost": "action",
+          "target": {
+            "affects": "area",
+            "shape": "wall-or-sphere",
+            "panels": 10,
+            "panelSize": 10,
+            "sphereRadius": 10
+          },
+          "note": "Invisible wall of force. Nothing can physically pass through it. Immune to all damage and cannot be dispelled by dispel magic (though disintegrate destroys it instantly). Can be a flat surface of up to ten 10-ft-by-10-ft panels, or a sphere up to 10 ft in radius."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "wall-of-stone",
+    "version": 1,
+    "name": "Wall of Stone",
+    "data": {
+      "level": 5,
+      "school": "evocation",
+      "castingTime": "action",
+      "range": {
+        "value": 120,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "10 minutes",
+      "concentration": true,
+      "ritual": false,
+      "materialComponent": "a small block of granite",
+      "classes": [
+        "druid",
+        "sorcerer",
+        "wizard"
+      ]
+    }
+  }
+]

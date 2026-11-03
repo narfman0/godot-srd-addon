@@ -1,0 +1,212 @@
+[
+  {
+    "kind": "feature",
+    "slug": "spellcasting-wizard",
+    "version": 1,
+    "name": "Spellcasting (Wizard)",
+    "data": {
+      "description": "You prepare a list of Wizard spells from your spellbook, using Intelligence as your spellcasting ability. You cast prepared spells by expending spell slots of the appropriate level.",
+      "ownerKind": "class",
+      "ownerSlug": "wizard",
+      "minLevel": 1,
+      "modifiers": [
+        {
+          "kind": "stat-modifier",
+          "target": "spellcasting.ability",
+          "mode": "OVERRIDE",
+          "value": "int"
+        }
+      ]
+    }
+  },
+  {
+    "kind": "feature",
+    "slug": "ritual-adept",
+    "version": 1,
+    "name": "Ritual Adept",
+    "data": {
+      "description": "You can cast any spell as a Ritual if it has the Ritual tag and it is in your spellbook, even if it is not currently prepared.",
+      "ownerKind": "class",
+      "ownerSlug": "wizard",
+      "minLevel": 1,
+      "modifiers": [
+        {
+          "kind": "stat-modifier",
+          "target": "spellcasting.ritual-without-prep",
+          "mode": "OVERRIDE",
+          "value": true
+        }
+      ]
+    }
+  },
+  {
+    "kind": "feature",
+    "slug": "arcane-recovery",
+    "version": 1,
+    "name": "Arcane Recovery",
+    "data": {
+      "description": "Once per day when you finish a Short Rest, you can recover expended spell slots with a combined level equal to half your Wizard level (rounded up). No recovered slot can be 6th level or higher.",
+      "ownerKind": "class",
+      "ownerSlug": "wizard",
+      "minLevel": 1,
+      "note": "Once per day when you finish a Short Rest, you can regain expended spell slots totalling no more than half your Wizard level (rounded up). None of the slots can be 6th level or higher. The resource counter tracks the 1/long-rest use of this feature; the actual slot-level budget (half wizard level, rounded up) is not yet enforced by the engine.",
+      "activities": [
+        {
+          "id": "arcane-recovery",
+          "type": "utility",
+          "name": "Arcane Recovery",
+          "cost": "free",
+          "trigger": "short-rest-completed",
+          "uses": {
+            "max": 1,
+            "per": "long-rest"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "kind": "feature",
+    "slug": "scholar",
+    "version": 1,
+    "name": "Scholar",
+    "data": {
+      "description": "Choose one skill from Arcana, History, Investigation, Medicine, Nature, or Religion in which you are proficient. You gain Expertise in that skill, doubling your proficiency bonus for ability checks using it.",
+      "ownerKind": "class",
+      "ownerSlug": "wizard",
+      "minLevel": 2,
+      "note": "Choose one skill from Arcana, History, Investigation, Medicine, Nature, or Religion in which you have proficiency. You gain Expertise in that skill (doubled proficiency bonus). Engine emits expertise.skill.<slug> from choices.expertise pick.",
+      "choices": {
+        "expertise": {
+          "allowedSkills": [
+            "arcana",
+            "history",
+            "investigation",
+            "medicine",
+            "nature",
+            "religion"
+          ]
+        }
+      }
+    }
+  },
+  {
+    "kind": "feature",
+    "slug": "arcane-tradition",
+    "version": 1,
+    "name": "Arcane Tradition",
+    "data": {
+      "description": "Choose an Arcane Tradition — a school of magic that defines your approach to wizardry. Your choice grants you features at 3rd level and again at higher levels.",
+      "ownerKind": "class",
+      "ownerSlug": "wizard",
+      "minLevel": 3,
+      "note": "Choose an Arcane Tradition (subclass) that shapes your magical practice. SRD 5.2 traditions: Abjurer, Diviner, Evoker, Illusionist. The chosen subclass slug lives on character.classes[].subclass; subclass feature rows are authored separately.",
+      "choice": {
+        "kind": "subclass",
+        "pick": 1,
+        "from": "wizard-subclasses"
+      }
+    }
+  },
+  {
+    "kind": "feature",
+    "slug": "memorize-spell",
+    "version": 1,
+    "name": "Memorize Spell",
+    "data": {
+      "description": "Whenever you finish a Long Rest, you can replace one of your prepared Wizard spells with another Wizard spell from your spellbook of a level for which you have spell slots.",
+      "ownerKind": "class",
+      "ownerSlug": "wizard",
+      "minLevel": 5,
+      "note": "SRD 5.2: Whenever you finish a Long Rest, you can study your spellbook and replace one of the Wizard spells you have prepared for another Wizard spell from your spellbook. The replacement spell must be of a level for which you have spell slots. This is a free swap that occurs automatically during a long rest — no activity cost, no resource expenditure. Modelled as a trait flag; the actual spell-list manipulation is handled by the character level-up / long-rest UI flow.",
+      "modifiers": [
+        {
+          "kind": "stat-modifier",
+          "target": "trait.memorize-spell",
+          "mode": "OVERRIDE",
+          "value": true
+        }
+      ]
+    }
+  },
+  {
+    "kind": "feature",
+    "slug": "spell-mastery",
+    "version": 1,
+    "name": "Spell Mastery",
+    "data": {
+      "description": "Choose one 1st-level and one 2nd-level Wizard spell from your spellbook. While you have those spells prepared, you can cast each at its lowest level without expending a spell slot. You can swap your choices when you finish a Long Rest.",
+      "ownerKind": "class",
+      "ownerSlug": "wizard",
+      "minLevel": 18,
+      "note": "SRD 5.2: Choose a 1st-level Wizard spell and a 2nd-level Wizard spell that are in your spellbook. You can cast those spells at their lowest level without expending a spell slot when you have them prepared. If you want to cast either spell at a higher level, you must expend a spell slot as normal. You can exchange one or both of your choices for different spells of the same levels when you finish a Long Rest. Modelled as a two-slot choice + trait flag. The engine does not yet short-circuit slot consumption for specific prepared spells; the 'free cast' mechanic is descriptive only until the spellcasting engine grows per-spell free-cast overrides.",
+      "choice": {
+        "kind": "spell-mastery",
+        "slots": [
+          {
+            "level": 1,
+            "pick": 1,
+            "from": "wizard-spells-level-1"
+          },
+          {
+            "level": 2,
+            "pick": 1,
+            "from": "wizard-spells-level-2"
+          }
+        ]
+      },
+      "modifiers": [
+        {
+          "kind": "stat-modifier",
+          "target": "trait.spell-mastery",
+          "mode": "OVERRIDE",
+          "value": true
+        }
+      ]
+    }
+  },
+  {
+    "kind": "feature",
+    "slug": "signature-spells",
+    "version": 1,
+    "name": "Signature Spells",
+    "data": {
+      "description": "Choose two 3rd-level Wizard spells from your spellbook as your signature spells. They are always prepared and don't count against your prepared spell limit. Once per Short Rest, you can cast each of them without expending a spell slot.",
+      "ownerKind": "class",
+      "ownerSlug": "wizard",
+      "minLevel": 20,
+      "note": "SRD 5.2: Choose two 3rd-level Wizard spells in your spellbook as your signature spells. You always have these spells prepared, they don't count against the number of spells you can prepare, and you can cast each of them once without expending a spell slot. When you do so, you can't cast them in this way again until you finish a Short Rest. You can also cast them normally using a spell slot. Modelled as a choice of two 3rd-level spells plus two activities (one per signature spell slot) with 1/short-rest uses. The engine does not yet suppress slot consumption for specific prepared spells; activities track the free uses only. Picks live on character.featureChoices['signature-spells'].spell.spells; the engine loads each chosen spell row as active content. `allowedSpells` is omitted because SRD spell rows carry no reliable `classes` array — the picker filters to level-3 wizard spells. The free once-per-rest casting at level 3 without expending a slot is not modelled (no freeCasts channel keyed to a player-chosen spell).",
+      "activities": [
+        {
+          "id": "signature-spell-1",
+          "type": "utility",
+          "name": "Signature Spell (slot 1)",
+          "cost": "free",
+          "uses": {
+            "max": 1,
+            "per": "short-rest"
+          },
+          "note": "Free cast of your first chosen 3rd-level signature spell."
+        },
+        {
+          "id": "signature-spell-2",
+          "type": "utility",
+          "name": "Signature Spell (slot 2)",
+          "cost": "free",
+          "uses": {
+            "max": 1,
+            "per": "short-rest"
+          },
+          "note": "Free cast of your second chosen 3rd-level signature spell."
+        }
+      ],
+      "choices": {
+        "spell": {
+          "label": "Signature Spell (level 3)",
+          "picks": 2,
+          "level": 3
+        }
+      }
+    }
+  }
+]

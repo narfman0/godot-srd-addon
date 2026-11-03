@@ -19,11 +19,18 @@ extends Resource
 # WeaponProperty bitmask (SRD.WeaponProperty flags OR'd together)
 @export var properties: int = 0
 
+## Monster stat blocks state attack and damage bonuses outright; NO_FIXED derives them from stats.
+const NO_FIXED := -1000
+@export var fixed_attack_bonus: int = NO_FIXED
+@export var fixed_damage_bonus: int = NO_FIXED
+
 func has_property(prop: SRD.WeaponProperty) -> bool:
 	return (properties & int(prop)) != 0
 
 ## Compute attack bonus for a character using this weapon.
 func attack_bonus(char: CharacterStats, proficient: bool, two_handed: bool = false) -> int:
+	if fixed_attack_bonus != NO_FIXED:
+		return fixed_attack_bonus
 	var ability := _attack_ability(char)
 	var mod := char.ability_modifier(ability)
 	var prof := char.proficiency_bonus() if proficient else 0
@@ -104,6 +111,8 @@ func _attack_ability(char: CharacterStats) -> SRD.Ability:
 	return SRD.Ability.STRENGTH
 
 func _damage_mod(char: CharacterStats) -> int:
+	if fixed_damage_bonus != NO_FIXED:
+		return fixed_damage_bonus
 	return char.ability_modifier(_attack_ability(char))
 
 func _is_versatile() -> bool:

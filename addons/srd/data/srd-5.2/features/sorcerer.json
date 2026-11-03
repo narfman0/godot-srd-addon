@@ -1,0 +1,444 @@
+[
+  {
+    "kind": "feature",
+    "slug": "spellcasting-sorcerer",
+    "version": 1,
+    "name": "Spellcasting (Sorcerer)",
+    "data": {
+      "description": "You cast Sorcerer spells using Charisma as your spellcasting ability. You know a set number of spells and can cast them using spell slots, which you regain on a Long Rest.",
+      "ownerKind": "class",
+      "ownerSlug": "sorcerer",
+      "minLevel": 1,
+      "modifiers": [
+        {
+          "kind": "stat-modifier",
+          "target": "spellcasting.ability",
+          "mode": "OVERRIDE",
+          "value": "cha"
+        }
+      ]
+    }
+  },
+  {
+    "kind": "feature",
+    "slug": "innate-sorcery",
+    "version": 1,
+    "name": "Innate Sorcery",
+    "data": {
+      "description": "As a Bonus Action, you can unleash the sorcerous power within you. For 1 minute, your Spell Save DC increases by 1 and you have Advantage on spell attack rolls. You can use this feature twice, regaining all expended uses on a Long Rest.",
+      "ownerKind": "class",
+      "ownerSlug": "sorcerer",
+      "minLevel": 1,
+      "note": "2024 SRD 5.2 Innate Sorcery (replaces 2014's Sorcerous Restoration as the L1 capstone trait): bonus action, lasts 1 minute, twice per long rest (recovers one use on a short rest at higher levels — engine extension needed). While active: your Spell Save DC is +1 and you have Advantage on Spell attack rolls you make. v0 surfaces the activity with a 2/long-rest uses block and a passive +1 to spell DC; the duration-gated advantage on spell attacks is left as a tagged effect for the UI (advantage isn't a first-class action target in the engine yet).",
+      "activities": [
+        {
+          "id": "innate-sorcery",
+          "type": "utility",
+          "name": "Innate Sorcery",
+          "cost": "bonus",
+          "duration": {
+            "value": 1,
+            "units": "minute",
+            "concentration": false
+          },
+          "uses": {
+            "max": 2,
+            "per": "long-rest"
+          },
+          "appliedModifiers": [
+            {
+              "kind": "stat-modifier",
+              "target": "spellcasting.dc.bonus",
+              "mode": "ADD",
+              "value": 1
+            },
+            {
+              "kind": "stat-modifier",
+              "target": "spellcasting.attack.advantage",
+              "mode": "OVERRIDE",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "kind": "feature",
+    "slug": "sorcerous-origin",
+    "version": 1,
+    "name": "Sorcerous Origin",
+    "data": {
+      "description": "Choose a Sorcerous Origin that reflects the source of your innate magic. Your choice grants you features at 3rd level and again at higher Sorcerer levels.",
+      "ownerKind": "class",
+      "ownerSlug": "sorcerer",
+      "minLevel": 1,
+      "note": "Placeholder for Sorcerous Origin selection at L3 (Aberrant Sorcery / Clockwork Sorcery / Draconic Sorcery / Wild Magic Sorcery in 2024 SRD 5.2). The L1 row is a sourcing slot only; the actual subclass features come online at L3. The chosen subclass slug lives on character.classes[].subclass. Out-of-scope for this batch (2b).",
+      "choice": {
+        "kind": "subclass",
+        "pick": 1,
+        "from": "sorcerer-subclasses"
+      }
+    }
+  },
+  {
+    "kind": "feature",
+    "slug": "font-of-magic",
+    "version": 1,
+    "name": "Font of Magic",
+    "data": {
+      "description": "You have a pool of Sorcery Points equal to your Sorcerer level, which you regain on a Long Rest. These points fuel your Metamagic options and can be converted to or from spell slots using Flexible Casting.",
+      "ownerKind": "class",
+      "ownerSlug": "sorcerer",
+      "minLevel": 2,
+      "note": "Sorcery Points pool, gained at Sorcerer 2. Used to fuel Metamagic options and (via Flexible Casting) to convert points to spell slots or vice versa. Sorcery Points table indexed from character-level 1: 0 at L1, then sorcerer level from L2 onward. Pool refreshes on long rest. v0 surfaces the resource; the conversions (Sorcery Points <-> spell slots) aren't yet wired.",
+      "activities": [
+        {
+          "id": "sorcery-points",
+          "type": "utility",
+          "name": "Sorcery Points",
+          "cost": "free",
+          "uses": {
+            "max": {
+              "perClass": "sorcerer",
+              "table": [
+                0,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12,
+                13,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20
+              ]
+            },
+            "per": "long-rest"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "kind": "feature",
+    "slug": "metamagic",
+    "version": 1,
+    "name": "Metamagic",
+    "data": {
+      "description": "You can twist your spells to suit your needs. Choose 2 Metamagic options (gaining more at higher levels); each option costs Sorcery Points and modifies a spell as you cast it — changing its range, targets, damage type, or other properties.",
+      "ownerKind": "class",
+      "ownerSlug": "sorcerer",
+      "minLevel": 2,
+      "note": "At Sorcerer 2 the sorcerer picks 2 Metamagic options (and may change one on a long rest); the count rises to 3 at Sorcerer 10 and 4 at Sorcerer 17, expressed as the perClass picks table. Picks live on character.featureChoices['metamagic'].modifierFromChoice.options and only the picked options' toggles are derived. Each option is a defaultEnabled:false action-modifier that tags the cast; the Sorcery Point cost accounting and the spell-modification mechanics (extra target, no components, ignore resistance, etc.) are NOT simulated — engine extension needed.",
+      "choices": {
+        "modifierFromChoice": {
+          "label": "Metamagic options",
+          "picks": {
+            "perClass": "sorcerer",
+            "table": [
+              0,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              2,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              3,
+              4,
+              4,
+              4,
+              4
+            ]
+          },
+          "options": [
+            {
+              "id": "careful-spell",
+              "label": "Careful Spell",
+              "modifiers": [
+                {
+                  "kind": "action-modifier",
+                  "id": "metamagic-careful",
+                  "name": "Metamagic: Careful Spell",
+                  "defaultEnabled": false,
+                  "appliesTo": {
+                    "activityType": "cast"
+                  },
+                  "effects": [
+                    {
+                      "target": "tag.metamagic.careful",
+                      "mode": "OVERRIDE",
+                      "value": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "distant-spell",
+              "label": "Distant Spell",
+              "modifiers": [
+                {
+                  "kind": "action-modifier",
+                  "id": "metamagic-distant",
+                  "name": "Metamagic: Distant Spell",
+                  "defaultEnabled": false,
+                  "appliesTo": {
+                    "activityType": "cast"
+                  },
+                  "effects": [
+                    {
+                      "target": "tag.metamagic.distant",
+                      "mode": "OVERRIDE",
+                      "value": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "empowered-spell",
+              "label": "Empowered Spell",
+              "modifiers": [
+                {
+                  "kind": "action-modifier",
+                  "id": "metamagic-empowered",
+                  "name": "Metamagic: Empowered Spell",
+                  "defaultEnabled": false,
+                  "appliesTo": {
+                    "activityType": "cast"
+                  },
+                  "effects": [
+                    {
+                      "target": "tag.metamagic.empowered",
+                      "mode": "OVERRIDE",
+                      "value": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "extended-spell",
+              "label": "Extended Spell",
+              "modifiers": [
+                {
+                  "kind": "action-modifier",
+                  "id": "metamagic-extended",
+                  "name": "Metamagic: Extended Spell",
+                  "defaultEnabled": false,
+                  "appliesTo": {
+                    "activityType": "cast"
+                  },
+                  "effects": [
+                    {
+                      "target": "tag.metamagic.extended",
+                      "mode": "OVERRIDE",
+                      "value": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "heightened-spell",
+              "label": "Heightened Spell",
+              "modifiers": [
+                {
+                  "kind": "action-modifier",
+                  "id": "metamagic-heightened",
+                  "name": "Metamagic: Heightened Spell",
+                  "defaultEnabled": false,
+                  "appliesTo": {
+                    "activityType": "cast"
+                  },
+                  "effects": [
+                    {
+                      "target": "tag.metamagic.heightened",
+                      "mode": "OVERRIDE",
+                      "value": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "quickened-spell",
+              "label": "Quickened Spell",
+              "modifiers": [
+                {
+                  "kind": "action-modifier",
+                  "id": "metamagic-quickened",
+                  "name": "Metamagic: Quickened Spell",
+                  "defaultEnabled": false,
+                  "appliesTo": {
+                    "activityType": "cast"
+                  },
+                  "effects": [
+                    {
+                      "target": "tag.metamagic.quickened",
+                      "mode": "OVERRIDE",
+                      "value": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "seeking-spell",
+              "label": "Seeking Spell",
+              "modifiers": [
+                {
+                  "kind": "action-modifier",
+                  "id": "metamagic-seeking",
+                  "name": "Metamagic: Seeking Spell",
+                  "defaultEnabled": false,
+                  "appliesTo": {
+                    "activityType": "cast"
+                  },
+                  "effects": [
+                    {
+                      "target": "tag.metamagic.seeking",
+                      "mode": "OVERRIDE",
+                      "value": true
+                    }
+                  ],
+                  "note": "Cost: 2 Sorcery Points. If you make an attack roll for a spell and miss, you can spend 2 Sorcery Points to reroll the d20, using the new roll. You can use Seeking Spell even if you've already used a Metamagic option during the casting. Engine does not yet support mid-resolution reroll triggers; tag only."
+                }
+              ]
+            },
+            {
+              "id": "subtle-spell",
+              "label": "Subtle Spell",
+              "modifiers": [
+                {
+                  "kind": "action-modifier",
+                  "id": "metamagic-subtle",
+                  "name": "Metamagic: Subtle Spell",
+                  "defaultEnabled": false,
+                  "appliesTo": {
+                    "activityType": "cast"
+                  },
+                  "effects": [
+                    {
+                      "target": "tag.metamagic.subtle",
+                      "mode": "OVERRIDE",
+                      "value": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "transmuted-spell",
+              "label": "Transmuted Spell",
+              "modifiers": [
+                {
+                  "kind": "action-modifier",
+                  "id": "metamagic-transmuted",
+                  "name": "Metamagic: Transmuted Spell",
+                  "defaultEnabled": false,
+                  "appliesTo": {
+                    "activityType": "cast"
+                  },
+                  "effects": [
+                    {
+                      "target": "tag.metamagic.transmuted",
+                      "mode": "OVERRIDE",
+                      "value": true
+                    }
+                  ],
+                  "note": "Cost: 1 Sorcery Point. When you cast a spell that deals a type of damage from the following list, you can spend 1 Sorcery Point to change that damage type to one of the other listed types: Acid, Cold, Fire, Lightning, Poison, Thunder. Engine does not yet swap damage types at resolution; tag only."
+                }
+              ]
+            },
+            {
+              "id": "twinned-spell",
+              "label": "Twinned Spell",
+              "modifiers": [
+                {
+                  "kind": "action-modifier",
+                  "id": "metamagic-twinned",
+                  "name": "Metamagic: Twinned Spell",
+                  "defaultEnabled": false,
+                  "appliesTo": {
+                    "activityType": "cast"
+                  },
+                  "effects": [
+                    {
+                      "target": "tag.metamagic.twinned",
+                      "mode": "OVERRIDE",
+                      "value": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "kind": "feature",
+    "slug": "sorcerer-subclass",
+    "version": 1,
+    "name": "Sorcerer Subclass",
+    "data": {
+      "description": "At 3rd level, your chosen Sorcerous Origin manifests fully, granting you subclass features that define the nature and expression of your innate magic.",
+      "ownerKind": "class",
+      "ownerSlug": "sorcerer",
+      "minLevel": 3,
+      "note": "Sorcerous Origin features come online at L3 (Aberrant / Clockwork / Draconic / Wild Magic in 2024 SRD 5.2). The chosen subclass slug lives on character.classes[].subclass. Out-of-scope for this batch (2b).",
+      "choice": {
+        "kind": "subclass",
+        "pick": 1,
+        "from": "sorcerer-subclasses"
+      }
+    }
+  },
+  {
+    "kind": "feature",
+    "slug": "sorcerous-restoration",
+    "version": 1,
+    "name": "Sorcerous Restoration",
+    "data": {
+      "description": "When you finish a Short Rest, you regain a number of expended Sorcery Points equal to half your Sorcerer level (rounded down). You can use this feature once per Long Rest.",
+      "ownerKind": "class",
+      "ownerSlug": "sorcerer",
+      "minLevel": 5,
+      "note": "When you finish a Short Rest, you regain expended Sorcery Points (up to a maximum equal to half your Sorcerer level, rounded down). Once per long rest. v0 surfaces a utility activity that fires the recovery; the conditional 'half sorcerer level rounded down' cap and the interaction with the font-of-magic resource aren't yet plumbed.",
+      "activities": [
+        {
+          "id": "sorcerous-restoration",
+          "type": "utility",
+          "name": "Sorcerous Restoration",
+          "cost": "free",
+          "trigger": "short-rest-completed",
+          "uses": {
+            "max": 1,
+            "per": "long-rest"
+          }
+        }
+      ]
+    }
+  }
+]

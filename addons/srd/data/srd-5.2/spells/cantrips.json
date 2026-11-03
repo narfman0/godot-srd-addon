@@ -1,0 +1,862 @@
+[
+  {
+    "kind": "spell",
+    "slug": "acid-splash",
+    "version": 1,
+    "name": "Acid Splash",
+    "data": {
+      "level": 0,
+      "school": "conjuration",
+      "castingTime": "action",
+      "range": {
+        "value": 60,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": false,
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "activities": [
+        {
+          "id": "acid-splash-cast",
+          "type": "save",
+          "name": "Acid Splash",
+          "cost": "action",
+          "save": {
+            "ability": "dex",
+            "dc": {
+              "calc": "spell"
+            }
+          },
+          "damage": {
+            "parts": [
+              {
+                "dice": "1d6",
+                "type": "acid",
+                "scalesWithCharacterLevel": {
+                  "at5": "2d6",
+                  "at11": "3d6",
+                  "at17": "4d6"
+                }
+              }
+            ]
+          },
+          "target": {
+            "affects": "area",
+            "shape": "sphere",
+            "radius": 5
+          },
+          "note": "5-foot-radius sphere centered on a point within range."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "chill-touch",
+    "version": 1,
+    "name": "Chill Touch",
+    "data": {
+      "level": 0,
+      "school": "necromancy",
+      "castingTime": "action",
+      "range": {
+        "value": 120,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "1 round",
+      "concentration": false,
+      "ritual": false,
+      "classes": [
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ],
+      "activities": [
+        {
+          "id": "chill-touch-cast",
+          "type": "attack",
+          "name": "Chill Touch",
+          "cost": "action",
+          "attack": {
+            "ability": "spellcasting",
+            "classification": "spell",
+            "range": "melee",
+            "damage": [
+              {
+                "dice": "1d10",
+                "type": "necrotic",
+                "scalesWithCharacterLevel": {
+                  "at5": "2d10",
+                  "at11": "3d10",
+                  "at17": "4d10"
+                }
+              }
+            ]
+          },
+          "note": "On a hit the target can't regain HP until the end of your next turn."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "dancing-lights",
+    "version": 1,
+    "name": "Dancing Lights",
+    "data": {
+      "level": 0,
+      "school": "evocation",
+      "castingTime": "action",
+      "range": {
+        "value": 120,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "1 minute",
+      "concentration": true,
+      "ritual": false,
+      "materialComponent": "a bit of phosphorus or wychwood, or a glowworm",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "eldritch-blast",
+    "version": 1,
+    "name": "Eldritch Blast",
+    "data": {
+      "level": 0,
+      "school": "evocation",
+      "castingTime": "action",
+      "range": {
+        "value": 120,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "instantaneous",
+      "activities": [
+        {
+          "id": "eldritch-blast-cast",
+          "type": "attack",
+          "name": "Eldritch Blast",
+          "cost": "action",
+          "attack": {
+            "ability": "spellcasting",
+            "classification": "spell",
+            "range": "ranged",
+            "damage": [
+              {
+                "dice": "1d10",
+                "type": "force"
+              }
+            ]
+          },
+          "target": {
+            "affects": "creature",
+            "count": 1,
+            "scalesWithCharacterLevel": {
+              "at5": 2,
+              "at11": 3,
+              "at17": 4
+            }
+          },
+          "note": "Creates 1 beam, gaining additional beams at levels 5/11/17. Each beam is a separate spell attack roll."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "fire-bolt",
+    "version": 1,
+    "name": "Fire Bolt",
+    "data": {
+      "level": 0,
+      "school": "evocation",
+      "castingTime": "action",
+      "range": {
+        "value": 120,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "instantaneous",
+      "activities": [
+        {
+          "id": "fire-bolt-cast",
+          "type": "attack",
+          "name": "Fire Bolt",
+          "cost": "action",
+          "attack": {
+            "ability": "spellcasting",
+            "classification": "spell",
+            "range": "ranged",
+            "damage": [
+              {
+                "dice": "1d10",
+                "type": "fire",
+                "scalesWithCharacterLevel": {
+                  "at5": "2d10",
+                  "at11": "3d10",
+                  "at17": "4d10"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "guidance",
+    "version": 1,
+    "name": "Guidance",
+    "data": {
+      "level": 0,
+      "school": "divination",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "touch"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "concentration, up to 1 minute",
+      "concentration": true,
+      "activities": [
+        {
+          "id": "guidance-cast",
+          "type": "utility",
+          "name": "Guidance",
+          "cost": "action",
+          "note": "Target adds 1d4 to one ability check of its choice before the spell ends. Spell then ends."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "light",
+    "version": 1,
+    "name": "Light",
+    "data": {
+      "level": 0,
+      "school": "evocation",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "touch"
+      },
+      "components": [
+        "v",
+        "m"
+      ],
+      "duration": "1 hour",
+      "activities": [
+        {
+          "id": "light-cast",
+          "type": "utility",
+          "name": "Light",
+          "cost": "action",
+          "note": "Object touched sheds bright light in a 20-foot radius and dim light for an additional 20 feet. Dexterity save to avoid if cast on a hostile creature's item."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "mage-hand",
+    "version": 1,
+    "name": "Mage Hand",
+    "data": {
+      "level": 0,
+      "school": "conjuration",
+      "castingTime": "action",
+      "range": {
+        "value": 30,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "1 minute",
+      "activities": [
+        {
+          "id": "mage-hand-cast",
+          "type": "utility",
+          "name": "Mage Hand",
+          "cost": "action"
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "mending",
+    "version": 1,
+    "name": "Mending",
+    "data": {
+      "level": 0,
+      "school": "transmutation",
+      "castingTime": "1 minute",
+      "range": {
+        "value": 0,
+        "units": "touch"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "two lodestones",
+      "classes": [
+        "bard",
+        "cleric",
+        "druid",
+        "sorcerer",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "message",
+    "version": 1,
+    "name": "Message",
+    "data": {
+      "level": 0,
+      "school": "transmutation",
+      "castingTime": "action",
+      "range": {
+        "value": 120,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "1 round",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "a short piece of copper wire",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "minor-illusion",
+    "version": 1,
+    "name": "Minor Illusion",
+    "data": {
+      "level": 0,
+      "school": "illusion",
+      "castingTime": "action",
+      "range": {
+        "value": 30,
+        "units": "ft"
+      },
+      "components": [
+        "s",
+        "m"
+      ],
+      "duration": "1 minute",
+      "concentration": false,
+      "ritual": false,
+      "materialComponent": "a bit of fleece",
+      "classes": [
+        "bard",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "prestidigitation",
+    "version": 1,
+    "name": "Prestidigitation",
+    "data": {
+      "level": 0,
+      "school": "transmutation",
+      "castingTime": "action",
+      "range": {
+        "value": 10,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "up to 1 hour",
+      "concentration": false,
+      "ritual": false,
+      "activities": [
+        {
+          "id": "prestidigitation-cast",
+          "type": "utility",
+          "name": "Prestidigitation",
+          "cost": "action",
+          "note": "Minor magical trick: create a sensory effect, light/snuff a small flame, clean or soil an object, chill/warm/flavor material, create a trinket or illusory image. Up to three non-instantaneous effects can be active at once."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "produce-flame",
+    "version": 1,
+    "name": "Produce Flame",
+    "data": {
+      "level": 0,
+      "school": "conjuration",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "self"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "10 minutes",
+      "concentration": false,
+      "ritual": false,
+      "classes": [
+        "druid"
+      ],
+      "activities": [
+        {
+          "id": "produce-flame-cast",
+          "type": "attack",
+          "name": "Hurl Produce Flame",
+          "cost": "action",
+          "attack": {
+            "ability": "spellcasting",
+            "classification": "spell",
+            "range": "ranged",
+            "damage": [
+              {
+                "dice": "1d8",
+                "type": "fire",
+                "scalesWithCharacterLevel": {
+                  "at5": "2d8",
+                  "at11": "3d8",
+                  "at17": "4d8"
+                }
+              }
+            ]
+          },
+          "note": "Casting (Bonus Action) creates the flame; hurling it is a Magic action that ends the spell."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "ray-of-frost",
+    "version": 1,
+    "name": "Ray of Frost",
+    "data": {
+      "level": 0,
+      "school": "evocation",
+      "castingTime": "action",
+      "range": {
+        "value": 60,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": false,
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "activities": [
+        {
+          "id": "ray-of-frost-cast",
+          "type": "attack",
+          "name": "Ray of Frost",
+          "cost": "action",
+          "attack": {
+            "ability": "spellcasting",
+            "classification": "spell",
+            "range": "ranged",
+            "damage": [
+              {
+                "dice": "1d8",
+                "type": "cold",
+                "scalesWithCharacterLevel": {
+                  "at5": "2d8",
+                  "at11": "3d8",
+                  "at17": "4d8"
+                }
+              }
+            ]
+          },
+          "note": "On a hit the target's Speed drops by 10 ft until the start of your next turn."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "resistance",
+    "version": 1,
+    "name": "Resistance",
+    "data": {
+      "level": 0,
+      "school": "abjuration",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "touch"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "1 minute",
+      "concentration": true,
+      "ritual": false,
+      "materialComponent": "a miniature cloak",
+      "classes": [
+        "cleric",
+        "druid"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "sacred-flame",
+    "version": 1,
+    "name": "Sacred Flame",
+    "data": {
+      "level": 0,
+      "school": "evocation",
+      "castingTime": "action",
+      "range": {
+        "value": 60,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "instantaneous",
+      "activities": [
+        {
+          "id": "sacred-flame-cast",
+          "type": "save",
+          "name": "Sacred Flame",
+          "cost": "action",
+          "save": {
+            "ability": "dex",
+            "dc": {
+              "calc": "spell"
+            }
+          },
+          "damage": {
+            "parts": [
+              {
+                "dice": "1d8",
+                "type": "radiant",
+                "scalesWithCharacterLevel": {
+                  "at5": "2d8",
+                  "at11": "3d8",
+                  "at17": "4d8"
+                }
+              }
+            ]
+          },
+          "target": {
+            "affects": "creature",
+            "count": 1
+          },
+          "note": "Target gains no benefit from cover for this save."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "shillelagh",
+    "version": 1,
+    "name": "Shillelagh",
+    "data": {
+      "level": 0,
+      "school": "transmutation",
+      "castingTime": "bonus",
+      "range": {
+        "value": 0,
+        "units": "self"
+      },
+      "components": [
+        "v",
+        "s",
+        "m"
+      ],
+      "duration": "1 minute",
+      "concentration": false,
+      "ritual": false,
+      "activities": [
+        {
+          "id": "shillelagh-cast",
+          "type": "utility",
+          "name": "Shillelagh",
+          "cost": "bonus",
+          "note": "Imbue a Club or Quarterstaff. Until the spell ends, the weapon becomes magical, deals 1d8 (2d8 at L5, 3d8 at L11, 4d8 at L17) force damage on a hit, and uses your spellcasting ability for attack and damage rolls instead of STR/DEX. v0 cannot retarget weapon attack ability — surfaces as a note only."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "shocking-grasp",
+    "version": 1,
+    "name": "Shocking Grasp",
+    "data": {
+      "level": 0,
+      "school": "evocation",
+      "castingTime": "action",
+      "range": {
+        "value": 0,
+        "units": "touch"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": false,
+      "classes": [
+        "sorcerer",
+        "wizard"
+      ],
+      "activities": [
+        {
+          "id": "shocking-grasp-cast",
+          "type": "attack",
+          "name": "Shocking Grasp",
+          "cost": "action",
+          "attack": {
+            "ability": "spellcasting",
+            "classification": "spell",
+            "range": "melee",
+            "damage": [
+              {
+                "dice": "1d8",
+                "type": "lightning",
+                "scalesWithCharacterLevel": {
+                  "at5": "2d8",
+                  "at11": "3d8",
+                  "at17": "4d8"
+                }
+              }
+            ]
+          },
+          "note": "On a hit the target can't make Opportunity Attacks until the start of its next turn."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "thaumaturgy",
+    "version": 1,
+    "name": "Thaumaturgy",
+    "data": {
+      "level": 0,
+      "school": "transmutation",
+      "castingTime": "action",
+      "range": {
+        "value": 30,
+        "units": "ft"
+      },
+      "components": [
+        "v"
+      ],
+      "duration": "1 minute",
+      "concentration": false,
+      "ritual": false,
+      "classes": [
+        "cleric"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "toll-the-dead",
+    "version": 1,
+    "name": "Toll the Dead",
+    "data": {
+      "level": 0,
+      "school": "necromancy",
+      "castingTime": "action",
+      "range": {
+        "value": 60,
+        "units": "ft"
+      },
+      "components": [
+        "v",
+        "s"
+      ],
+      "duration": "instantaneous",
+      "activities": [
+        {
+          "id": "toll-the-dead-cast",
+          "type": "save",
+          "name": "Toll the Dead",
+          "cost": "action",
+          "save": {
+            "ability": "wis",
+            "dc": {
+              "calc": "spell"
+            }
+          },
+          "damage": {
+            "parts": [
+              {
+                "dice": "1d8",
+                "type": "necrotic",
+                "scalesWithCharacterLevel": {
+                  "at5": "2d8",
+                  "at11": "3d8",
+                  "at17": "4d8"
+                }
+              }
+            ]
+          },
+          "target": {
+            "affects": "creature",
+            "count": 1
+          },
+          "note": "Damage die is 1d12 instead of 1d8 (2d12/3d12/4d12 at higher levels) if the target is missing any of its hit points."
+        }
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "true-strike",
+    "version": 1,
+    "name": "True Strike",
+    "data": {
+      "level": 0,
+      "school": "divination",
+      "castingTime": "action",
+      "range": {
+        "value": 30,
+        "units": "ft"
+      },
+      "components": [
+        "s"
+      ],
+      "duration": "1 round",
+      "concentration": true,
+      "ritual": false,
+      "classes": [
+        "bard",
+        "sorcerer",
+        "warlock",
+        "wizard"
+      ]
+    }
+  },
+  {
+    "kind": "spell",
+    "slug": "vicious-mockery",
+    "version": 1,
+    "name": "Vicious Mockery",
+    "data": {
+      "level": 0,
+      "school": "enchantment",
+      "castingTime": "action",
+      "range": {
+        "value": 60,
+        "units": "ft"
+      },
+      "components": [
+        "v"
+      ],
+      "duration": "instantaneous",
+      "concentration": false,
+      "ritual": false,
+      "activities": [
+        {
+          "id": "vicious-mockery-cast",
+          "type": "save",
+          "name": "Vicious Mockery",
+          "cost": "action",
+          "save": {
+            "ability": "wis",
+            "dc": {
+              "calc": "spell"
+            }
+          },
+          "damage": {
+            "parts": [
+              {
+                "dice": "1d6",
+                "type": "psychic",
+                "scalesWithCharacterLevel": {
+                  "at5": "2d6",
+                  "at11": "3d6",
+                  "at17": "4d6"
+                }
+              }
+            ]
+          },
+          "target": {
+            "affects": "creature",
+            "count": 1
+          },
+          "note": "On a failed save, target takes psychic damage and has Disadvantage on the next attack roll it makes before the end of its next turn."
+        }
+      ]
+    }
+  }
+]

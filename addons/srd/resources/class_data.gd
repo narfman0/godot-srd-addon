@@ -30,6 +30,8 @@ func make_slots(level: int) -> EnergySlots:
 			return EnergySlots.make_half_caster(level)
 		SRD.SlotProgression.THIRD:
 			return EnergySlots.make_third_caster(level)
+		SRD.SlotProgression.PACT:
+			return EnergySlots.make_pact_caster(level)
 	return EnergySlots.new()  # NONE — no slots
 
 # --- Built-in Space SRD archetypes ---

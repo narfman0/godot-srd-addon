@@ -71,6 +71,19 @@ static func make_full_caster(char_level: int) -> EnergySlots:
 		s.slots_remaining[i] = row[i]
 	return s
 
+## Pact Magic (Warlock): every slot is the same level; all recover on a short rest.
+static func make_pact_caster(char_level: int) -> EnergySlots:
+	var s := EnergySlots.new()
+	# [slot count, slot level] per character level
+	const TABLE: Array[Array] = [
+		[1,1], [2,1], [2,2], [2,2], [2,3], [2,3], [2,4], [2,4], [2,5], [2,5],
+		[3,5], [3,5], [3,5], [3,5], [3,5], [3,5], [4,5], [4,5], [4,5], [4,5],
+	]
+	var row: Array = TABLE[clampi(char_level, 1, 20) - 1]
+	s.slots_max[row[1] - 1] = row[0]
+	s.slots_remaining[row[1] - 1] = row[0]
+	return s
+
 ## Half caster table (Paladin/Warden — rounds down).
 static func make_half_caster(char_level: int) -> EnergySlots:
 	var s := EnergySlots.new()
