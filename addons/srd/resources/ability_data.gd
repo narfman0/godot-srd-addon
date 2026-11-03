@@ -63,8 +63,15 @@ var casting_ability: SRD.Ability = SRD.Ability.INTELLIGENCE
 var effects: Array = []
 ## Condition immunities that make a target auto-succeed (Sleep: "exhaustion").
 var immune_if: Array = []
+## "melee" | "ranged" spell attack ("" = infer from range: beyond 5 ft. is ranged).
+@export var attack_kind: String = ""
 ## Summoned force the caster keeps using (Spiritual Weapon): {repeat_as, move_feet, rounds}.
 var summon: Dictionary = {}
+
+func is_ranged_attack() -> bool:
+	if attack_kind != "":
+		return attack_kind == "ranged"
+	return range_feet > 5
 
 func is_healing() -> bool:
 	return heal_die_count > 0 or heal_bonus > 0

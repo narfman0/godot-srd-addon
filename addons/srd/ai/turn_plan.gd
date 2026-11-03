@@ -34,3 +34,13 @@ var action_target: Combatant = null
 
 var bonus_action: BonusActionChoice = BonusActionChoice.NONE
 var bonus_target: Combatant = null
+
+## Monster Bonus Action (a MonsterActions feature) and when to take it:
+## "before_move" (Shadow Step to the target, then attack with Advantage) or
+## "after_action" (attack, then Nimble Escape's Disengage and fall back).
+var monster_bonus: Dictionary = {}
+var bonus_timing: String = ""
+var bonus_option: String = ""      ## simple features: "disengage" | "dash" | "hide"
+var bonus_purpose: String = ""     ## "engage" (teleport next to action_target) | "escape"
+## Move away from move_target after the action instead of before it.
+var retreat_after_action: bool = false

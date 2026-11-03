@@ -28,6 +28,18 @@ var turn_flags: Dictionary = {}
 var size: String = "medium"
 ## Lowercase condition names this creature ignores ("exhaustion" also makes it immune to Sleep).
 var condition_immunities: Array[String] = []
+## Monster Bonus Actions and Reactions (MonsterActions feature Dictionaries), limited-use
+## counters for them ({feature key: uses spent}), and weapon on-hit riders
+## ({name, dice, type, condition: "advantage", per_turn}).
+var bonus_actions: Array = []
+var reactions: Array = []
+var monster_uses: Dictionary = {}
+var hit_riders: Array = []
+## Initiative modifier: the stat block's Initiative for monsters; -999 = use the DEX modifier.
+var initiative_override: int = -999
+## The last Undead Fortitude save take_damage() rolled (or refused), for the game's log:
+## {dc, d20, bonus, total, saved} or {blocked: "radiant" | "critical"}. {} when it didn't apply.
+var last_undead_fortitude: Dictionary = {}
 
 func _init(char_stats: CharacterStats, weapon_data: WeaponData = null,
 		equip: EquipmentSlots = null) -> void:
@@ -74,23 +86,40 @@ func _style_ac_bonus() -> int:
 		return 1
 	return 0
 
+var initiative_bonus: int:
+	get: return initiative_override if initiative_override != -999 \
+		else stats.ability_modifier(SRD.Ability.DEXTERITY)
+
 ## Apply damage and handle Undead Fortitude if applicable.
-## Returns actual damage dealt.
+## Returns actual damage dealt. last_undead_fortitude describes the save, if any.
 func take_damage(amount: int, damage_type: SRD.DamageType,
 		is_crit: bool = false, fixed_d20: int = -1) -> int:
 	var actual := DamageResolver.apply(stats, amount, damage_type)
+	last_undead_fortitude = {}
 	if actual > 0:
 		effects.took_damage()
 	if stats.is_at_zero_hp() and has_undead_fortitude and actual > 0:
-		if damage_type != SRD.DamageType.RADIANT and not is_crit:
-			var dc := 5 + actual
-			var d20 := fixed_d20 if fixed_d20 >= 1 else Dice.roll_d20()
-			var bonus := stats.ability_modifier(SRD.Ability.CONSTITUTION)
-			if d20 + bonus >= dc:
-				stats.current_hp = 1  # Undead Fortitude saves it
+		last_undead_fortitude = undead_fortitude_save(actual, damage_type, is_crit, fixed_d20)
+		if last_undead_fortitude.get("saved", false):
+			stats.current_hp = 1  # Undead Fortitude saves it
 	if stats.is_at_zero_hp() and dies_at_zero_hp:
 		death_saves.is_dead = true
 	return actual
+
+## SRD Zombie: "If damage reduces the zombie to 0 Hit Points, it makes a Constitution
+## saving throw (DC 5 plus the damage taken) unless the damage is Radiant or from a
+## Critical Hit. On a successful save, the zombie drops to 1 Hit Point instead."
+## Rolls (or refuses) the save without changing HP.
+func undead_fortitude_save(damage_taken: int, damage_type: SRD.DamageType, is_crit: bool,
+		fixed_d20: int = -1) -> Dictionary:
+	if damage_type == SRD.DamageType.RADIANT and undead_fortitude_immune_to_radiant:
+		return {"blocked": "radiant"}
+	if is_crit:
+		return {"blocked": "critical"}
+	var dc := 5 + damage_taken
+	var d20 := fixed_d20 if fixed_d20 >= 1 else Dice.roll_d20()
+	var bonus := stats.saving_throw_bonus(SRD.Ability.CONSTITUTION) + effects.roll_bonus("save")
+	return {"dc": dc, "d20": d20, "bonus": bonus, "total": d20 + bonus, "saved": d20 + bonus >= dc}
 
 ## True if this combatant can still meaningfully act.
 func can_act() -> bool:

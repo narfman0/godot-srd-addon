@@ -9,12 +9,94 @@ enum Profile {
 }
 
 static func plan_turn(ctx: AIContext, profile: Profile) -> TurnPlan:
+	var plan := TurnPlan.new()
 	match profile:
-		Profile.AGGRESSIVE: return _aggressive(ctx)
-		Profile.DEFENSIVE:  return _defensive(ctx)
-		Profile.SKIRMISHER: return _skirmisher(ctx)
-		Profile.SUPPORT:    return _support(ctx)
-	return TurnPlan.new()
+		Profile.AGGRESSIVE: plan = _aggressive(ctx)
+		Profile.DEFENSIVE:  plan = _defensive(ctx)
+		Profile.SKIRMISHER: plan = _skirmisher(ctx)
+		Profile.SUPPORT:    plan = _support(ctx)
+	_monster_bonus(ctx, plan, profile)
+	return plan
+
+## A creature that wants out (fleeing when Bloodied): teleport away if it can (Shadow
+## Step), else a Bonus Action Disengage (Nimble Escape) and Dash, else Disengage and walk.
+static func plan_escape(ctx: AIContext) -> TurnPlan:
+	var plan := TurnPlan.new()
+	var foes := ctx.living_enemies()
+	if foes.is_empty():
+		return plan
+	plan.move_intent = TurnPlan.MoveIntent.RETREAT
+	plan.move_target = _nearest(foes, ctx)
+	var tp := _feature(ctx, "teleport")
+	if not tp.is_empty():
+		plan.monster_bonus = tp
+		plan.bonus_timing = "before_move"
+		plan.bonus_purpose = "escape"
+		plan.action = TurnPlan.ActionChoice.DASH
+		return plan
+	var dis := _feature(ctx, "simple", "disengage")
+	if not dis.is_empty():
+		plan.monster_bonus = dis
+		plan.bonus_option = "disengage"
+		plan.bonus_timing = "before_move"
+		plan.bonus_purpose = "escape"
+		plan.action = TurnPlan.ActionChoice.DASH
+		return plan
+	plan.action = TurnPlan.ActionChoice.DISENGAGE
+	return plan
+
+## Fold the creature's own Bonus Actions into the plan: a teleport that closes the gap to
+## the attack target (taken before moving), or a Disengage after attacking for creatures
+## that fight and fall back (skirmishers, or anything with Nimble Escape already in melee
+## with more than one foe).
+static func _monster_bonus(ctx: AIContext, plan: TurnPlan, profile: Profile) -> void:
+	if ctx.actor.bonus_actions.is_empty() or plan.bonus_action != TurnPlan.BonusActionChoice.NONE:
+		return
+	var foes := ctx.living_enemies()
+	if foes.is_empty():
+		return
+	var in_melee := foes.filter(func(e): return ctx.melee_range(ctx.actor, e))
+	var tp := _feature(ctx, "teleport")
+	# Teleport to the target instead of walking: Shadow Step also grants Advantage
+	if not tp.is_empty() and in_melee.is_empty():
+		var tgt: Combatant = plan.action_target if plan.action_target else plan.move_target
+		if tgt == null:
+			tgt = _weakest(foes)
+		if ctx.dist(tgt) <= int(tp.get("feet", 0)) + 5:
+			plan.monster_bonus = tp
+			plan.bonus_timing = "before_move"
+			plan.bonus_purpose = "engage"
+			plan.action = TurnPlan.ActionChoice.ATTACK
+			plan.action_target = tgt
+			plan.move_target = tgt
+			plan.move_intent = TurnPlan.MoveIntent.CLOSE_TO_TARGET
+			return
+	var dis := _feature(ctx, "simple", "disengage")
+	if dis.is_empty() or in_melee.is_empty():
+		return
+	if profile == Profile.SKIRMISHER or in_melee.size() > 1:
+		# Fight, then slip away: the Bonus Action replaces spending the action on Disengage
+		plan.action = TurnPlan.ActionChoice.ATTACK
+		plan.action_target = _weakest(in_melee)
+		plan.monster_bonus = dis
+		plan.bonus_option = "disengage"
+		plan.bonus_timing = "after_action"
+		plan.bonus_purpose = "escape"
+		plan.move_intent = TurnPlan.MoveIntent.HOLD
+		plan.move_target = _nearest(in_melee, ctx)
+		plan.retreat_after_action = true
+
+## The actor's first usable Bonus Action of this kind (and option), or {}.
+static func _feature(ctx: AIContext, kind: String, option: String = "") -> Dictionary:
+	for f in ctx.actor.bonus_actions:
+		if f.get("kind") != kind or not MonsterActions.available(ctx.actor, f):
+			continue
+		if option != "" and not option in f.get("options", []):
+			continue
+		if not ctx.meets(str(f.get("requires", ""))):
+			continue
+		return f
+	return {}
 
 # ── Profiles ──────────────────────────────────────────────────────────────────
 

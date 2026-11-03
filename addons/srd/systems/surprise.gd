@@ -1,3 +1,6 @@
+## Who is surprised when combat starts. SRD 5.2.1: a surprised combatant has Disadvantage
+## on its Initiative roll (CombatOrder.roll(c, tracker.is_surprised(c))) and nothing more.
+## apply_to_turn() is the older (2014) "loses its first turn" rule, kept for Wayfarer.
 class_name SurpriseTracker
 extends RefCounted
 

@@ -5,6 +5,8 @@ var _active_ability: AbilityData = null
 var _caster: CharacterStats = null
 ## Combatants carrying effects this concentration sustains; end() strips them.
 var affected: Array = []
+## Summoned forces the spell keeps alive (Spiritual Weapon); end() dismisses them.
+var summons: Array = []
 
 var is_concentrating: bool:
 	get: return _active_ability != null
@@ -26,6 +28,9 @@ func end() -> void:
 		for c in affected:
 			c.effects.end_concentration(_caster.character_name)
 	affected.clear()
+	for s in summons:
+		s.dismiss()
+	summons.clear()
 	_active_ability = null
 	_caster = null
 
@@ -33,6 +38,10 @@ func end() -> void:
 func track(target) -> void:
 	if not target in affected:
 		affected.append(target)
+
+func track_summon(summon) -> void:
+	summon.concentration = self
+	summons.append(summon)
 
 ## Called when the concentrating character takes damage.
 ## Rolls a CON saving throw: DC = max(10, floor(damage / 2)).

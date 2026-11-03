@@ -27,12 +27,13 @@ var slot_table: Array = []
 
 ## Build EnergySlots for a character of this class at the given level.
 func make_slots(level: int) -> EnergySlots:
-	if not slot_table.is_empty() and slot_progression != SRD.SlotProgression.PACT:
+	if not slot_table.is_empty():
 		var s := EnergySlots.new()
 		var row: Array = slot_table[clampi(level, 1, slot_table.size()) - 1]
 		for i in mini(9, row.size()):
 			s.slots_max[i] = int(row[i])
 			s.slots_remaining[i] = int(row[i])
+		s.recovers_on_short_rest = slot_progression == SRD.SlotProgression.PACT
 		return s
 	match slot_progression:
 		SRD.SlotProgression.FULL:

@@ -17,7 +17,13 @@
 ## Damage for one cast is rolled once and shared by every target, per the 2024 rules.
 ##
 ## opts (optional): d20, d20_2 (fixed attack rolls), save_d20 (fixed saves), average
-## (average dice), advantage/disadvantage, sculpted (names Sculpt Spells protects).
+## (average dice), advantage/disadvantage, sculpted (names Sculpt Spells protects),
+## within_5ft (bool, or {target name: bool}: automatic crits on Paralyzed / Unconscious
+## targets, Prone), cover (SRD.Cover, or {target name: SRD.Cover}: +2 / +5 to AC against
+## spell attacks and to Dexterity saves).
+##
+## Summons (Spiritual Weapon): casting appends a {type: "summon", summon: SpellSummon}
+## event; the game places summon.position and later calls summon_strike().
 class_name SpellResolver
 extends RefCounted
 
@@ -45,6 +51,9 @@ func cast(caster: Combatant, ability: AbilityData, targets: Array,
 	_cast_damage = -1
 	_in_cast = true
 	_empowered = false
+	if not ability.summon.is_empty():
+		opts = opts.duplicate()
+		opts["within_5ft"] = true  # the force attacks a creature within 5 feet of itself
 	var limit := ability.target_limit(level)
 	if limit > 0 and targets.size() > limit:
 		targets = targets.slice(0, limit)
@@ -62,9 +71,17 @@ func cast(caster: Combatant, ability: AbilityData, targets: Array,
 				ev = _resolve_buff(caster, ability, target, level)
 			else:
 				ev = _resolve_attack_spell(caster, ability, target, level, int(opts.get("d20", -1)), opts)
+				if not ability.summon.is_empty():
+					ev["by_summon"] = true
 			events.append(ev)
 			if concentration != null and ability.concentration:
 				concentration.track(target)
+
+	if not ability.summon.is_empty():
+		var sm := SpellSummon.create(caster, ability, level)
+		if concentration != null and ability.concentration:
+			concentration.track_summon(sm)
+		events.append({"type": "summon", "ability": ability.ability_name, "summon": sm})
 
 	var self_ev := _apply_self_effects(caster, ability, level)
 	if not self_ev.is_empty():
@@ -98,10 +115,26 @@ func roll_damage(ability: AbilityData, caster_level: int,
 		cast_at_level: int) -> int:
 	return ability.roll_damage(caster_level, cast_at_level)
 
-## Apply damage to a target. Override for reactions, immunities, etc.
+## Apply damage to a target. Override for reactions, immunities, etc. is_crit: the
+## damage is from a Critical Hit (Undead Fortitude can't save against it).
 func apply_damage(target: Combatant, amount: int,
-		damage_type: SRD.DamageType) -> int:
-	return target.take_damage(amount, damage_type)
+		damage_type: SRD.DamageType, is_crit: bool = false) -> int:
+	return target.take_damage(amount, damage_type, is_crit)
+
+## A summoned force's later attack (Spiritual Weapon: "As a Bonus Action on your later
+## turns, you can move the force up to 20 feet and repeat the attack against a creature
+## within 5 feet of it"). The game moves summon.position and spends the Bonus Action.
+func summon_strike(summon: SpellSummon, target: Combatant, opts: Dictionary = {}) -> Dictionary:
+	if not summon.active:
+		return {"type": "spell_attack", "ability": summon.ability.ability_name, "target": target.name,
+			"hit": false, "skipped": "summon gone"}
+	var o := opts.duplicate()
+	o["within_5ft"] = true  # it attacks a creature within 5 feet of itself
+	_cast_damage = -1
+	var ev := _resolve_attack_spell(summon.caster, summon.ability, target, summon.level, int(o.get("d20", -1)), o)
+	ev["by_summon"] = true
+	after_cast(summon.caster, summon.ability, [ev])
+	return ev
 
 ## Apply a condition to a target. Override to trigger animations or log.
 func apply_condition(target: Combatant, condition: SRD.Condition) -> void:
@@ -129,7 +162,11 @@ func _resolve_save_spell(caster: Combatant, ability: AbilityData,
 		saved = false; auto = "auto_fail"
 	else:
 		# Bless and similar dice add to the save: fold them into the DC the hook sees
-		saved = resolve_save(target.stats, dc - target.effects.roll_bonus("save"),
+		# Cover adds +2 / +5 to Dexterity saves against an effect from the other side
+		var cover_bonus := 0
+		if ability.save_ability == SRD.Ability.DEXTERITY:
+			cover_bonus = SRDRules.cover_ac_bonus(int(_per_target(opts, "cover", target, SRD.Cover.NONE)))
+		saved = resolve_save(target.stats, dc - target.effects.roll_bonus("save") - cover_bonus,
 			ability.save_ability, fixed_d20)
 	var dmg := 0
 	var dealt := 0
@@ -144,6 +181,7 @@ func _resolve_save_spell(caster: Combatant, ability: AbilityData,
 			dmg = raw_dmg / 2  # Potent Cantrip: half damage on a successful save
 		if dmg > 0:
 			dealt = apply_damage(target, dmg, ability.damage_type)
+	var uf := target.last_undead_fortitude if dmg > 0 else {}
 	var ev := {
 		"type": "spell_save",
 		"ability": ability.ability_name,
@@ -156,6 +194,8 @@ func _resolve_save_spell(caster: Combatant, ability: AbilityData,
 	}
 	if auto != "":
 		ev["auto"] = auto
+	if not uf.is_empty():
+		ev["undead_fortitude"] = uf
 	if not saved:
 		_apply_effects(caster, ability, target, "fail", ev, dc)
 	return ev
@@ -167,23 +207,37 @@ func _resolve_attack_spell(caster: Combatant, ability: AbilityData,
 	var o := opts.duplicate()
 	if fixed_d20 >= 1:
 		o["d20"] = fixed_d20
-	var mode := AttackResolver.roll_mode(caster, target, ability.range_feet > 5, o, ev)
+	var ranged := ability.is_ranged_attack()
+	var near := _per_target(opts, "within_5ft", target, null)
+	if near != null:
+		o["within_5ft"] = bool(near)
+	var mode := AttackResolver.roll_mode(caster, target, ranged, o, ev)
 	var rolls := AttackResolver.roll_d20s(mode, o)
 	var d20: int = rolls[0] if rolls.size() == 1 else (rolls.max() if mode > 0 else rolls.min())
 	var atk_bonus := ability.spell_attack_bonus(caster.stats)
 	var bless := caster.effects.roll_bonus("attack")
+	caster.effects.made_attack()
+	var cover := int(_per_target(opts, "cover", target, SRD.Cover.NONE))
+	var ac := target.armor_class + SRDRules.cover_ac_bonus(cover)
 	var crit := SRDRules.is_critical_hit(d20)
 	var miss := SRDRules.is_critical_miss(d20)
-	var hit := crit or (not miss and SRDRules.attack_hits(d20, atk_bonus + bless, target.armor_class))
+	var hit := crit or (not miss and SRDRules.attack_hits(d20, atk_bonus + bless, ac))
+	if hit and not crit and target.conditions.crit_from_within_5ft() \
+			and AttackResolver.is_within_5ft(caster, target, ranged, o):
+		crit = true
+		ev["auto_crit"] = true
 	var dmg := 0; var dealt := 0
 	if ability.has_damage() and (hit or (ability.slot_level == 0 and _kit_has(caster, "potent-cantrip"))):
 		dmg = _spell_dice(caster, ability, cast_at_level, opts)
 		if crit:
-			dmg += _spell_dice(caster, ability, cast_at_level, opts)
+			dmg += _spell_dice(caster, ability, cast_at_level, opts)  # crits roll the dice twice
 		dmg = maxi(0, dmg + _flat_damage(caster, ability))
 		if not hit:
 			dmg /= 2  # Potent Cantrip: half damage on a miss, no other effect
-		dealt = apply_damage(target, dmg, ability.damage_type)
+		dealt = apply_damage(target, dmg, ability.damage_type, crit)
+		if not target.last_undead_fortitude.is_empty():
+			ev["undead_fortitude"] = target.last_undead_fortitude
+	ev.merge({"target_ac": ac, "cover": cover, "attack_bonus": atk_bonus})
 	ev.merge({
 		"type": "spell_attack",
 		"ability": ability.ability_name,
@@ -196,9 +250,16 @@ func _resolve_attack_spell(caster: Combatant, ability: AbilityData,
 	})
 	if hit:
 		_apply_effects(caster, ability, target, "hit", ev)
-	if not ability.summon.is_empty():
-		ev["summon"] = ability.summon
 	return ev
+
+## opts[key] may be one value for every target or a {target name: value} map.
+static func _per_target(opts: Dictionary, key: String, target: Combatant, default: Variant) -> Variant:
+	if not opts.has(key):
+		return default
+	var v: Variant = opts[key]
+	if v is Dictionary:
+		return v.get(target.name, default)
+	return v
 
 ## Darts (auto-hit, one damage roll each) and rays (one attack roll each).
 func _resolve_projectiles(caster: Combatant, ability: AbilityData, targets: Array,

@@ -263,7 +263,8 @@ func test_spiritual_weapon():
 	var ev := resolver.cast(c, ab, [t], 2, null, {"d20": 15, "average": true})
 	assert_true(ev[0].hit)
 	assert_eq(ev[0].damage_dealt, 4 + 3, "1d8 + spellcasting modifier")
-	assert_eq(ev[0].summon.repeat_as, "bonus_action")
+	assert_eq(ev[1].type, "summon")
+	assert_eq(ev[1].summon.repeat_as, "bonus_action")
 	assert_eq(ab.upcasted_damage_dice(3), 2)
 
 func test_sleep_skips_creatures_magic_cannot_put_to_sleep():

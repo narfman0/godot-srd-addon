@@ -1,5 +1,21 @@
+## Initiative order. CombatOrder.roll() rolls one combatant's Initiative under SRD 5.2.1:
+## a Dexterity check (a monster uses its stat block's Initiative modifier), with
+## Disadvantage if it is surprised or Incapacitated and Advantage if it is Invisible.
 class_name CombatOrder
 extends RefCounted
+
+## {d20, rolls, bonus, total, surprised, advantage, disadvantage}. fixed: preset d20s.
+static func roll(c: Combatant, surprised: bool = false, fixed: Array = []) -> Dictionary:
+	var dis := surprised or c.conditions.is_incapacitated()
+	var adv := c.conditions.has(SRD.Condition.INVISIBLE)
+	var mode := 0 if adv == dis else (1 if adv else -1)
+	var rolls := [int(fixed[0]) if fixed.size() > 0 else Dice.roll_d20()]
+	if mode != 0:
+		rolls.append(int(fixed[1]) if fixed.size() > 1 else Dice.roll_d20())
+	var d20: int = rolls[0] if mode == 0 else (rolls.max() if mode > 0 else rolls.min())
+	var bonus := c.initiative_bonus
+	return {"d20": d20, "rolls": rolls, "bonus": bonus, "total": d20 + bonus,
+		"surprised": surprised, "advantage": mode > 0, "disadvantage": mode < 0}
 
 # Each entry: { "char": CharacterStats, "roll": int, "total": int }
 var _order: Array = []

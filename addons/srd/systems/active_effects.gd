@@ -13,6 +13,7 @@
 ##   uses      int     consumed by use (advantage riders); -1 = unlimited
 ##   concentration  String  caster name when it ends with that caster's Concentration
 ##   ends_on_damage bool    removed when the bearer takes damage (Sleep)
+##   ends_on_attack bool    removed once the bearer makes an attack roll (Invisible from a teleport)
 ## plus type-specific keys (amount, die, applies, target, condition, spell).
 ##
 ## The combat loop calls turn_started(name) / turn_ended(name) on every combatant's
@@ -132,6 +133,13 @@ func turn_ended(who: String) -> Array:
 ## The bearer took damage: end effects that break on damage (Sleep).
 func took_damage() -> Array:
 	var gone := _effects.filter(func(e): return e.get("ends_on_damage", false))
+	for e in gone:
+		_remove(e)
+	return gone
+
+## The bearer made an attack roll: end effects that last "until it makes an attack roll".
+func made_attack() -> Array:
+	var gone := _effects.filter(func(e): return e.get("ends_on_attack", false))
 	for e in gone:
 		_remove(e)
 	return gone

@@ -25,9 +25,13 @@ static func level_up(char: CharacterStats, class_data: ClassData,
 		var new_slots := class_data.make_slots(char.level)
 		for i in 9:
 			var gained := new_slots.slots_max[i] - slots.slots_max[i]
+			slots.slots_max[i] = new_slots.slots_max[i]
 			if gained > 0:
-				slots.slots_max[i] = new_slots.slots_max[i]
 				slots.slots_remaining[i] += gained  # new slots come pre-filled
+			else:
+				# Pact Magic slots move up a level: the old level's slots go away
+				slots.slots_remaining[i] = mini(slots.slots_remaining[i], slots.slots_max[i])
+		slots.recovers_on_short_rest = new_slots.recovers_on_short_rest
 
 	return hp_gained
 

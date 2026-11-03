@@ -57,7 +57,45 @@ healing, or effect carry `no_mechanics`.
 - `SpellResolver.cast(...)` handles attack/save spells with riders, darts and rays,
   healing (reviving a creature at 0 HP), buffs, self effects, and Concentration cleanup.
 - `ActiveEffects` (`combatant.effects`) holds timed effects; drive expiry with
-  `SRDEffects.turn_started(all, actor)` / `SRDEffects.turn_ended(all, actor)`. Games layer their own rows (homebrew
+  `SRDEffects.turn_started(all, actor)` / `SRDEffects.turn_ended(all, actor)`.
+- **Critical Hits.** Spell attacks roll their dice twice on a crit and tell
+  `SpellResolver.apply_damage(target, amount, type, is_crit)`. Hits from within 5 ft. on a
+  Paralyzed or Unconscious target are automatic crits (weapon and spell attacks): pass
+  `opts.within_5ft`, or set `AttackResolver.within_5ft` once (a `func(attacker, target) -> bool`).
+  The same fact decides Prone's Advantage (within 5 ft.) or Disadvantage (beyond).
+- **Cover.** `opts.cover` (`SRD.Cover`, or `{target name: SRD.Cover}` for spells) adds +2 / +5
+  to AC against attacks and to Dexterity saves. The game measures it from its geometry.
+- **Monster Bonus Actions and Reactions** (`MonsterActions`). `make_monster()` parses the stat
+  block into `combatant.bonus_actions` / `combatant.reactions`: `simple` (Nimble Escape's
+  Disengage or Hide, Hasten's Dash and Disengage), `teleport` (Blink Dog, Shadow Step-style
+  teleports with a `requires` the game answers and an Advantage rider), `ac_bonus` (Parry), and
+  damage-triggered teleports that leave the creature Invisible until it attacks. Uses (1/Day,
+  Recharge X) are tracked; `MonsterActions.start_turn(c)` rolls recharges. Authored keys in a
+  pack row (`teleport_feet`, `condition`, `requires`, `usage`...) override the parse.
+  `MonsterActions.reaction_for(c, "took_damage" | "hit_by_attack", ctx)` finds a reaction worth
+  taking; `use(c, feature)` spends it and returns what the game must do (`teleport_feet`).
+  Weapon riders ("if it had Advantage on the roll, an extra 2d6 Necrotic", once per turn) are
+  `combatant.hit_riders`, applied by `AttackResolver`. `CombatAI.plan_turn()` folds them into the
+  plan (`plan.monster_bonus`, `bonus_timing` "before_move" / "after_action",
+  `retreat_after_action`); `CombatAI.plan_escape(ctx)` plans a getaway. Give
+  `AIContext.requirement_met` a callable for lighting requirements.
+- **Unarmed Strike** (`UnarmedStrike`): Shove (push 5 ft. or Prone) and Grapple, 2024 style:
+  the target picks a STR or DEX save vs 8 + STR mod + PB; at most one size larger;
+  Paralyzed / Unconscious targets fail. `fail_chance()` for previews.
+- **Undead Fortitude** is a CON save (DC 5 + damage taken) the engine rolls in
+  `Combatant.take_damage()`; the result is `combatant.last_undead_fortitude`
+  (`{dc, d20, bonus, total, saved}` or `{blocked: "radiant" | "critical"}`) and appears as
+  `undead_fortitude` on attack and spell events.
+- **Summons** (`SpellSummon`, Spiritual Weapon): casting appends a `{type: "summon", summon}`
+  event. The force keeps the cast's slot level, attacks from within 5 ft. of itself (a melee
+  spell attack), lasts the duration (`turn_started()` on the caster's turns) and ends with
+  Concentration. Later turns: `SpellResolver.summon_strike(summon, target)` after the game
+  moves `summon.position` up to `move_feet`.
+- **Initiative and Surprise.** `CombatOrder.roll(c, surprised)`: the stat block's Initiative
+  for monsters (`combatant.initiative_bonus`), Disadvantage when surprised or Incapacitated,
+  Advantage when Invisible (SRD 5.2.1 Surprise has no lost turn).
+- **Pact Magic** slots come from the Warlock table (level 3: two 2nd-level slots), and
+  `SRDLevelUp` drops the old level's slots when they move up. Games layer their own rows (homebrew
 monsters, renamed setting content) with a second `SRDContentPack.load_dir()`.
 
 When exporting a game, add `*.json` to the export filter so the pack ships.

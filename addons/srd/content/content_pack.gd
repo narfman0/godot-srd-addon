@@ -25,11 +25,15 @@ func load_dir(dir: String) -> void:
 		if path.get_file() == "meta.json":
 			meta = parsed
 			continue
-		for row in (parsed if parsed is Array else [parsed]):
-			if row is Dictionary and row.has("kind") and row.has("slug"):
-				if not _rows.has(row.kind):
-					_rows[row.kind] = {}
-				_rows[row.kind][row.slug] = row
+		add_rows(parsed if parsed is Array else [parsed])
+
+## Add rows directly (tests, rows a game builds in code). Later rows win on kind+slug.
+func add_rows(rows_in: Array) -> void:
+	for row in rows_in:
+		if row is Dictionary and row.has("kind") and row.has("slug"):
+			if not _rows.has(row.kind):
+				_rows[row.kind] = {}
+			_rows[row.kind][row.slug] = row
 
 func has_row(kind: String, slug: String) -> bool:
 	return _rows.has(kind) and _rows[kind].has(slug)

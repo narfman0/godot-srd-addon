@@ -21,6 +21,10 @@
 ##   light_extra         this is the Light property's extra attack (same rule; Two-Weapon Fighting adds it)
 ##   save_d20            fixed d20 for the target's save (Topple)
 ##   average             roll average damage (deterministic tests)
+##   within_5ft          the attacker is within 5 ft. of the target (Prone, and automatic
+##                       Critical Hits on Paralyzed / Unconscious targets); else asks
+##                       AttackResolver.within_5ft, else assumes melee = within 5 ft.
+##   cover               SRD.Cover the target has against this attack (+2 / +5 AC)
 class_name AttackResolver
 extends RefCounted
 
@@ -28,6 +32,9 @@ extends RefCounted
 ## the attacker who isn't Incapacitated is within 5 feet of the target (Sneak Attack).
 ## Leave empty (invalid) for "no ally".
 static var ally_adjacent: Callable
+## func(attacker: Combatant, target: Combatant) -> bool: is the attacker within 5 feet of
+## the target? Leave invalid to treat melee attacks as within 5 ft. and ranged as not.
+static var within_5ft: Callable
 
 const _PUSHABLE := ["tiny", "small", "medium", "large"]
 
@@ -47,11 +54,17 @@ static func weapon_attack(attacker: Combatant, target: Combatant, opts: Dictiona
 	if kit != null and kit.fighting_style() == "archery" and ranged:
 		bonus += 2
 	var bless := attacker.effects.roll_bonus("attack")
+	attacker.effects.made_attack()
 	var crit_on := kit.crit_threshold() if kit != null and w != null else 20
 	var crit := d20 >= crit_on
-	var hit := crit or (d20 != 1 and d20 + bonus + bless >= target.armor_class)
+	var cover := int(opts.get("cover", SRD.Cover.NONE))
+	var ac := target.armor_class + SRDRules.cover_ac_bonus(cover)
+	var hit := crit or (d20 != 1 and d20 + bonus + bless >= ac)
+	if hit and not crit and target.conditions.crit_from_within_5ft() and is_within_5ft(attacker, target, ranged, opts):
+		crit = true
+		ev["auto_crit"] = true
 	ev.merge({"d20": d20, "rolls": rolls, "advantage": mode > 0, "disadvantage": mode < 0,
-		"attack_bonus": bonus, "bonus_dice": bless, "target_ac": target.armor_class,
+		"attack_bonus": bonus, "bonus_dice": bless, "target_ac": ac, "cover": cover,
 		"hit": hit, "crit": crit})
 
 	var mastery := ""
@@ -81,6 +94,25 @@ static func weapon_attack(attacker: Combatant, target: Combatant, opts: Dictiona
 		dmg = maxi(0, dmg)
 		ev["damage"] = dmg
 		dealt = target.take_damage(dmg, w.damage_type if w else SRD.DamageType.BLUDGEONING, crit)
+		if not target.last_undead_fortitude.is_empty():
+			ev["undead_fortitude"] = target.last_undead_fortitude
+		# Monster riders: "Once per turn, if it had Advantage on the roll, an extra 2d6 Necrotic"
+		for rider in attacker.hit_riders:
+			var key := "rider-" + str(rider.name)
+			if rider.get("condition", "") == "advantage" and mode <= 0:
+				continue
+			if int(rider.get("per_turn", 0)) > 0 and attacker.turn_flags.get(key, false):
+				continue
+			if not target.is_alive:
+				break
+			attacker.turn_flags[key] = true
+			var rd := SRDContent.parse_dice(str(rider.dice))
+			var extra: int = _roll(int(rd.count) * (2 if crit else 1), int(rd.sides), opts) + int(rd.bonus)
+			var rtype := SRDContent.damage_type_from(str(rider.type))
+			var rdealt := target.take_damage(extra, rtype, crit)
+			ev["rider_damage"] = {"name": rider.name, "amount": extra, "dealt": rdealt,
+				"type": str(rider.type).to_lower()}
+			dealt += rdealt
 		# Divine Strike (Cleric 7): once per turn, extra Radiant
 		var ds := kit.divine_strike_dice() if kit != null and w != null else 0
 		if ds > 0 and not attacker.turn_flags.get("divine_strike", false) and target.is_alive:
@@ -115,10 +147,17 @@ static func roll_mode(attacker: Combatant, target: Combatant, ranged: bool, opts
 		ev: Dictionary = {}) -> int:
 	var adv: bool = opts.get("advantage", false)
 	var dis: bool = opts.get("disadvantage", false)
-	if target.conditions.has(SRD.Condition.PRONE) and ranged:
+	var prone := target.conditions.has(SRD.Condition.PRONE)
+	if prone and not is_within_5ft(attacker, target, ranged, opts):
 		dis = true  # Prone: attacks from beyond 5 ft. have Disadvantage
+		if target.conditions.has(SRD.Condition.UNCONSCIOUS) or target.conditions.has(SRD.Condition.PARALYZED) \
+				or target.conditions.has(SRD.Condition.STUNNED) or target.conditions.has(SRD.Condition.RESTRAINED) \
+				or target.conditions.has(SRD.Condition.PETRIFIED) or target.conditions.has(SRD.Condition.BLINDED):
+			adv = true
 	elif target.conditions.grants_advantage_to_attackers():
 		adv = true
+	if target.conditions.imposes_disadvantage_on_attackers():
+		dis = true
 	if attacker.conditions.has_attack_advantage():
 		adv = true
 	if attacker.conditions.has_attack_disadvantage():
@@ -134,6 +173,15 @@ static func roll_mode(attacker: Combatant, target: Combatant, ranged: bool, opts
 	if attacker.effects.consume("disadvantage_on_attack"):
 		dis = true
 	return 0 if adv == dis else (1 if adv else -1)
+
+## Is the attacker within 5 ft. of the target? opts.within_5ft, else the game's callable,
+## else melee attacks are and ranged ones aren't.
+static func is_within_5ft(attacker: Combatant, target: Combatant, ranged: bool, opts: Dictionary = {}) -> bool:
+	if opts.has("within_5ft"):
+		return bool(opts.within_5ft)
+	if within_5ft.is_valid():
+		return bool(within_5ft.call(attacker, target))
+	return not ranged
 
 ## The d20s rolled for an attack: one, or two with Advantage/Disadvantage.
 static func roll_d20s(mode: int, opts: Dictionary) -> Array:

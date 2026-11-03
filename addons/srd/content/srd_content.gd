@@ -56,7 +56,11 @@ func make_class(slug: String) -> ClassData:
 	var casting: Variant = d.get("spellcasting")
 	c.slot_progression = _progression(casting.get("progression", "") if casting is Dictionary else "")
 	for r in d.get("table", []):
-		if r.has("slot_1"):
+		if r.has("slot_level") and r.has("spell_slots"):  # Pact Magic: N slots of one level
+			var counts := [0, 0, 0, 0, 0, 0, 0, 0, 0]
+			counts[int(r.slot_level) - 1] = int(r.spell_slots)
+			c.slot_table.append(counts)
+		elif r.has("slot_1"):
 			var counts := []
 			for i in range(1, 10):
 				counts.append(int(r.get("slot_%d" % i, 0)))
@@ -360,6 +364,7 @@ func make_spell(slug: String, casting_ability: SRD.Ability = SRD.Ability.INTELLI
 	ab.effects = mech.get("effects", []).duplicate(true)
 	ab.immune_if = mech.get("immune_if", []).duplicate()
 	ab.summon = mech.get("summon", {}).duplicate()
+	ab.attack_kind = str(mech.get("attack", "")) if mech.get("attack", "") is String else ""
 	ab.projectiles = int(mech.get("projectiles", 0))
 	ab.upcast_projectiles = int(mech.get("upcast_projectiles", 0))
 	ab.auto_hit = bool(mech.get("auto_hit", false))
@@ -461,6 +466,14 @@ func make_monster(slug: String, id: int = 0) -> Combatant:
 	c.size = str(d.get("size", "medium")).split(" ")[0]
 	for ci in d.get("condition_immunities", []):
 		c.condition_immunities.append(str(ci))
+	if d.has("initiative"):
+		c.initiative_override = int(d.initiative)
+	c.bonus_actions = MonsterActions.parse_all(d.get("bonus_actions", []), "bonus")
+	c.reactions = MonsterActions.parse_all(d.get("reactions", []), "reaction")
+	for a in d.get("actions", []):
+		var rider := MonsterActions.parse_hit_rider(a)
+		if not rider.is_empty() and c.weapon != null and rider.name == c.weapon.weapon_name:
+			c.hit_riders.append(rider)
 	var no_sleep := RegEx.create_from_string("can.t put (?:it|you) to sleep")
 	for t in d.get("traits", []):
 		if t.get("name", "") == "Undead Fortitude":

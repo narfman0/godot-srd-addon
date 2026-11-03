@@ -61,11 +61,22 @@ func remove_exhaustion(levels: int = 1) -> void:
 
 # --- Mechanical query methods ---
 
-## Attackers have advantage against this target.
+## Attackers have advantage against this target (Prone only from within 5 ft.; see
+## AttackResolver.roll_mode).
 func grants_advantage_to_attackers() -> bool:
 	return has(SRD.Condition.PARALYZED) or has(SRD.Condition.PETRIFIED) \
 		or has(SRD.Condition.PRONE) or has(SRD.Condition.RESTRAINED) \
-		or has(SRD.Condition.STUNNED) or has(SRD.Condition.UNCONSCIOUS)
+		or has(SRD.Condition.STUNNED) or has(SRD.Condition.UNCONSCIOUS) \
+		or has(SRD.Condition.BLINDED)
+
+## Paralyzed / Unconscious: "Any attack roll that hits you is a Critical Hit if the
+## attacker is within 5 feet of you."
+func crit_from_within_5ft() -> bool:
+	return has(SRD.Condition.PARALYZED) or has(SRD.Condition.UNCONSCIOUS)
+
+## Invisible: attack rolls against it have Disadvantage (unless the attacker can see it).
+func imposes_disadvantage_on_attackers() -> bool:
+	return has(SRD.Condition.INVISIBLE)
 
 ## Target has disadvantage on their own attack rolls.
 func has_attack_disadvantage() -> bool:

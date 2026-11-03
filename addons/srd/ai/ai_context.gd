@@ -18,6 +18,9 @@ var is_in_melee_range: Callable     ## func(a: Combatant, b: Combatant) -> bool
 var can_reach_in_one_move: Callable ## func(actor: Combatant, target: Combatant) -> bool
 var distance_feet: Callable         ## func(a: Combatant, b: Combatant) -> int
 var cover_between: Callable         ## func(a: Combatant, b: Combatant) -> SRD.Cover
+## Optional: func(c: Combatant, requirement: String) -> bool for monster features with a
+## `requires` ("dim_light_or_darkness"). Unset: features with a requirement aren't used.
+var requirement_met: Callable
 
 ## Convenience wrappers so AI code reads cleanly
 func melee_range(a: Combatant, b: Combatant) -> bool:
@@ -31,6 +34,11 @@ func dist(target: Combatant) -> int:
 
 func cover(target: Combatant) -> SRD.Cover:
 	return cover_between.call(actor, target)
+
+func meets(requirement: String) -> bool:
+	if requirement == "":
+		return true
+	return requirement_met.is_valid() and bool(requirement_met.call(actor, requirement))
 
 func living_enemies() -> Array:
 	return enemies.filter(func(c): return c.is_active)
