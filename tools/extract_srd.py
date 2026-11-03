@@ -7,8 +7,8 @@ Coverage grows section by section. Each section parser is independent, keyed off
 bookmarks and fonts, and writes one JSON file of {kind, slug, name, page, data} rows.
 Currently: spells (with effect riders), monsters, weapons, weapon and mastery properties,
 armor, classes (core traits + the 20-level features table), class features, subclasses,
-class options (Metamagic, Eldritch Invocations), species, backgrounds, feats.
-Not yet: magic items, the rules glossary.
+class options (Metamagic, Eldritch Invocations), species, backgrounds, feats, magic items.
+ Not yet: the rules glossary.
 
 Requires PyMuPDF: python3 -m venv tools/.venv && tools/.venv/bin/pip install pymupdf
 """
@@ -1028,6 +1028,59 @@ def parse_weapon_properties(doc) -> list[dict]:
             out.append(row("weapon_property", head.text, head.page, {"mastery": mastery, "text": join_text(body)}))
     return out
 
+# ── Magic items ───────────────────────────────────────────────────────────────
+
+RARITIES = ["Common", "Uncommon", "Rare", "Very Rare", "Legendary", "Artifact"]
+ITEM_CATEGORIES = ["Armor", "Potion", "Ring", "Rod", "Scroll", "Staff", "Wand", "Weapon", "Wondrous Item"]
+
+def parse_magic_items(doc) -> list[dict]:
+    """Magic Items A–Z: category, rarity (per +N variant where priced so), attunement, text."""
+    lines = page_lines(doc, section_pages(doc, "Magic Items"))
+    start = next(i for i, ln in enumerate(lines) if ln.text == "Magic Items A–Z")
+    lines = lines[start + 1:]
+    heads = [i for i, ln in enumerate(lines) if ln.has_font("GillSans-SemiBold:12.0")]
+    out = []
+    carried = ""  # a name that wrapped onto two heading lines
+    for n, i in enumerate(heads):
+        block = lines[i + 1:heads[n + 1] if n + 1 < len(heads) else len(lines)]
+        meta, body = [], []
+        for ln in block:
+            (meta if ln.has_font("Cambria-Italic") and not body else body).append(ln)
+        if not meta:
+            carried = (carried + " " + lines[i].text).strip()
+            continue
+        name = (carried + " " + lines[i].text).strip()
+        carried = ""
+        text = join_text([ln for ln in body if ln.spans[0]["font"].startswith("Cambria")])
+        out.append(row("magic_item", name, lines[i].page, _magic_item(" ".join(m.text for m in meta), text)))
+    return out
+
+def _magic_item(meta: str, text: str) -> dict:
+    d: dict = {"meta": meta, "text": text}
+    head = meta.split(",")[0]
+    d["category"] = next((c for c in ITEM_CATEGORIES if head.startswith(c)), "Wondrous Item")
+    m = re.search(r"\(([^)]*)\)", head)
+    if m:
+        d["applies_to"] = m.group(1)
+    # "Rare (+2)" per variant, or one rarity; longest names first ("Very Rare" before "Rare")
+    variants = {b: r for r, b in re.findall(r"(Very Rare|Uncommon|Common|Rare|Legendary)\s*\(\+(\d)\)", meta)}
+    if variants:
+        d["variants"] = {k: v.lower() for k, v in sorted(variants.items())}
+    found = [r for r in sorted(RARITIES, key=len, reverse=True) if re.search(rf"\b{r}\b", meta, re.I)]
+    picked = []
+    rest = meta
+    for r in found:
+        if re.search(rf"\b{r}\b", rest, re.I):
+            picked.append(r)
+            rest = re.sub(rf"\b{r}\b", "", rest, flags=re.I)
+    d["rarity"] = min(picked, key=RARITIES.index).lower() if picked else "varies"
+    a = re.search(r"Requires Attunement(?: by ([^)]*))?", meta)
+    d["attunement"] = bool(a)
+    if a and a.group(1):
+        d["attunement_by"] = a.group(1).strip()
+    d["consumable"] = d["category"] in ("Potion", "Scroll")
+    return d
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 _FEATURES_CACHE: dict = {}
@@ -1050,6 +1103,7 @@ PARSERS = {
     "species": parse_species,
     "backgrounds": parse_backgrounds,
     "feats": parse_feats,
+    "magic_items": parse_magic_items,
 }
 
 ATTRIBUTION = (
