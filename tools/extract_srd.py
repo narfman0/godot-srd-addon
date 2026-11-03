@@ -106,6 +106,8 @@ def join_text(lines: list[Line]) -> str:
             text = t
         elif ln.paragraph_start():
             text += "\n" + t
+        elif text.endswith("-") and t[:1].islower() and text[-2:-1].isdigit():
+            text += t  # "40-" / "foot": a real hyphen
         elif text.endswith("-") and t[:1].islower():
             text = text[:-1] + t
         else:

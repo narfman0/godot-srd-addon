@@ -272,6 +272,12 @@ static func auto_answer(choice: Dictionary, prefs: Dictionary, scores: Array) ->
 	var want: Array = prefs.get(choice.id, [])
 	var ids: Array = choice.options.map(func(o): return o.id)
 	var out := []
+	if choice.kind == "spell":  # the strongest listed spell this level opens up comes first
+		var level_of := {}
+		for o in choice.options:
+			level_of[o.id] = int(o.level)
+		want = want.duplicate()
+		want.sort_custom(func(a, b): return int(level_of.get(a, -1)) > int(level_of.get(b, -1)))
 	for p in want:
 		if p in ids and not p in out and out.size() < int(choice.count):
 			out.append(p)

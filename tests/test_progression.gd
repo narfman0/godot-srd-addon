@@ -56,6 +56,10 @@ func test_auto_answer_prefers_the_list_then_modelled_spells():
 	var a := SRDProgression.auto_answer(c, {"spells": ["counterspell", "fireball"]}, [])
 	assert_eq(a, ["counterspell", "fireball"])
 
+func test_auto_answer_takes_the_highest_level_listed():
+	var c: Dictionary = SRDProgression.choices(srd, _build("wizard"), 5).filter(func(x): return x.id == "spells")[0]
+	assert_eq(SRDProgression.auto_answer(c, {"spells": ["shield", "web", "fireball", "fly"]}, []), ["fireball", "fly"])
+
 func test_auto_asi_spreads_past_the_cap():
 	var a := SRDProgression.auto_answer({"id": "asi", "kind": "asi"}, {"asi": ["int", "con"]}, [8, 14, 14, 19, 12, 10])
 	assert_eq(a, ["ability-score-improvement", "int", "con"])
