@@ -117,6 +117,7 @@ static func parse_save_actions(actions: Array) -> Array:
 			"dc": int(m.get_string(2)), "dice": "", "type": "", "half": "half damage" in text.to_lower(),
 			"area_shape": "", "area_size": 0, "range": 5, "recharge": _recharge(str(a.get("name", "")) + " " + str(a.get("usage", ""))),
 			"condition": "", "uses": _limited(str(a.get("name", "")) + " " + str(a.get("usage", ""))), "key": str(a.get("name", ""))}
+		f["needs_grapple"] = RegEx.create_from_string("(Grappled|Charmed|Restrained|Stunned|Paralyzed) by").search(text) != null
 		var d := RegEx.create_from_string("\\((\\d+d\\d+(?:\\s*[+−-]\\s*\\d+)?)\\)\\s*(\\w+) damage").search(text)
 		if d:
 			f.dice = d.get_string(1).replace(" ", "").replace("−", "-")
