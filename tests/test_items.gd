@@ -25,6 +25,10 @@ func test_rarity_values():
 	assert_eq(SRDItems.value_of("rare", true), 2000)
 	assert_eq(SRDItems.value_of("artifact"), 0)
 
+func test_every_armor_has_a_price():
+	for slug in srd.pack.slugs("armor"):
+		assert_gt(SRDItems.cost_gp(str(srd.pack.get_row("armor", slug).data.cost)), 0.0, slug)
+
 func test_cost_parsing():
 	assert_eq(SRDItems.cost_gp("15 GP"), 15.0)
 	assert_eq(SRDItems.cost_gp("5 SP"), 0.5)

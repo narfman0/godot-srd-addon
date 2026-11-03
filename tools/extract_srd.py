@@ -537,7 +537,11 @@ def parse_armor(doc) -> list[dict]:
     for cat, r in _table_rows(lines, "Armor", ["Armor", "Armor Class", "Strength", "Stealth", "Weight", "Cost"]):
         ac = r.get("Armor Class", "")
         kind = cat.split(" ")[0].lower()  # light / medium / heavy / shield
-        d = {"type": kind, "ac_raw": ac, "weight": r.get("Weight", ""), "cost": r.get("Cost", "")}
+        d = {"type": kind, "ac_raw": ac, **_weight_cost(r)}
+        if not d["cost"]:  # a wide row can merge the last cells: find the price wherever it landed
+            found = re.search(r"[\d,]+ [CSEGP]P", " ".join(str(v) for v in r.values()))
+            d["cost"] = found.group(0) if found else ""
+            d["weight"] = re.sub(r"\s*[\d,]+ [CSEGP]P$", "", d["weight"])
         if m := re.match(r"(\d+)", ac):
             d["base_ac"] = int(m.group(1))
         if m := re.match(r"\+(\d+)", ac):

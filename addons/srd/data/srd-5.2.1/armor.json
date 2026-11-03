@@ -100,8 +100,8 @@
   "data": {
    "type": "medium",
    "ac_raw": "14 + Dex modifier (max 2)",
-   "weight": "20 lb. 400 GP",
-   "cost": "",
+   "weight": "20 lb.",
+   "cost": "400 GP",
    "base_ac": 14,
    "dex": true,
    "dex_cap": 2,
@@ -116,8 +116,8 @@
   "data": {
    "type": "medium",
    "ac_raw": "15 + Dex modifier (max 2)",
-   "weight": "40 lb. 750 GP",
-   "cost": "",
+   "weight": "40 lb.",
+   "cost": "750 GP",
    "base_ac": 15,
    "dex": true,
    "dex_cap": 2,
@@ -163,8 +163,8 @@
   "data": {
    "type": "heavy",
    "ac_raw": "17",
-   "weight": "60 lb. 200 GP",
-   "cost": "",
+   "weight": "60 lb.",
+   "cost": "200 GP",
    "base_ac": 17,
    "dex": false,
    "strength": 15,
@@ -179,8 +179,8 @@
   "data": {
    "type": "heavy",
    "ac_raw": "18",
-   "weight": "65 lb. 1,500 GP",
-   "cost": "",
+   "weight": "65 lb.",
+   "cost": "1,500 GP",
    "base_ac": 18,
    "dex": false,
    "strength": 15,
