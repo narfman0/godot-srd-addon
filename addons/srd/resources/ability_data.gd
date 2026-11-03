@@ -34,6 +34,56 @@ extends Resource
 # Casting ability for this ability (set by class data)
 var casting_ability: SRD.Ability = SRD.Ability.INTELLIGENCE
 
+# ── SRD 5.2.1 spell mechanics (SRDContent.make_spell fills these from the pack) ──
+## Pack slug ("magic-missile"); effects use it as their id so recasting replaces them.
+@export var spell_id: String = ""
+## "action" | "bonus_action" | "reaction" | "minute" ... (the casting time's first words).
+@export var casting_time: String = "action"
+## Reaction spells: the trigger text ("when you are hit by an attack roll ...").
+@export var reaction_trigger: String = ""
+## Flat damage per roll (Magic Missile's +1), and whether the caster's spellcasting
+## modifier is added (Spiritual Weapon).
+@export var damage_bonus: int = 0
+@export var damage_add_modifier: bool = false
+## Healing: dice + flat + optional spellcasting modifier; upcast adds dice per slot level.
+@export var heal_die_count: int = 0
+@export var heal_die_sides: int = 0
+@export var heal_bonus: int = 0
+@export var heal_add_modifier: bool = false
+@export var upcast_heal_die_count: int = 0
+## Darts and rays: each projectile rolls damage (and an attack roll unless auto_hit).
+@export var projectiles: int = 0
+@export var upcast_projectiles: int = 0
+@export var auto_hit: bool = false
+## Buff targets (Bless: 3, +1 per slot level above 1); 0 = whatever the caller passes.
+@export var max_targets: int = 0
+@export var upcast_targets: int = 0
+## Effect templates from data: {on: "hit"|"fail"|"apply", type, expires, of, turns, ...}.
+## "hit" applies on an attack hit, "fail" on a failed save, "apply" always (buffs, self).
+var effects: Array = []
+## Condition immunities that make a target auto-succeed (Sleep: "exhaustion").
+var immune_if: Array = []
+## Summoned force the caster keeps using (Spiritual Weapon): {repeat_as, move_feet, rounds}.
+var summon: Dictionary = {}
+
+func is_healing() -> bool:
+	return heal_die_count > 0 or heal_bonus > 0
+
+func has_damage() -> bool:
+	return damage_die_count > 0
+
+## Projectiles at a slot level (Magic Missile: 3, +1 per level above 1).
+func projectile_count(cast_at_level: int) -> int:
+	return projectiles + maxi(0, cast_at_level - slot_level) * upcast_projectiles if slot_level > 0 else projectiles
+
+func target_limit(cast_at_level: int) -> int:
+	if max_targets <= 0:
+		return 0
+	return max_targets + maxi(0, cast_at_level - slot_level) * upcast_targets
+
+func heal_dice(cast_at_level: int) -> int:
+	return heal_die_count + maxi(0, cast_at_level - slot_level) * upcast_heal_die_count
+
 ## Base damage dice at minimum slot level.
 func base_damage_dice(caster_level: int = 1) -> int:
 	# Cantrips scale by caster level

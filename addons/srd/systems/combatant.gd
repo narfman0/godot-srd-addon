@@ -18,6 +18,17 @@ var dies_at_zero_hp: bool = false
 var has_undead_fortitude: bool = false
 var undead_fortitude_immune_to_radiant: bool = true
 
+## Timed buffs, riders, and mastery effects (Bless, Shield, Sap, Vex...).
+var effects: ActiveEffects
+## Class features, resources, and masteries; null for monsters and bare stat blocks.
+var kit: ClassKit = null
+## Per-turn state cleared by SRDEffects.turn_started (sneak_attack, cleave, action_surge...).
+var turn_flags: Dictionary = {}
+## "tiny" .. "gargantuan": Push only moves Large or smaller creatures.
+var size: String = "medium"
+## Lowercase condition names this creature ignores ("exhaustion" also makes it immune to Sleep).
+var condition_immunities: Array[String] = []
+
 func _init(char_stats: CharacterStats, weapon_data: WeaponData = null,
 		equip: EquipmentSlots = null) -> void:
 	stats = char_stats
@@ -26,6 +37,7 @@ func _init(char_stats: CharacterStats, weapon_data: WeaponData = null,
 	death_saves = DeathSaveTracker.new()
 	action_economy = ActionEconomy.new(stats.speed)
 	conditions = ConditionTracker.new()
+	effects = ActiveEffects.new(conditions)
 
 var name: String:
 	get: return stats.character_name
@@ -46,13 +58,29 @@ var current_hp: int:
 	get: return stats.current_hp
 
 var armor_class: int:
-	get: return equipment.current_ac(stats)
+	get: return equipment.current_ac(stats) + effects.ac_bonus() + _style_ac_bonus()
+
+## Speed after reductions (Ray of Frost, Slow), never below 0.
+var speed: int:
+	get: return maxi(0, stats.speed - effects.speed_penalty())
+
+## SRD: a creature is Bloodied while at half its Hit Points or fewer.
+var is_bloodied: bool:
+	get: return stats.current_hp <= stats.max_hp / 2
+
+func _style_ac_bonus() -> int:
+	# Defense fighting style: +1 AC while wearing Light, Medium, or Heavy armor
+	if kit != null and kit.fighting_style() == "defense" and equipment.armor != null:
+		return 1
+	return 0
 
 ## Apply damage and handle Undead Fortitude if applicable.
 ## Returns actual damage dealt.
 func take_damage(amount: int, damage_type: SRD.DamageType,
 		is_crit: bool = false, fixed_d20: int = -1) -> int:
 	var actual := DamageResolver.apply(stats, amount, damage_type)
+	if actual > 0:
+		effects.took_damage()
 	if stats.is_at_zero_hp() and has_undead_fortitude and actual > 0:
 		if damage_type != SRD.DamageType.RADIANT and not is_crit:
 			var dc := 5 + actual

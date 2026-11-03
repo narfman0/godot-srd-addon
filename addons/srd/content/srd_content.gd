@@ -8,11 +8,12 @@
 class_name SRDContent
 extends RefCounted
 
-## Tag on AbilityData whose spell has effects AbilityData can't express yet
-## (multi-part damage, flat bonuses, darts, riders). The dice it does carry are correct.
+## Tag on AbilityData whose spell has effects AbilityData can't express yet (several
+## damage parts, or a rider its text describes that extraction didn't capture). The dice
+## it does carry are correct.
 const TAG_PARTIAL := "partial"
-## Tag on AbilityData for spells with no damage or healing detected: utility spells, or
-## mechanics the extractor's heuristics miss. They need hand-authored effects to do anything.
+## Tag on AbilityData for spells with no damage, healing, or effect detected: utility
+## spells, or mechanics the extractor's heuristics miss. They need hand-authored effects.
 const TAG_NO_MECHANICS := "no_mechanics"
 
 var pack: SRDContentPack
@@ -51,6 +52,12 @@ func make_class(slug: String) -> ClassData:
 	c.weapon_proficiencies.assign(_weapon_proficiency_keys(str(d.get("weapon_proficiencies", ""))))
 	var casting: Variant = d.get("spellcasting")
 	c.slot_progression = _progression(casting.get("progression", "") if casting is Dictionary else "")
+	for r in d.get("table", []):
+		if r.has("slot_1"):
+			var counts := []
+			for i in range(1, 10):
+				counts.append(int(r.get("slot_%d" % i, 0)))
+			c.slot_table.append(counts)
 	return c
 
 ## SRD.Ability the class casts with, or -1 for non-casters.
@@ -73,14 +80,23 @@ static func _weapon_proficiency_keys(text: String) -> Array:
 	return out
 
 ## Build a player character: level-1 max HP from the hit die, average HP per level after,
-## class save proficiencies, spell slots, and gear. scores are STR..CHA in order;
-## skills are skill slugs ("arcana", "sleight-of-hand") the player picked from the class list.
+## class save proficiencies, spell slots from the class table, gear, and a ClassKit with the
+## features, resources, and Weapon Mastery choices for the level. scores are STR..CHA in
+## order; skills are skill slugs ("arcana", "sleight-of-hand") the player picked.
+##
+## subclass: subclass slug; empty picks the class's SRD subclass from level 3.
+## options: fighting_style ("defense" | "archery" | "great-weapon-fighting" |
+##   "two-weapon-fighting"; Fighter default "defense"), divine_order ("protector" |
+##   "thaumaturge"; default "protector"), blessed_strikes ("divine-strike" |
+##   "potent-spellcasting"), weapon_masteries (weapon slugs; default the wielded weapon),
+##   expertise (skill slugs; Rogue default Stealth and Sleight of Hand when proficient).
 func make_character(char_name: String, class_slug: String, level: int, scores: Array,
 		weapon_slug: String = "", armor_slug: String = "", shield: bool = false,
-		skills: Array = []) -> Combatant:
+		skills: Array = [], subclass: String = "", options: Dictionary = {}) -> Combatant:
 	var class_data := make_class(class_slug)
 	if class_data == null:
 		return null
+	level = clampi(level, 1, 20)
 	var s := CharacterStats.new()
 	s.character_name = char_name
 	for i in mini(scores.size(), 6):
@@ -93,9 +109,26 @@ func make_character(char_name: String, class_slug: String, level: int, scores: A
 		if skill >= 0:
 			s.set_skill_proficiency(skill as SRD.Skill, true)
 	var slots := class_data.make_slots(1)
-	for _l in range(1, clampi(level, 1, 20)):
+	for _l in range(1, level):
 		SRDLevelUp.level_up(s, class_data, slots)
 	s.reset()
+
+	var kit := make_kit(class_slug, level, subclass, options)
+	# Divine Order: Protector adds Martial weapons and Heavy armor training
+	if kit.has_feature("divine-order") and kit.options.get("divine_order") == "protector":
+		if not "martial" in class_data.weapon_proficiencies:
+			class_data.weapon_proficiencies.append("martial")
+		if not "heavy" in class_data.armor_proficiencies:
+			class_data.armor_proficiencies.append("heavy")
+	if kit.has_feature("expertise"):
+		var picks: Array = options.get("expertise", [])
+		if picks.is_empty():
+			for k in ["stealth", "sleight-of-hand"] + skills:
+				if picks.size() < 2 and k in skills and not k in picks:
+					picks.append(k)
+		for k in picks:
+			if skill_from(k) >= 0 and s.is_skill_proficient(skill_from(k) as SRD.Skill):
+				s.set_skill_proficiency(skill_from(k) as SRD.Skill, true, true)
 
 	var eq := EquipmentSlots.new()
 	if armor_slug != "":
@@ -106,7 +139,125 @@ func make_character(char_name: String, class_slug: String, level: int, scores: A
 	var c := Combatant.new(s, weapon, eq)
 	c.energy_slots = slots
 	c.is_proficient_with_weapon = weapon == null or is_weapon_proficient(class_data, weapon)
+	var masteries: Array = options.get("weapon_masteries", [])
+	if masteries.is_empty() and weapon_slug != "":
+		masteries = [weapon_slug]
+	for m in masteries.slice(0, weapon_mastery_count(class_slug, level)):
+		kit.weapon_masteries.append(str(m))
+	c.kit = kit
 	return c
+
+## The ClassKit for a class at a level: features (class + subclass), the class table row,
+## build options with SRD-recommended defaults, and limited-use resources.
+func make_kit(class_slug: String, level: int, subclass: String = "", options: Dictionary = {}) -> ClassKit:
+	var kit := ClassKit.new()
+	kit.class_slug = class_slug
+	kit.level = clampi(level, 1, 20)
+	if subclass == "" and kit.level >= 3:
+		var subs := subclass_slugs(class_slug)
+		subclass = subs[0] if not subs.is_empty() else ""
+	kit.subclass_slug = subclass if kit.level >= 3 else ""
+	kit.features = features_at(class_slug, kit.level, kit.subclass_slug)
+	kit.table_row = class_table_row(class_slug, kit.level)
+	kit.casting_ability = spellcasting_ability(class_slug)
+	kit.options = options.duplicate()
+	if class_slug == "fighter":
+		kit.options.merge({"fighting_style": "defense"})  # "Defense is recommended"
+	if class_slug == "cleric":
+		kit.options.merge({"divine_order": "protector", "blessed_strikes": "potent-spellcasting"})
+	var t := kit.table_row
+	match class_slug:
+		"fighter":
+			kit.add_resource("second_wind", int(t.get("second_wind", 0)), "one")
+			kit.add_resource("action_surge", 2 if kit.level >= 17 else (1 if kit.level >= 2 else 0), "all")
+			kit.add_resource("indomitable", 3 if kit.level >= 17 else (2 if kit.level >= 13 else (1 if kit.level >= 9 else 0)))
+		"cleric", "paladin":
+			kit.add_resource("channel_divinity", int(t.get("channel_divinity", 0)), "one")
+		"wizard":
+			kit.add_resource("arcane_recovery", 1)
+		"barbarian":
+			kit.add_resource("rage", int(t.get("rages", 0)), "one")
+		"monk":
+			kit.add_resource("focus_points", int(t.get("focus_points", 0)), "all")
+		"sorcerer":
+			kit.add_resource("sorcery_points", int(t.get("sorcery_points", 0)))
+		"druid":
+			kit.add_resource("wild_shape", int(t.get("wild_shape", 0)), "one")
+	if class_slug == "paladin":
+		kit.add_resource("lay_on_hands", 5 * kit.level)
+	return kit
+
+# ── Class features ────────────────────────────────────────────────────────────
+
+## Feature rows a character of this class has at `level` (cumulative, level order), with
+## the subclass's features from level 3. Each row: {slug, name, data: {class, subclass,
+## level, levels, feature, text, entries?}}.
+func features_at(class_slug: String, level: int, subclass: String = "") -> Array:
+	var held := pack.rows("feature").filter(func(r): return r.data["class"] == class_slug \
+		and int(r.data.level) <= level and (r.data.subclass == "" or r.data.subclass == subclass))
+	# Level order, class before subclass, then the PDF's order (rows load in that order)
+	var out := []
+	for lvl in range(1, level + 1):
+		for sub in [false, true]:
+			for r in held:
+				if int(r.data.level) == lvl and (r.data.subclass != "") == sub:
+					out.append(r)
+	return out
+
+## Feature rows gained exactly at `level` (the class table's Class Features column, resolved).
+func features_gained_at(class_slug: String, level: int, subclass: String = "") -> Array:
+	return features_at(class_slug, level, subclass).filter(func(r): \
+		return r.data.get("levels", [r.data.level]).any(func(l): return int(l) == level))
+
+## The class table row for a level: {level, proficiency_bonus, features, <columns>}.
+func class_table_row(class_slug: String, level: int) -> Dictionary:
+	for r in pack.get_row("class", class_slug).get("data", {}).get("table", []):
+		if int(r.level) == level:
+			return r
+	return {}
+
+func subclass_slugs(class_slug: String) -> Array:
+	var out := []
+	for r in pack.rows("subclass"):
+		if r.data["class"] == class_slug:
+			out.append(r.slug)
+	out.sort()
+	return out
+
+func subclass_row(slug: String) -> Dictionary:
+	return pack.get_row("subclass", slug)
+
+## Kinds of weapons whose mastery the class can use at a level: the table's Weapon Mastery
+## column (Barbarian, Fighter), or the count in the Weapon Mastery feature text.
+func weapon_mastery_count(class_slug: String, level: int) -> int:
+	var t := class_table_row(class_slug, level)
+	if t.has("weapon_mastery"):
+		return int(t.weapon_mastery)
+	var row := pack.get_row("feature", class_slug + "-weapon-mastery")
+	if row.is_empty() or int(row.data.level) > level:
+		return 0
+	var words := {"one": 1, "two": 2, "three": 3, "four": 4}
+	var m := RegEx.create_from_string("mastery properties of (\\w+) kinds").search(str(row.data.text))
+	return int(words.get(m.get_string(1), 0)) if m else 0
+
+## Spells a subclass always has prepared at a class level (Life Domain Spells...).
+## For Circle of the Land, pass land: "arid" | "polar" | "temperate" | "tropical".
+func subclass_spells(subclass: String, level: int, land: String = "") -> Array:
+	var out := []
+	for r in pack.rows("feature"):
+		if r.data.subclass != subclass or not r.data.has("prepared_spells"):
+			continue
+		var table: Dictionary = r.data.prepared_spells
+		if land != "":
+			table = table.get(land, {})
+		for lvl in table:
+			if int(lvl) <= level and table[lvl] is Array:
+				out.append_array(table[lvl])
+	return out
+
+## Weapon property and mastery rules text ({mastery: bool, text}).
+func weapon_property(slug: String) -> Dictionary:
+	return pack.get_row("weapon_property", slug)
 
 ## Class weapon proficiency, including the SRD's restricted martial categories (Monk, Rogue).
 static func is_weapon_proficient(class_data: ClassData, weapon: WeaponData) -> bool:
@@ -132,6 +283,8 @@ func make_weapon(slug: String) -> WeaponData:
 	var d: Dictionary = row.data
 	var w := WeaponData.new()
 	w.weapon_name = row.name
+	w.slug = slug
+	w.mastery = str(d.get("mastery", ""))
 	w.weapon_type = SRD.WeaponType.MARTIAL if str(d.category).begins_with("martial") \
 		else SRD.WeaponType.SIMPLE
 	w.properties = _weapon_properties(d.get("properties", []))
@@ -195,25 +348,62 @@ func make_spell(slug: String, casting_ability: SRD.Ability = SRD.Ability.INTELLI
 		ab.area_shape = _aoe_shape(str(mech.area.shape))
 		ab.area_size = int(mech.area.size)
 
+	ab.spell_id = slug
+	for cls in d.get("classes", []):
+		ab.tags.append(str(cls))
+	var ct := str(d.get("casting_time", "Action"))
+	ab.casting_time = ct.split(",")[0].strip_edges().to_lower().replace(" ", "_")
+	ab.reaction_trigger = str(mech.get("reaction_trigger", ""))
+	ab.effects = mech.get("effects", []).duplicate(true)
+	ab.immune_if = mech.get("immune_if", []).duplicate()
+	ab.summon = mech.get("summon", {}).duplicate()
+	ab.projectiles = int(mech.get("projectiles", 0))
+	ab.upcast_projectiles = int(mech.get("upcast_projectiles", 0))
+	ab.auto_hit = bool(mech.get("auto_hit", false))
+	ab.max_targets = int(mech.get("max_targets", 0))
+	ab.upcast_targets = int(mech.get("upcast_targets", 0))
+	ab.duration_rounds = _duration_rounds(str(d.get("duration", "")))
+	if mech.has("save"):
+		ab.save_ability = ability_from(mech.save) as SRD.Ability
+	ab.uses_save = mech.has("save") and not mech.has("attack")
+
+	if mech.has("healing"):
+		var h := parse_dice(str(mech.healing))
+		ab.heal_die_count = h.count
+		ab.heal_die_sides = h.sides
+		ab.heal_bonus = h.bonus
+		ab.heal_add_modifier = bool(mech.get("healing_add_modifier", false))
+		if mech.has("upcast_dice") and not mech.has("damage"):
+			ab.upcast_heal_die_count = parse_dice(mech.upcast_dice).count
+
 	if not mech.has("damage"):
 		ab.damage_die_count = 0
-		if not mech.has("healing"):
+		if not mech.has("healing") and ab.effects.is_empty():
 			ab.tags.append(TAG_NO_MECHANICS)
 		return ab
-	ab.uses_save = mech.has("save") and not mech.has("attack")
-	if ab.uses_save:
-		ab.save_ability = ability_from(mech.save) as SRD.Ability
 	var parts: Array = mech.damage
 	var dice := parse_dice(parts[0].dice)
 	ab.damage_die_count = dice.count
 	ab.damage_die_sides = dice.sides
+	ab.damage_bonus = dice.bonus
+	ab.damage_add_modifier = bool(mech.get("damage_add_modifier", false))
 	ab.damage_type = damage_type_from(parts[0].type)
 	ab.save_effect = SRD.SaveEffect.HALF if mech.get("half_on_save", false) else SRD.SaveEffect.NONE
 	if mech.has("upcast_dice"):
 		ab.upcast_bonus_die_count = parse_dice(mech.upcast_dice).count
-	if parts.size() > 1 or dice.bonus != 0:
+	if parts.size() > 1 or (ab.effects.is_empty() and RegEx.create_from_string(_RIDER_WORDS).search(ab.description) != null):
 		ab.tags.append(TAG_PARTIAL)
 	return ab
+
+## Words in a damaging spell's text that signal a rider; with no effect extracted, the
+## spell is tagged partial (its damage works, its rider doesn't yet).
+const _RIDER_WORDS := "has the \\w+ condition|Speed|pushed|Advantage|Disadvantage|Temporary Hit Points|can’t take"
+
+static func _duration_rounds(duration: String) -> int:
+	var m := RegEx.create_from_string("(\\d+) (round|minute|hour)").search(duration)
+	if m == null:
+		return 0
+	return int(m.get_string(1)) * {"round": 1, "minute": 10, "hour": 600}[m.get_string(2)]
 
 ## Spell slugs on a class's spell list, optionally limited to one spell level.
 func class_spell_slugs(class_slug: String, spell_level: int = -1) -> Array:
@@ -262,6 +452,9 @@ func make_monster(slug: String, id: int = 0) -> Combatant:
 	eq.natural_ac = int(d.get("ac", 10))
 	var c := Combatant.new(s, _monster_weapon(d.get("actions", [])), eq)
 	c.dies_at_zero_hp = true
+	c.size = str(d.get("size", "medium")).split(" ")[0]
+	for ci in d.get("condition_immunities", []):
+		c.condition_immunities.append(str(ci))
 	for t in d.get("traits", []):
 		if t.get("name", "") == "Undead Fortitude":
 			c.has_undead_fortitude = true

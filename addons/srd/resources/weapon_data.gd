@@ -2,6 +2,10 @@ class_name WeaponData
 extends Resource
 
 @export var weapon_name: String = ""
+## Pack slug ("longsword"); Weapon Mastery choices are made per kind of weapon.
+@export var slug: String = ""
+## SRD 5.2.1 mastery property: cleave | graze | nick | push | sap | slow | topple | vex | "".
+@export var mastery: String = ""
 @export var weapon_type: SRD.WeaponType = SRD.WeaponType.SIMPLE
 @export var damage_type: SRD.DamageType = SRD.DamageType.BLUDGEONING
 
@@ -23,6 +27,11 @@ extends Resource
 const NO_FIXED := -1000
 @export var fixed_attack_bonus: int = NO_FIXED
 @export var fixed_damage_bonus: int = NO_FIXED
+
+## Ranged weapons have a long range beyond their normal range; melee weapons (including
+## monster reach attacks) have range_long == range_normal.
+func is_ranged() -> bool:
+	return range_long > range_normal
 
 func has_property(prop: SRD.WeaponProperty) -> bool:
 	return (properties & int(prop)) != 0
@@ -98,6 +107,12 @@ static func make_rapier() -> WeaponData:
 static func make_shortsword() -> WeaponData:
 	return _make("Shortsword", SRD.WeaponType.MARTIAL, SRD.DamageType.PIERCING, 1, 6,
 		int(SRD.WeaponProperty.FINESSE) | int(SRD.WeaponProperty.LIGHT))
+
+## The ability modifier this weapon attacks with (Graze damage, Topple DC).
+func attack_ability_modifier(char: CharacterStats) -> int:
+	if fixed_damage_bonus != NO_FIXED:
+		return fixed_damage_bonus
+	return char.ability_modifier(_attack_ability(char))
 
 # --- Private ---
 

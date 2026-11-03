@@ -1,0 +1,86 @@
+[
+ {
+  "kind": "background",
+  "slug": "acolyte",
+  "name": "Acolyte",
+  "page": 83,
+  "data": {
+   "ability_scores": [
+    "int",
+    "wis",
+    "cha"
+   ],
+   "feat": "Magic Initiate (Cleric)",
+   "feat_slug": "magic-initiate",
+   "skills": [
+    "insight",
+    "religion"
+   ],
+   "tool": "Calligrapher’s Supplies",
+   "equipment": "Choose A or B: (A) Calligrapher’s Supplies, Book (prayers), Holy Symbol, Parchment (10 sheets), Robe, 8 GP; or (B) 50 GP"
+  }
+ },
+ {
+  "kind": "background",
+  "slug": "criminal",
+  "name": "Criminal",
+  "page": 83,
+  "data": {
+   "ability_scores": [
+    "dex",
+    "con",
+    "int"
+   ],
+   "feat": "Alert",
+   "feat_slug": "alert",
+   "skills": [
+    "sleight-of-hand",
+    "stealth"
+   ],
+   "tool": "Thieves’ Tools",
+   "equipment": "Choose A or B: (A) 2 Daggers, Thieves’ Tools, Crowbar, 2 Pouches, Traveler’s Clothes, 16 GP; or (B) 50 GP"
+  }
+ },
+ {
+  "kind": "background",
+  "slug": "sage",
+  "name": "Sage",
+  "page": 83,
+  "data": {
+   "ability_scores": [
+    "con",
+    "int",
+    "wis"
+   ],
+   "feat": "Magic Initiate (Wizard)",
+   "feat_slug": "magic-initiate",
+   "skills": [
+    "arcana",
+    "history"
+   ],
+   "tool": "Calligrapher’s Supplies",
+   "equipment": "Choose A or B: (A) Quarterstaff, Calligrapher’s Supplies, Book (history), Parchment (8 sheets), Robe, 8 GP; or (B) 50 GP"
+  }
+ },
+ {
+  "kind": "background",
+  "slug": "soldier",
+  "name": "Soldier",
+  "page": 83,
+  "data": {
+   "ability_scores": [
+    "str",
+    "dex",
+    "con"
+   ],
+   "feat": "Savage Attacker",
+   "feat_slug": "savage-attacker",
+   "skills": [
+    "athletics",
+    "intimidation"
+   ],
+   "tool": "Choose one kind ofGaming Set (see “Equipment”)",
+   "equipment": "Choose A or B: (A) Spear, Shortbow, 20 Arrows, Gaming Set (same as above), Healer’s Kit, Quiver, Traveler’s Clothes, 14 GP; or (B) 50 GP"
+  }
+ }
+]

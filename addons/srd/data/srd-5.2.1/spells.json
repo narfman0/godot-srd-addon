@@ -124,7 +124,9 @@
    "text": "Choose up to three creatures within range. Each target’s Hit Point maximum and current Hit Points increase by 5 for the duration.",
    "higher_levels": "Each target’s Hit Points increase by 5 for each spell slot level above 2.",
    "cantrip_upgrade": "",
-   "mechanics": {}
+   "mechanics": {
+    "max_targets": 3
+   }
   }
  },
  {
@@ -326,7 +328,9 @@
    "text": "Choose a pile of bones or a corpse of a Medium or Small Humanoid within range. The target becomes an Undead creature: a Skeleton if you chose bones or a Zombie if you chose a corpse (see “Monsters” for the stat blocks).\nOn each of your turns, you can take a Bonus Action to mentally command any creature you made with this spell if the creature is within 60 feet of you (if you control multiple creatures, you can command any of them at the same time, issuing the same command to each one). You decide what action the creature will take and where it will move on its next turn, or you can issue a general command, such as to guard a chamber or corridor. If you issue no commands, the creature takes the Dodge action and moves only to avoid harm. Once given an order, the creature continues to follow it until its task is complete.\nThe creature is under your control for 24 hours, after which it stops obeying any command you’ve given it. To maintain control of the creature for another 24 hours, you must cast this spell on the creature again before the current 24-hour period ends. This use of the spell reasserts your control over up to four creatures you have animated with this spell rather than animating a new creature.",
    "higher_levels": "You animate or reassert control over two additional Undead creatures for each spell slot level above 3. Each of the creatures must come from a different corpse or pile of bones.",
    "cantrip_upgrade": "",
-   "mechanics": {}
+   "mechanics": {
+    "max_targets": 4
+   }
   }
  },
  {
@@ -604,7 +608,14 @@
    "higher_levels": "",
    "cantrip_upgrade": "",
    "mechanics": {
-    "attack": "melee"
+    "attack": "melee",
+    "damage": [
+     {
+      "dice": "4d12",
+      "type": "force"
+     }
+    ],
+    "damage_add_modifier": true
    }
   }
  },
@@ -804,7 +815,8 @@
    "cantrip_upgrade": "",
    "mechanics": {
     "save": "cha",
-    "half_on_save": false
+    "half_on_save": false,
+    "upcast_targets": 1
    }
   }
  },
@@ -842,7 +854,8 @@
    "cantrip_upgrade": "",
    "mechanics": {
     "save": "cha",
-    "half_on_save": false
+    "half_on_save": false,
+    "upcast_targets": 1
    }
   }
  },
@@ -861,7 +874,8 @@
    "casting_time": "Bonus Action",
    "ritual": false,
    "range": {
-    "raw": "Touch Component: V, S, M (a handful of bark)"
+    "raw": "Touch Component: V, S, M (a handful of bark)",
+    "touch": true
    },
    "components": [],
    "material": "",
@@ -1098,7 +1112,24 @@
    "text": "You bless up to three creatures within range. Whenever a target makes an attack roll or a saving throw before the spell ends, the target adds 1d4 to the attack roll or save.",
    "higher_levels": "You can target one additional creature for each spell slot level above 1.",
    "cantrip_upgrade": "",
-   "mechanics": {}
+   "mechanics": {
+    "max_targets": 3,
+    "upcast_targets": 1,
+    "effects": [
+     {
+      "on": "apply",
+      "type": "bonus_die",
+      "die": "1d4",
+      "applies": [
+       "attack",
+       "save"
+      ],
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 10
+     }
+    ]
+   }
   }
  },
  {
@@ -1175,7 +1206,8 @@
    "cantrip_upgrade": "",
    "mechanics": {
     "save": "con",
-    "half_on_save": false
+    "half_on_save": false,
+    "upcast_targets": 1
    }
   }
  },
@@ -1437,7 +1469,8 @@
    "cantrip_upgrade": "",
    "mechanics": {
     "save": "wis",
-    "half_on_save": false
+    "half_on_save": false,
+    "upcast_targets": 1
    }
   }
  },
@@ -1474,7 +1507,8 @@
    "cantrip_upgrade": "",
    "mechanics": {
     "save": "wis",
-    "half_on_save": false
+    "half_on_save": false,
+    "upcast_targets": 1
    }
   }
  },
@@ -1785,7 +1819,8 @@
    "cantrip_upgrade": "",
    "mechanics": {
     "save": "wis",
-    "half_on_save": false
+    "half_on_save": false,
+    "upcast_targets": 1
    }
   }
  },
@@ -2087,7 +2122,8 @@
     "area": {
      "shape": "cylinder",
      "size": 10
-    }
+    },
+    "healing_add_modifier": true
    }
   }
  },
@@ -2155,7 +2191,14 @@
    "cantrip_upgrade": "",
    "mechanics": {
     "attack": "melee",
-    "upcast_dice": "1d12"
+    "upcast_dice": "1d12",
+    "damage": [
+     {
+      "dice": "3d12",
+      "type": "psychic"
+     }
+    ],
+    "damage_add_modifier": true
    }
   }
  },
@@ -2295,7 +2338,8 @@
    "casting_time": "Action",
    "ritual": false,
    "range": {
-    "raw": "Touch Component: V, S"
+    "raw": "Touch Component: V, S",
+    "touch": true
    },
    "components": [],
    "material": "",
@@ -2485,7 +2529,8 @@
    "cantrip_upgrade": "",
    "mechanics": {
     "save": "con",
-    "half_on_save": false
+    "half_on_save": false,
+    "reaction_trigger": "when you see a creature within 60 feet of yourself casting a spell with Verbal, Somatic, or Material components"
    }
   }
  },
@@ -2587,7 +2632,9 @@
    "text": "You can cast this spell only at night. Choose up to three corpses of Medium or Small Humanoids within range. Each one becomes a Ghoul under your control (see “Monsters” for its stat block).\nAs a Bonus Action on each of your turns, you can mentally command any creature you animated with this spell if the creature is within 120 feet of you (if you control multiple creatures, you can command any of them at the same time, issuing the same command to them). You decide what action the creature will take and where it will move on its next turn, or you can issue a general command, such as to guard a particular place. If you issue no commands, the creature takes the Dodge action and moves only to avoid harm. Once given an order, the creature continues to follow the order until its task is complete.\nThe creature is under your control for 24 hours, after which it stops obeying any command you’ve given it. To maintain control of the creature for another 24 hours, you must cast this spell on the creature before the current 24-hour period ends. This use of the spell reasserts your control over up to three creatures you have animated with this spell rather than animating new ones.",
    "higher_levels": "If you use a level 7 spell slot, you can animate or reassert control over four Ghouls. If you use a level 8 spell slot, you can animate or reassert control over five Ghouls or two Ghasts or Wights. If you use a level 9 spell slot, you can animate or reassert control over six Ghouls, three Ghasts or Wights, or two Mummies. See “Monsters” for these stat blocks.",
    "cantrip_upgrade": "",
-   "mechanics": {}
+   "mechanics": {
+    "max_targets": 3
+   }
   }
  },
  {
@@ -2660,7 +2707,8 @@
    "cantrip_upgrade": "",
    "mechanics": {
     "healing": "2d8",
-    "upcast_dice": "2d8"
+    "upcast_dice": "2d8",
+    "healing_add_modifier": true
    }
   }
  },
@@ -3784,7 +3832,9 @@
    "text": "You touch a creature and choose Strength, Dexterity, Intelligence, Wisdom, or Charisma. For the duration, the target has Advantage on ability checks using the chosen ability.",
    "higher_levels": "You can target one additional creature for each spell slot level above 2. You can choose a different ability for each target.",
    "cantrip_upgrade": "",
-   "mechanics": {}
+   "mechanics": {
+    "upcast_targets": 1
+   }
   }
  },
  {
@@ -4247,7 +4297,9 @@
    "text": "Choose up to five falling creatures within range. A falling creature’s rate of descent slows to 60 feet per round until the spell ends. If a creature lands before the spell ends, the creature takes no damage from the fall, and the spell ends for that creature.",
    "higher_levels": "",
    "cantrip_upgrade": "",
-   "mechanics": {}
+   "mechanics": {
+    "reaction_trigger": "when you or a creature you can see within 60 feet of you falls"
+   }
   }
  },
  {
@@ -4624,7 +4676,14 @@
    "cantrip_upgrade": "",
    "mechanics": {
     "attack": "melee",
-    "upcast_dice": "1d6"
+    "upcast_dice": "1d6",
+    "damage": [
+     {
+      "dice": "3d6",
+      "type": "fire"
+     }
+    ],
+    "damage_add_modifier": true
    }
   }
  },
@@ -4816,7 +4875,9 @@
    "text": "You touch a willing creature. For the duration, the target gains a Fly Speed of 60 feet and can hover. When the spell ends, the target falls if it is still aloft unless it can stop the fall.",
    "higher_levels": "You can target one additional creature for each spell slot level above 3.",
    "cantrip_upgrade": "",
-   "mechanics": {}
+   "mechanics": {
+    "upcast_targets": 1
+   }
   }
  },
  {
@@ -4989,7 +5050,9 @@
    "text": "You touch a willing creature. For the duration, the target’s movement is unaffected by Difficult Terrain, and spells and other magical effects can neither reduce the target’s Speed nor cause the target to have the Paralyzed or Restrained conditions. The target also has a Swim Speed equal to its Speed.\nIn addition, the target can spend 5 feet of movement to automatically escape from nonmagical restraints, such as manacles or a creature imposing the Grappled condition on it.",
    "higher_levels": "You can target one additional creature for each spell slot level above 4.",
    "cantrip_upgrade": "",
-   "mechanics": {}
+   "mechanics": {
+    "upcast_targets": 1
+   }
   }
  },
  {
@@ -5070,7 +5133,8 @@
    "cantrip_upgrade": "",
    "mechanics": {
     "save": "con",
-    "half_on_save": false
+    "half_on_save": false,
+    "upcast_targets": 1
    }
   }
  },
@@ -5529,7 +5593,8 @@
    "casting_time": "Action",
    "ritual": false,
    "range": {
-    "raw": "Touch Component: V, S"
+    "raw": "Touch Component: V, S",
+    "touch": true
    },
    "components": [],
    "material": "",
@@ -5538,7 +5603,21 @@
    "text": "You touch a willing creature and choose a skill. Until the spell ends, the creature adds 1d4 to any ability check using the chosen skill.",
    "higher_levels": "",
    "cantrip_upgrade": "",
-   "mechanics": {}
+   "mechanics": {
+    "effects": [
+     {
+      "on": "apply",
+      "type": "bonus_die",
+      "die": "1d4",
+      "applies": [
+       "check"
+      ],
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 10
+     }
+    ]
+   }
   }
  },
  {
@@ -5576,7 +5655,17 @@
       "type": "radiant"
      }
     ],
-    "upcast_dice": "1d6"
+    "upcast_dice": "1d6",
+    "effects": [
+     {
+      "on": "hit",
+      "type": "advantage_to_attackers",
+      "uses": 1,
+      "expires": "end_of_turn",
+      "of": "caster",
+      "turns": 2
+     }
+    ]
    }
   }
  },
@@ -5822,7 +5911,8 @@
    "cantrip_upgrade": "",
    "mechanics": {
     "healing": "2d4",
-    "upcast_dice": "2d4"
+    "upcast_dice": "2d4",
+    "healing_add_modifier": true
    }
   }
  },
@@ -5904,7 +5994,8 @@
       "type": "fire"
      }
     ],
-    "upcast_dice": "1d10"
+    "upcast_dice": "1d10",
+    "reaction_trigger": "in response to taking damage from a creature that you can see within 60 feet of yourself"
    }
   }
  },
@@ -5974,7 +6065,9 @@
    "text": "A willing creature you touch is imbued with bravery. Until the spell ends, the creature is immune to the Frightened condition and gains Temporary Hit Points equal to your spellcasting ability modifier at the start of each of its turns.",
    "higher_levels": "You can target one additional creature for each spell slot level above 1.",
    "cantrip_upgrade": "",
-   "mechanics": {}
+   "mechanics": {
+    "upcast_targets": 1
+   }
   }
  },
  {
@@ -6047,7 +6140,8 @@
    "cantrip_upgrade": "",
    "mechanics": {
     "save": "wis",
-    "half_on_save": false
+    "half_on_save": false,
+    "upcast_targets": 1
    }
   }
  },
@@ -6084,7 +6178,8 @@
    "cantrip_upgrade": "",
    "mechanics": {
     "save": "wis",
-    "half_on_save": false
+    "half_on_save": false,
+    "upcast_targets": 1
    }
   }
  },
@@ -6665,7 +6760,9 @@
    "text": "A creature you touch has the Invisible condition until the spell ends. The spell ends early immediately after the target makes an attack roll, deals damage, or casts a spell.",
    "higher_levels": "You can target one additional creature for each spell slot level above 2.",
    "cantrip_upgrade": "",
-   "mechanics": {}
+   "mechanics": {
+    "upcast_targets": 1
+   }
   }
  },
  {
@@ -6685,7 +6782,8 @@
    "casting_time": "Bonus Action",
    "ritual": false,
    "range": {
-    "raw": "Touch Component: V, S, M (a grasshopper’s hind leg)"
+    "raw": "Touch Component: V, S, M (a grasshopper’s hind leg)",
+    "touch": true
    },
    "components": [],
    "material": "",
@@ -6694,7 +6792,9 @@
    "text": "You touch a willing creature. Once on each of its turns until the spell ends, that creature can jump up to 30 feet by spending 10 feet of movement.",
    "higher_levels": "You can target one additional creature for each spell slot level above 1.",
    "cantrip_upgrade": "",
-   "mechanics": {}
+   "mechanics": {
+    "upcast_targets": 1
+   }
   }
  },
  {
@@ -7045,7 +7145,9 @@
    "text": "You touch a creature. The target’s Speed increases by 10 feet until the spell ends.",
    "higher_levels": "You can target one additional creature for each spell slot level above 1.",
    "cantrip_upgrade": "",
-   "mechanics": {}
+   "mechanics": {
+    "upcast_targets": 1
+   }
   }
  },
  {
@@ -7222,7 +7324,10 @@
       "dice": "1d4+1",
       "type": "force"
      }
-    ]
+    ],
+    "projectiles": 3,
+    "auto_hit": true,
+    "upcast_projectiles": 1
    }
   }
  },
@@ -7402,7 +7507,9 @@
      "shape": "sphere",
      "size": 30
     },
-    "upcast_dice": "1d8"
+    "upcast_dice": "1d8",
+    "healing_add_modifier": true,
+    "max_targets": 6
    }
   }
  },
@@ -7465,7 +7572,8 @@
    "cantrip_upgrade": "",
    "mechanics": {
     "healing": "2d4",
-    "upcast_dice": "1d4"
+    "upcast_dice": "1d4",
+    "healing_add_modifier": true
    }
   }
  },
@@ -7922,7 +8030,16 @@
    "text": "Briefly surrounded by silvery mist, you teleport up to 30 feet to an unoccupied space you can see.",
    "higher_levels": "",
    "cantrip_upgrade": "",
-   "mechanics": {}
+   "mechanics": {
+    "effects": [
+     {
+      "on": "apply",
+      "type": "teleport",
+      "feet": 30,
+      "self": true
+     }
+    ]
+   }
   }
  },
  {
@@ -9149,7 +9266,17 @@
      "5": "2d8",
      "11": "3d8",
      "17": "4d8"
-    }
+    },
+    "effects": [
+     {
+      "on": "hit",
+      "type": "speed_penalty",
+      "amount": 10,
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 1
+     }
+    ]
    }
   }
  },
@@ -9339,7 +9466,8 @@
    "casting_time": "Action",
    "ritual": false,
    "range": {
-    "raw": "Touch Component: V, S"
+    "raw": "Touch Component: V, S",
+    "touch": true
    },
    "components": [],
    "material": "",
@@ -9601,7 +9729,9 @@
       "dice": "2d6",
       "type": "fire"
      }
-    ]
+    ],
+    "projectiles": 3,
+    "upcast_projectiles": 1
    }
   }
  },
@@ -9953,7 +10083,29 @@
    "text": "An imperceptible barrier of magical force protects you. Until the start of your next turn, you have a +5 bonus to AC, including against the triggering attack, and you take no damage from Magic Missile.",
    "higher_levels": "",
    "cantrip_upgrade": "",
-   "mechanics": {}
+   "mechanics": {
+    "effects": [
+     {
+      "on": "apply",
+      "type": "ac_bonus",
+      "amount": 5,
+      "self": true,
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 1
+     },
+     {
+      "on": "apply",
+      "type": "immune_to_spell",
+      "spell": "magic-missile",
+      "self": true,
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 1
+     }
+    ],
+    "reaction_trigger": "when you are hit by an attack roll or targeted by the Magic Missile spell"
+   }
   }
  },
  {
@@ -9985,7 +10137,18 @@
    "text": "A shimmering field surrounds a creature of your choice within range, granting it a +2 bonus to AC for the duration.",
    "higher_levels": "",
    "cantrip_upgrade": "",
-   "mechanics": {}
+   "mechanics": {
+    "effects": [
+     {
+      "on": "apply",
+      "type": "ac_bonus",
+      "amount": 2,
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 100
+     }
+    ]
+   }
   }
  },
  {
@@ -10098,7 +10261,16 @@
      "5": "2d8",
      "11": "3d8",
      "17": "4d8"
-    }
+    },
+    "effects": [
+     {
+      "on": "hit",
+      "type": "no_opportunity_attacks",
+      "expires": "start_of_turn",
+      "of": "target",
+      "turns": 1
+     }
+    ]
    }
   }
  },
@@ -10244,7 +10416,31 @@
     "area": {
      "shape": "sphere",
      "size": 5
-    }
+    },
+    "effects": [
+     {
+      "on": "fail",
+      "type": "condition",
+      "condition": "incapacitated",
+      "ends_on_damage": true,
+      "expires": "end_of_turn",
+      "of": "target",
+      "turns": 1,
+      "repeat_save": {
+       "on_fail": {
+        "type": "condition",
+        "condition": "unconscious",
+        "ends_on_damage": true,
+        "expires": "start_of_turn",
+        "of": "caster",
+        "turns": 10
+       }
+      }
+     }
+    ],
+    "immune_if": [
+     "exhaustion"
+    ]
    }
   }
  },
@@ -10324,7 +10520,8 @@
     "area": {
      "shape": "cube",
      "size": 40
-    }
+    },
+    "max_targets": 6
    }
   }
  },
@@ -10526,7 +10723,9 @@
    "text": "Until the spell ends, one willing creature you touch gains the ability to move up, down, and across vertical surfaces and along ceilings, while leaving its hands free. The target also gains a Climb Speed equal to its Speed.",
    "higher_levels": "You can target one additional creature for each spell slot level above 2.",
    "cantrip_upgrade": "",
-   "mechanics": {}
+   "mechanics": {
+    "upcast_targets": 1
+   }
   }
  },
  {
@@ -10649,7 +10848,20 @@
    "higher_levels": "The damage increases by 1d8 for every slot level above 2.",
    "cantrip_upgrade": "",
    "mechanics": {
-    "attack": "melee"
+    "attack": "melee",
+    "damage": [
+     {
+      "dice": "1d8",
+      "type": "force"
+     }
+    ],
+    "damage_add_modifier": true,
+    "upcast_dice": "1d8",
+    "summon": {
+     "repeat_as": "bonus_action",
+     "move_feet": 20,
+     "rounds": 10
+    }
    }
   }
  },
@@ -11276,7 +11488,14 @@
      "shape": "cube",
      "size": 15
     },
-    "upcast_dice": "1d8"
+    "upcast_dice": "1d8",
+    "effects": [
+     {
+      "on": "fail",
+      "type": "push",
+      "feet": 10
+     }
+    ]
    }
   }
  },
@@ -12026,7 +12245,18 @@
    "text": "You touch another creature that is willing and create a mystic connection between you and the target until the spell ends. While the target is within 60 feet of you, it gains a +1 bonus to AC and saving throws, and it has Resistance to all damage. Also, each time it takes damage, you take the same amount of damage.\nThe spell ends if you drop to 0 Hit Points or if you and the target become separated by more than 60 feet. It also ends if the spell is cast again on either of the connected creatures.",
    "higher_levels": "",
    "cantrip_upgrade": "",
-   "mechanics": {}
+   "mechanics": {
+    "effects": [
+     {
+      "on": "apply",
+      "type": "ac_bonus",
+      "amount": 1,
+      "expires": "start_of_turn",
+      "of": "caster",
+      "turns": 600
+     }
+    ]
+   }
   }
  },
  {

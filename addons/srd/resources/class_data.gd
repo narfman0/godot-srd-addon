@@ -21,8 +21,19 @@ var weapon_proficiencies: Array[String] = []
 func starting_hp(con_modifier: int) -> int:
 	return maxi(1, hit_die + con_modifier)
 
+## Per-level slot counts from the SRD class table ([[l1..l9] x 20]); when set, make_slots
+## uses it instead of the generic progression (2024 half casters have slots at level 1).
+var slot_table: Array = []
+
 ## Build EnergySlots for a character of this class at the given level.
 func make_slots(level: int) -> EnergySlots:
+	if not slot_table.is_empty() and slot_progression != SRD.SlotProgression.PACT:
+		var s := EnergySlots.new()
+		var row: Array = slot_table[clampi(level, 1, slot_table.size()) - 1]
+		for i in mini(9, row.size()):
+			s.slots_max[i] = int(row[i])
+			s.slots_remaining[i] = int(row[i])
+		return s
 	match slot_progression:
 		SRD.SlotProgression.FULL:
 			return EnergySlots.make_full_caster(level)

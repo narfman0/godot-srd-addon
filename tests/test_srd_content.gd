@@ -139,10 +139,12 @@ func test_fire_bolt_cantrip_scales():
 	assert_eq(ab.base_damage_dice(1), 1)
 	assert_eq(ab.base_damage_dice(11), 3)
 
-func test_magic_missile_flagged_partial():
+func test_magic_missile_fully_expressed():
+	# Darts and the flat +1 are modelled now (was tagged partial before projectiles existed)
 	var ab := srd.make_spell("magic-missile")
-	assert_has(ab.tags, SRDContent.TAG_PARTIAL)
+	assert_does_not_have(ab.tags, SRDContent.TAG_PARTIAL)
 	assert_eq(ab.damage_type, SRD.DamageType.FORCE)
+	assert_eq([ab.projectiles, ab.damage_bonus], [3, 1])
 
 func test_utility_spell_flagged():
 	assert_has(srd.make_spell("knock").tags, SRDContent.TAG_NO_MECHANICS)
@@ -221,7 +223,7 @@ func test_make_fighter_level_5():
 		"longsword", "chain-mail", true, ["athletics", "perception"])
 	assert_eq(f.stats.level, 5)
 	assert_eq(f.stats.max_hp, 10 + 2 + 4 * (6 + 2))  # d10: 10+CON at 1, avg 6+CON after
-	assert_eq(f.armor_class, 16 + 2)
+	assert_eq(f.armor_class, 16 + 2 + 1)  # chain mail, shield, Defense (the default Fighting Style)
 	assert_eq(f.attack_modifier(), 3 + 3)
 	assert_true(f.stats.is_save_proficient(SRD.Ability.STRENGTH))
 	assert_true(f.stats.is_skill_proficient(SRD.Skill.ATHLETICS))

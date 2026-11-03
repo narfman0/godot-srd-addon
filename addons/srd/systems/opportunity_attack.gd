@@ -10,6 +10,8 @@ static func can_trigger(watcher: Combatant, mover_is_disengaging: bool) -> bool:
 		return false  # Disengage prevents opportunity attacks
 	if not watcher.action_economy.has_reaction:
 		return false
+	if not watcher.effects.can_make_opportunity_attacks():
+		return false  # e.g. hit by Shocking Grasp
 	if watcher.conditions.is_incapacitated():
 		return false
 	if not watcher.can_act():

@@ -12,11 +12,16 @@ Coverage grows a section at a time:
 
 | Section | Status |
 |---|---|
-| Spells (339) | Header fields, full text, heuristic mechanics (attack/save, damage, healing, area, upcast, cantrip scaling) |
-| Monsters (330) | Full stat blocks: AC, HP, speeds, ability scores and saves, defenses, senses, CR/XP, traits, actions with parsed attacks and saves |
-| Weapons (38), Armor (13) | Complete tables |
-| Classes (12) | Core traits and spellcasting progression only |
-| Class features, subclasses, species, backgrounds, feats, magic items | Not yet |
+| Spells (339) | Header fields, full text, mechanics: attack/save, damage, healing, area, upcast, cantrip scaling, darts/rays, target counts, timed effects (speed loss, push, Advantage riders, AC and d4 buffs, teleport), reaction triggers |
+| Monsters (330) | Full stat blocks: AC, HP, speeds, size, ability scores and saves, defenses, senses, CR/XP, traits, actions with parsed attacks and saves |
+| Weapons (38), Armor (13) | Complete tables, including each weapon's mastery |
+| Weapon properties (18) | Property and mastery rules text (Cleave ... Vex) |
+| Classes (12) | Core traits, spellcasting, and the full 20-level features table (proficiency, features, Rages, Sneak Attack, Cantrips, Prepared Spells, slots...) |
+| Class features (232) | Every "Level N: Feature" section with text, named sub-entries, levels gained, embedded tables |
+| Subclasses (12) | Tagline, intro, features, always-prepared spells |
+| Class options (38) | Metamagic (cost) and Eldritch Invocations (prerequisite) |
+| Species (9), Backgrounds (4), Feats (17) | Traits, ability scores, feat categories and prerequisites |
+| Magic items, rules glossary | Not yet |
 
 ```bash
 python3 -m venv tools/.venv && tools/.venv/bin/pip install pymupdf
@@ -36,8 +41,23 @@ var hero := srd.make_character("Rynn", "fighter", 5, [16, 12, 14, 10, 10, 8],
 	"longsword", "chain-mail", true, ["athletics"])        # Combatant with HP, AC, slots
 ```
 
-Spells whose effects `AbilityData` can't express yet carry the `partial` tag; spells with no
-detected damage or healing carry `no_mechanics`. Games layer their own rows (homebrew
+Spells whose effects `AbilityData` can't express yet carry the `partial` tag (several damage
+parts, or a rider in the text with no extracted effect); spells with no detected damage,
+healing, or effect carry `no_mechanics`.
+
+### Rules beyond the stat line
+
+- `make_character()` attaches a `ClassKit` (`combatant.kit`): features held at the level,
+  limited uses (Second Wind, Action Surge, Channel Divinity, Arcane Recovery...), Weapon
+  Mastery picks, and the feature logic. `kit.feature_report()` says which are implemented.
+- `AttackResolver.weapon_attack(attacker, target, opts)` resolves a weapon attack with
+  Advantage sources, Bless dice, crit range, Fighting Styles, Sneak Attack, Divine Strike,
+  and the eight mastery properties. Positional facts come from the game (`opts`, or the
+  `AttackResolver.ally_adjacent` callable for Sneak Attack).
+- `SpellResolver.cast(...)` handles attack/save spells with riders, darts and rays,
+  healing (reviving a creature at 0 HP), buffs, self effects, and Concentration cleanup.
+- `ActiveEffects` (`combatant.effects`) holds timed effects; drive expiry with
+  `SRDEffects.turn_started(all, actor)` / `SRDEffects.turn_ended(all, actor)`. Games layer their own rows (homebrew
 monsters, renamed setting content) with a second `SRDContentPack.load_dir()`.
 
 When exporting a game, add `*.json` to the export filter so the pack ships.

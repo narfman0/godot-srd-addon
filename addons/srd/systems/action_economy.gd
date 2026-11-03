@@ -6,6 +6,8 @@ var _has_bonus_action: bool = true
 var _has_reaction: bool = true
 var _movement_remaining: int = 30
 var _speed: int = 30
+## True once the creature has moved this turn (Steady Aim needs it false).
+var has_moved: bool = false
 
 func _init(speed: int = 30) -> void:
 	_speed = speed
@@ -16,6 +18,7 @@ func reset_turn() -> void:
 	_has_action = true
 	_has_bonus_action = true
 	_movement_remaining = _speed
+	has_moved = false
 
 ## Reaction resets at the start of each character's turn in the round
 ## (tracked per-round; reset separately if needed).
@@ -68,6 +71,8 @@ func spend_movement(feet: int) -> bool:
 	if feet > _movement_remaining:
 		return false
 	_movement_remaining -= feet
+	if feet > 0:
+		has_moved = true
 	return true
 
 # --- Condition integration ---
