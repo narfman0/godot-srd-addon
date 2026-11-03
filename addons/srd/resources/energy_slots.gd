@@ -4,6 +4,8 @@ extends Resource
 # slots_max[i] and slots_remaining[i] for slot levels 1-9 (index 0 = level 1)
 var slots_max: Array[int] = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 var slots_remaining: Array[int] = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+## Pact Magic slots come back on a short rest as well as a long rest.
+var recovers_on_short_rest: bool = false
 
 func _init() -> void:
 	slots_max.resize(9)
@@ -82,6 +84,7 @@ static func make_pact_caster(char_level: int) -> EnergySlots:
 	var row: Array = TABLE[clampi(char_level, 1, 20) - 1]
 	s.slots_max[row[1] - 1] = row[0]
 	s.slots_remaining[row[1] - 1] = row[0]
+	s.recovers_on_short_rest = true
 	return s
 
 ## Half caster table (Paladin/Warden — rounds down).

@@ -5,6 +5,8 @@ extends RefCounted
 ## Returns total HP restored.
 static func short_rest(char: CharacterStats, dice_to_spend: int,
 		slots: EnergySlots = null) -> int:
+	if slots != null and slots.recovers_on_short_rest:
+		slots.recover_all()
 	dice_to_spend = mini(dice_to_spend, char.hit_dice_remaining)
 	if dice_to_spend <= 0:
 		return 0

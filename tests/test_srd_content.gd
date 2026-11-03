@@ -204,6 +204,39 @@ func test_pack_monsters_fight_in_simulator():
 		[srd.make_monster("goblin", 1), srd.make_monster("goblin", 2), srd.make_monster("wolf", 1)])
 	assert_true(result.party_won)
 
+# ── Characters ───────────────────────────────────────────────────────────────
+
+func test_make_fighter_level_5():
+	var f := srd.make_character("Rynn", "fighter", 5, [16, 12, 14, 10, 10, 8],
+		"longsword", "chain-mail", true, ["athletics", "perception"])
+	assert_eq(f.stats.level, 5)
+	assert_eq(f.stats.max_hp, 10 + 2 + 4 * (6 + 2))  # d10: 10+CON at 1, avg 6+CON after
+	assert_eq(f.armor_class, 16 + 2)
+	assert_eq(f.attack_modifier(), 3 + 3)
+	assert_true(f.stats.is_save_proficient(SRD.Ability.STRENGTH))
+	assert_true(f.stats.is_skill_proficient(SRD.Skill.ATHLETICS))
+	assert_eq(f.energy_slots.slots_remaining_at(1), 0)
+
+func test_make_wizard_has_slots():
+	var w := srd.make_character("Vex", "wizard", 3, [8, 14, 14, 16, 12, 10], "quarterstaff")
+	assert_eq(w.energy_slots.slots_remaining_at(2), 2)
+	assert_eq(w.armor_class, 12)
+
+func test_monk_and_rogue_restricted_martial():
+	var monk := srd.make_class("monk")
+	var rogue := srd.make_class("rogue")
+	assert_true(SRDContent.is_weapon_proficient(monk, srd.make_weapon("scimitar")))
+	assert_false(SRDContent.is_weapon_proficient(monk, srd.make_weapon("rapier")))
+	assert_true(SRDContent.is_weapon_proficient(rogue, srd.make_weapon("rapier")))
+	assert_false(SRDContent.is_weapon_proficient(rogue, srd.make_weapon("greatsword")))
+
+func test_warlock_short_rest_restores_pact_slots():
+	var w := srd.make_character("Hex", "warlock", 3, [8, 14, 14, 10, 12, 16])
+	w.energy_slots.use_slot(2)
+	w.energy_slots.use_slot(2)
+	SRDRest.short_rest(w.stats, 0, w.energy_slots)
+	assert_eq(w.energy_slots.slots_remaining_at(2), 2)
+
 # ── Parsing ──────────────────────────────────────────────────────────────────
 
 func test_parse_dice():

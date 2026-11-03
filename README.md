@@ -15,6 +15,8 @@ var wizard := srd.make_class("wizard")                     # ClassData (slots, s
 var fireball := srd.make_spell("fireball", SRD.Ability.INTELLIGENCE)   # AbilityData
 var goblin := srd.make_monster("goblin", 1)                # Combatant from the stat block
 var sword := srd.make_weapon("longsword")                  # WeaponData
+var hero := srd.make_character("Rynn", "fighter", 5, [16, 12, 14, 10, 10, 8],
+	"longsword", "chain-mail", true, ["athletics"])        # Combatant with HP, AC, slots
 ```
 
 Spells whose effects `AbilityData` can't yet express carry the `partial` tag; pack rows

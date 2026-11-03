@@ -54,6 +54,57 @@ func class_features_at(class_slug: String, level: int) -> Array:
 			out.append(pack.get_row("feature", f.slug))
 	return out
 
+## Build a player character: level-1 max HP from the hit die, average HP per level after,
+## class save proficiencies, spell slots, and gear. scores are STR..CHA in order;
+## skills are skill slugs ("arcana", "sleight-of-hand") the player picked from the class list.
+func make_character(char_name: String, class_slug: String, level: int, scores: Array,
+		weapon_slug: String = "", armor_slug: String = "", shield: bool = false,
+		skills: Array = []) -> Combatant:
+	var class_data := make_class(class_slug)
+	if class_data == null:
+		return null
+	var s := CharacterStats.new()
+	s.character_name = char_name
+	for i in mini(scores.size(), 6):
+		s.set_ability(i as SRD.Ability, int(scores[i]))
+	s.hit_die = class_data.hit_die
+	s.max_hp = class_data.starting_hp(s.ability_modifier(SRD.Ability.CONSTITUTION))
+	SRDLevelUp.apply_class_proficiencies(s, class_data)
+	for skill_slug in skills:
+		var skill := skill_from(skill_slug)
+		if skill >= 0:
+			s.set_skill_proficiency(skill as SRD.Skill, true)
+	var slots := class_data.make_slots(1)
+	for _l in range(1, clampi(level, 1, 20)):
+		SRDLevelUp.level_up(s, class_data, slots)
+	s.reset()
+
+	var eq := EquipmentSlots.new()
+	if armor_slug != "":
+		eq.equip_armor(make_armor(armor_slug))
+	if shield:
+		eq.equip_shield(make_armor("shield"))
+	var weapon := make_weapon(weapon_slug) if weapon_slug != "" else null
+	var c := Combatant.new(s, weapon, eq)
+	c.energy_slots = slots
+	c.is_proficient_with_weapon = weapon == null or is_weapon_proficient(class_data, weapon)
+	return c
+
+## Class weapon proficiency, including the SRD's restricted martial categories (Monk, Rogue).
+static func is_weapon_proficient(class_data: ClassData, weapon: WeaponData) -> bool:
+	var profs := class_data.weapon_proficiencies
+	if weapon.weapon_type == SRD.WeaponType.SIMPLE:
+		return "simple" in profs
+	if "martial" in profs:
+		return true
+	var light := weapon.has_property(SRD.WeaponProperty.LIGHT)
+	var finesse := weapon.has_property(SRD.WeaponProperty.FINESSE)
+	if "martial-light-finesse" in profs:
+		return light  # Monk, SRD 5.2.1: "Martial weapons that have the Light property"
+	if "martial-finesse-or-light" in profs:
+		return light or finesse
+	return false
+
 # ── Equipment ─────────────────────────────────────────────────────────────────
 
 func make_weapon(slug: String) -> WeaponData:
