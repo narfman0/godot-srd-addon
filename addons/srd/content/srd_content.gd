@@ -496,6 +496,10 @@ func make_monster(slug: String, id: int = 0) -> Combatant:
 	var c := Combatant.new(s, _monster_weapon(d.get("actions", [])), eq)
 	c.dies_at_zero_hp = true
 	c.size = str(d.get("size", "medium")).split(" ")[0]
+	var sn: Variant = d.get("senses", {})
+	if sn is Dictionary:
+		for k in sn:
+			c.senses[k] = int(sn[k])
 	for ci in d.get("condition_immunities", []):
 		c.condition_immunities.append(str(ci))
 	if d.has("initiative"):
@@ -519,6 +523,54 @@ func make_monster(slug: String, id: int = 0) -> Combatant:
 			c.has_undead_fortitude = true
 		if no_sleep.search(str(t.get("text", ""))) != null:
 			c.condition_immunities.append(MAGICAL_SLEEP)
+	return c
+
+## Species and lineage traits that matter in a fight, for make_npc(). Speed and Darkvision
+## from species.json win where it has them; the rest is SRD 5.2.1 text (Elven Lineages,
+## Fiendish Legacies, Draconic Ancestors, Dwarven Resilience).
+const NPC_LINEAGES := {
+	"elf": {"drow": {"darkvision": 120, "name": "Drow"}, "high-elf": {"name": "High Elf"}, "wood-elf": {"speed": 35, "name": "Wood Elf"}},
+	"tiefling": {"abyssal": {"resist": ["poison"]}, "chthonic": {"resist": ["necrotic"]}, "infernal": {"resist": ["fire"]}},
+	"dragonborn": {"black": {"resist": ["acid"]}, "blue": {"resist": ["lightning"]}, "brass": {"resist": ["fire"]},
+		"bronze": {"resist": ["lightning"]}, "copper": {"resist": ["acid"]}, "gold": {"resist": ["fire"]},
+		"green": {"resist": ["poison"]}, "red": {"resist": ["fire"]}, "silver": {"resist": ["cold"]}, "white": {"resist": ["cold"]}},
+	"gnome": {"forest-gnome": {"name": "Forest Gnome"}, "rock-gnome": {"name": "Rock Gnome"}},
+}
+const NPC_SPECIES_RESIST := {"dwarf": ["poison"]}
+
+## An SRD NPC stat block (bandit, guard, knight, mage, priest...) as a member of a species:
+## the stat block as written, with the species' size (Small species are Small; "medium or
+## small" blocks take the species' size), Speed, Darkvision (Drow 120 ft) and damage
+## resistances (Dwarven Resilience, a Tiefling legacy, a Dragonborn ancestry) applied, and a
+## name like "Drow Bandit". Other traits (Luck, Fey Ancestry...) are not modelled. Null for an
+## unknown role or species. lineage: "drow", "wood-elf", "infernal", "red"...
+func make_npc(role_slug: String, species: String, lineage: String = "", id: int = 0) -> Combatant:
+	var row := _require("monster", role_slug)
+	if row.is_empty():
+		return null
+	var sp: Dictionary = pack.get_row("species", species) if species != "" else {}
+	if species != "" and sp.is_empty():
+		push_error("SRDContent.make_npc: no species '%s'" % species)
+		return null
+	var c := make_monster(role_slug, id)
+	if c == null or sp.is_empty():
+		return c
+	var sd: Dictionary = sp.get("data", {})
+	var lin: Dictionary = NPC_LINEAGES.get(species, {}).get(lineage, {})
+	var sizes: Array = sd.get("sizes", ["medium"])
+	var block_size := str(row.data.get("size", "medium")).to_lower()
+	if sizes.size() == 1 and (block_size.contains(str(sizes[0])) or block_size in ["medium", "small"]):
+		c.size = str(sizes[0])
+	var speed := int(lin.get("speed", sd.get("speed", c.stats.speed)))
+	if speed > 0:
+		c.stats.speed = speed
+	var dv := maxi(int(lin.get("darkvision", 0)), int(sd.get("darkvision", 0)))
+	if dv > int(c.senses.get("darkvision", 0)):
+		c.senses["darkvision"] = dv
+	for t in NPC_SPECIES_RESIST.get(species, []) + lin.get("resist", []):
+		c.stats.set_resistance(damage_type_from(t), true)
+	var who := str(lin.get("name", "")) if lin.has("name") else str(sp.get("name", species))
+	c.stats.character_name = "%s %s" % [who, row.name] + ("" if id == 0 else " %d" % id)
 	return c
 
 func monster_xp(slug: String) -> int:

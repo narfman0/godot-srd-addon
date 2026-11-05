@@ -58,6 +58,9 @@ var monster_spells: Dictionary = {}
 var save_actions: Array = []
 ## Initiative modifier: the stat block's Initiative for monsters; -999 = use the DEX modifier.
 var initiative_override: int = -999
+## Senses in feet (darkvision, blindsight, tremorsense, truesight): the stat block's, and for
+## NPCs from make_npc() the species' Darkvision when longer.
+var senses: Dictionary = {}
 ## The last Undead Fortitude save take_damage() rolled (or refused), for the game's log:
 ## {dc, d20, bonus, total, saved} or {blocked: "radiant" | "critical"}. {} when it didn't apply.
 var last_undead_fortitude: Dictionary = {}

@@ -41,6 +41,7 @@ var srd := SRDContent.new()
 var wizard := srd.make_class("wizard")                     # ClassData (slots, saves, skills)
 var fireball := srd.make_spell("fireball", SRD.Ability.INTELLIGENCE)   # AbilityData
 var goblin := srd.make_monster("goblin-warrior", 1)        # Combatant from the stat block
+var raider := srd.make_npc("bandit", "elf", "drow")         # "Drow Bandit": NPC stat block + species
 var sword := srd.make_weapon("longsword")                  # WeaponData
 var hero := srd.make_character("Rynn", "fighter", 5, [16, 12, 14, 10, 10, 8],
 	"longsword", "chain-mail", true, ["athletics"])        # Combatant with HP, AC, slots
@@ -70,6 +71,11 @@ healing, or effect carry `no_mechanics`.
   The same fact decides Prone's Advantage (within 5 ft.) or Disadvantage (beyond).
 - **Cover.** `opts.cover` (`SRD.Cover`, or `{target name: SRD.Cover}` for spells) adds +2 / +5
   to AC against attacks and to Dexterity saves. The game measures it from its geometry.
+- **NPCs of a species** (`make_npc(role, species, lineage := "", id := 0)`). An SRD NPC stat
+  block (bandit, guard, knight, mage, priest...) with the species' size, Speed, Darkvision
+  (Drow 120 ft) and damage resistances (Dwarven Resilience, Tiefling legacies, Dragonborn
+  ancestries) applied and a name like "Drow Bandit"; the block's numbers are otherwise as
+  written. `Combatant.senses` (feet) holds the stat block's senses for every monster.
 - **Monster Bonus Actions and Reactions** (`MonsterActions`). `make_monster()` parses the stat
   block into `combatant.bonus_actions` / `combatant.reactions`: `simple` (Nimble Escape's
   Disengage or Hide, Hasten's Dash and Disengage), `teleport` (Blink Dog, Shadow Step-style
