@@ -41,7 +41,7 @@ func build(combatants: Array) -> void:
 		var dex_b: int = b["char"].get_ability(SRD.Ability.DEXTERITY)
 		if dex_a != dex_b:
 			return dex_a > dex_b
-		return randi() % 2 == 0
+		return Dice.roll(2) == 1
 	)
 
 ## Inject a pre-built order (useful for deterministic tests).

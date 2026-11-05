@@ -1,8 +1,12 @@
 class_name Dice
 extends RefCounted
 
+## Set to make every roll reproducible (a seeded host, a replay, a test). Null uses the
+## global generator.
+static var rng: RandomNumberGenerator = null
+
 static func roll(sides: int) -> int:
-	return randi_range(1, sides)
+	return rng.randi_range(1, sides) if rng != null else randi_range(1, sides)
 
 static func roll_d4() -> int: return roll(4)
 static func roll_d6() -> int: return roll(6)

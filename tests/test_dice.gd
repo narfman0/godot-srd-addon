@@ -23,3 +23,17 @@ func test_advantage_not_below_disadvantage_over_many_rolls():
 		dis_total += Dice.roll_with_disadvantage(20)
 	# advantage average should beat disadvantage average over many samples
 	assert_true(adv_total > dis_total, "advantage should average higher than disadvantage")
+
+func test_seeded_rng_repeats_the_same_rolls() -> void:
+	var first: Array[int] = []
+	var second: Array[int] = []
+	Dice.rng = RandomNumberGenerator.new()
+	Dice.rng.seed = 1234
+	for i in 20:
+		first.append(Dice.roll_d20())
+	Dice.rng.seed = 1234
+	for i in 20:
+		second.append(Dice.roll_d20())
+	Dice.rng = null
+	assert_eq(first, second)
+
