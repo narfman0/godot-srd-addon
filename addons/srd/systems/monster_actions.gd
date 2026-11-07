@@ -27,6 +27,19 @@
 ##
 ## Space is the game's: a teleport's event carries teleport_feet and the game picks the
 ## destination (unoccupied, in sight, meeting `requires`).
+##
+## Legendary Actions (SRD 5.2.1: "Legendary Action Uses: 3 (4 in Lair). Immediately after another
+## creature's turn, the X can expend a use to take one of the following actions. The X regains all
+## expended uses at the start of each of its turns."): SRDContent.make_monster() fills
+## Combatant.legendary from the stat block's legendary_actions:
+##   {uses: 3, lair_uses: 4, options: [{name, kind, action, count, heal, requires, cost, text}]}
+##   kind     "attack": makes `count` `action` attacks ("The aboleth makes one Tentacle attack.")
+##            "action": uses the named `action` ("it uses Consume Memories")
+##            "other": text only
+##   heal     dice it regains ("regains 5 (1d10) Hit Points"), "" for none
+##   requires "charmed_or_grappled" when it needs a creature Charmed or Grappled by it, else ""
+##   if MonsterActions.legendary_available(c, opt, in_lair): var ev := MonsterActions.use_legendary(c, opt, in_lair)
+## start_turn() gives the uses back.
 class_name MonsterActions
 extends RefCounted
 
@@ -112,6 +125,86 @@ static func _usage(name: String, usage: String) -> Dictionary:
 		return {"recharge": int(rech.get_string(1))}
 	return {}
 
+## The stat block's legendary_actions list as {uses, lair_uses, options}; {} when it has none.
+static func parse_legendary(entries: Array) -> Dictionary:
+	if entries.is_empty():
+		return {}
+	var out := {"uses": 0, "lair_uses": 0, "options": []}
+	for e in entries:
+		if not e is Dictionary:
+			continue
+		var name := str(e.get("name", ""))
+		var low := name.to_lower()
+		var u := RegEx.create_from_string("legendary action uses:\\s*(\\d+)(?:\\s*\\((\\d+) in lair\\))?").search(low)
+		if u:
+			out.uses = int(u.get_string(1))
+			out.lair_uses = int(u.get_string(2)) if u.get_string(2) != "" else out.uses
+			continue
+		out.options.append(_legendary_option(e))
+	if out.uses <= 0:
+		out.uses = 3
+		out.lair_uses = maxi(out.lair_uses, 3)
+	return out
+
+static func _legendary_option(e: Dictionary) -> Dictionary:
+	var text := str(e.get("text", ""))
+	var low := text.to_lower()
+	var opt := {"name": _clean_name(str(e.get("name", ""))), "kind": "other", "action": "", "count": 1, "heal": "",
+		"requires": "", "cost": 1, "text": text}
+	var cost := RegEx.create_from_string("costs (\\d+) actions").search(str(e.get("name", "")).to_lower())
+	if cost:
+		opt.cost = int(cost.get_string(1))
+	var atk := RegEx.create_from_string("makes (one|two|three) ([A-Z][\\w' -]*?) attacks?").search(text)
+	var uses := RegEx.create_from_string("uses ([A-Z][\\w' -]*?)(?: and|,|\\.| to| on)").search(text)
+	if atk:
+		opt.kind = "attack"
+		opt.action = atk.get_string(2).strip_edges()
+		opt.count = {"one": 1, "two": 2, "three": 3}[atk.get_string(1)]
+	elif uses:
+		opt.kind = "action"
+		opt.action = uses.get_string(1).strip_edges()
+	var heal := RegEx.create_from_string("regains \\d+ \\((\\d+d\\d+(?:\\s*[+-]\\s*\\d+)?)\\) hit points").search(low)
+	if heal:
+		opt.heal = heal.get_string(1).replace(" ", "")
+	if "charmed or grappled" in low:
+		opt.requires = "charmed_or_grappled"
+	for k in ["kind", "action", "count", "heal", "requires", "cost"]:
+		if e.has(k):
+			opt[k] = e[k]
+	return opt
+
+## Legendary uses left this round (0 for a creature with none).
+static func legendary_left(c: Combatant, in_lair := false) -> int:
+	if c.legendary.is_empty():
+		return 0
+	var n := int(c.legendary.lair_uses if in_lair else c.legendary.uses)
+	return maxi(n - int(c.monster_uses.get("legendary", 0)), 0)
+
+## Can it take this legendary option now: uses enough left, not Incapacitated, alive, and the
+## mechanised kind. ctx.charmed_or_grappled: whether a creature is Charmed or Grappled by it (the
+## game knows).
+static func legendary_available(c: Combatant, opt: Dictionary, in_lair := false, ctx: Dictionary = {}) -> bool:
+	if opt.get("kind", "other") == "other" or not c.is_alive or c.conditions.is_incapacitated():
+		return false
+	if str(opt.get("requires", "")) == "charmed_or_grappled" and not bool(ctx.get("charmed_or_grappled", false)):
+		return false
+	return legendary_left(c, in_lair) >= int(opt.get("cost", 1))
+
+## Spend a legendary option. Returns {type: "legendary", name, kind, action, count, heal (rolled
+## Hit Points regained, applied), used}; the game makes the attacks or uses the action.
+static func use_legendary(c: Combatant, opt: Dictionary, in_lair := false, ctx: Dictionary = {}) -> Dictionary:
+	var ev := {"type": "legendary", "name": str(opt.get("name", "")), "kind": str(opt.get("kind", "other")),
+		"action": str(opt.get("action", "")), "count": int(opt.get("count", 1)), "actor": c.name, "heal": 0}
+	if not legendary_available(c, opt, in_lair, ctx):
+		ev["used"] = false
+		return ev
+	c.monster_uses["legendary"] = int(c.monster_uses.get("legendary", 0)) + int(opt.get("cost", 1))
+	if str(opt.get("heal", "")) != "":
+		var d := SRDContent.parse_dice(str(opt.heal))
+		ev["heal"] = c.stats.heal(Dice.roll_nd(int(d.count), int(d.sides)) + int(d.bonus))
+	ev["used"] = true
+	return ev
+
 ## The rider a monster's weapon action carries: "Once per turn, if the X had Advantage on
 ## the roll, the target takes an extra 7 (2d6) Necrotic damage." Authored as
 ## extra_damage: {dice, type, condition: "advantage", per_turn: 1}. Returns {} when absent.
@@ -153,6 +246,7 @@ static func uses_left(c: Combatant, f: Dictionary) -> int:
 ## [{name, d20: d6 roll, recharged}] for the log.
 static func start_turn(c: Combatant, fixed_d6: int = -1) -> Array:
 	var out := []
+	c.monster_uses.erase("legendary")        # legendary uses come back at the start of its turn
 	for f in c.bonus_actions + c.reactions:
 		var u: Dictionary = f.get("usage", {})
 		if u.has("recharge") and c.monster_uses.get(_key(f), 0):

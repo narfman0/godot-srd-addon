@@ -506,6 +506,7 @@ func make_monster(slug: String, id: int = 0) -> Combatant:
 		c.initiative_override = int(d.initiative)
 	c.bonus_actions = MonsterActions.parse_all(d.get("bonus_actions", []), "bonus")
 	c.reactions = MonsterActions.parse_all(d.get("reactions", []), "reaction")
+	c.legendary = MonsterActions.parse_legendary(d.get("legendary_actions", []))
 	for a in d.get("actions", []):
 		var rider := MonsterActions.parse_hit_rider(a)
 		if not rider.is_empty() and c.weapon != null and rider.name == c.weapon.weapon_name:

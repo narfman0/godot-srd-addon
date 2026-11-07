@@ -53,6 +53,9 @@ var bonus_actions: Array = []
 var reactions: Array = []
 var monster_uses: Dictionary = {}
 var hit_riders: Array = []
+## Legendary Actions (MonsterActions.parse_legendary): {uses, lair_uses, options: [...]}, {} for none.
+## Uses spent this round are monster_uses["legendary"].
+var legendary: Dictionary = {}
 ## Monster "Spellcasting" action and "<Ability> Saving Throw" actions (MonsterSpells).
 var monster_spells: Dictionary = {}
 var save_actions: Array = []
